@@ -1,7 +1,8 @@
+#-------------------------------------------------
+# 视频播放器
+#-------------------------------------------------
+
 INCLUDEPATH         += $$PWD/src
-
-QT          += multimediawidgets
-
 
 HEADERS += \
     $$PWD/src/videoplayer.h \
