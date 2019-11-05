@@ -13,6 +13,9 @@
 #include <QApplication>
 
 QString AppConfig::m_strSettingsFile = "conf/config.ini";
+bool    AppConfig::m_bMouseInsert = false;
+bool    AppConfig::m_bPlayVideo = false;
+
 void AppConfig::SaveSetting(const QString &group, const QString &name, const QVariant &value)
 {
     QSettings settings(m_strSettingsFile, QSettings::IniFormat);

@@ -47,9 +47,14 @@
 
 #include <QPainter>
 #include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QBoxLayout>
+#include <QFile>
+#include <QDir>
 #include <QDebug>
+#include <QTimerEvent>
+#include <QRegExp>
+
+#define MOUSE_DEV_PATH       "/dev/input/by-path/"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
@@ -67,10 +72,14 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     InitWidget();
     InitDesktop();
     InitKeyThread();
+
+    m_nMouseCheckId = startTimer(3000);
 }
 
 MainWindow::~MainWindow()
 {
+    killTimer(m_nMouseCheckId);
+
     delete m_aboutUs;
     m_aboutUs = NULL;
 
@@ -159,7 +168,7 @@ void MainWindow::InitDesktop()
     nPage++;
     m_launchItems.insert(12, new LauncherItem(12, nPage, QStringLiteral("RGB彩灯"), QPixmap(":/images/mainwindow/ic_light.png")));
 #ifdef BUILD_WITH_WEBVIEW
-    launchItems.insert(14, new LauncherItem(14, nPage, QStringLiteral("网络浏览器"), QPixmap(":/images/mainwindow/ic_webview.png")));
+    m_launchItems.insert(14, new LauncherItem(14, nPage, QStringLiteral("网络浏览器"), QPixmap(":/images/mainwindow/ic_webview.png")));
 #endif
     m_launchItems.insert(15, new LauncherItem(15, nPage, QStringLiteral("汽车仪表"), QPixmap(":/images/mainwindow/ic_car.png")));
     m_launchItems.insert(16, new LauncherItem(16, nPage, QStringLiteral("背光调节"), QPixmap(":/images/mainwindow/ic_backlight.png")));
@@ -418,3 +427,34 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 #endif
+
+bool MainWindow::CheckMouseInsert()
+{
+    QDir dir(MOUSE_DEV_PATH);
+    if (!dir.exists()) return false;
+
+    dir.setFilter(QDir::NoSymLinks | QDir::Files | QDir::NoDotAndDotDot);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); i++) {
+        QFileInfo fileInfo = list.at(i);
+        if (fileInfo.fileName().contains("mouse")) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void MainWindow::timerEvent(QTimerEvent *e)
+{
+    if (m_nMouseCheckId == e->timerId()) {
+        AppConfig::m_bMouseInsert = CheckMouseInsert();
+        if (this->cursor().shape() == Qt::BlankCursor &&
+                !AppConfig::m_bPlayVideo &&
+                AppConfig::m_bMouseInsert)
+        {
+            this->setCursor(Qt::ArrowCursor);
+        }
+    }
+}
+

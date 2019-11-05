@@ -19,6 +19,8 @@ public:
     static QString m_strSettingsFile;
     static void SaveSetting(const QString &group, const QString &name, const QVariant &value);
     static QVariant ReadSetting(const QString &group, const QString &name, const QVariant &value = QVariant());
+    static bool m_bMouseInsert;
+    static bool m_bPlayVideo;
 };
 
 #endif // APPCONFIG_H

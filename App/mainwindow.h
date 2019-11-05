@@ -45,6 +45,7 @@ private:
 
     ThreadKey       *m_threadPowerKey;
     ThreadKey       *m_threadKey;
+    int              m_nMouseCheckId;
 private:
     void InitWidget();
     void InitDesktop();
@@ -64,6 +65,9 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 #endif
+    // 新增鼠标检测
+    bool CheckMouseInsert();
+    void timerEvent(QTimerEvent *e);
 };
 
 #endif // MAINWINDOW_H

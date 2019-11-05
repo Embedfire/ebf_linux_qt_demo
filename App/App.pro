@@ -1,12 +1,13 @@
 #-------------------------------------------------
 #
 # Project created by QtCreator 2019-08-27T16:03:48
+# Qt5-demo 综合代码
 #
 #-------------------------------------------------
 
 QT       += core gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia multimediawidgets
 
 TARGET = App
 TEMPLATE = app
