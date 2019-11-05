@@ -163,9 +163,9 @@ void WeatherView::drawWeatherInfo(QPainter *painter)
         painter->drawText((this->width() - nW) / 2, m_nYOffset + 10, nW, 25, Qt::AlignCenter, m_strWeatherDatas.at(0));
         font.setPixelSize(100);
         painter->setFont(font);
-        QRect rectTemp((this->width() -  154 - 90) / 2, m_nYOffset + 35, 154, 140);
+        nW = painter->fontMetrics().width(m_strWeatherDatas.at(1) + "°");
+        QRect rectTemp((this->width() -  nW - 90) / 2, m_nYOffset + 35, nW, 140);
         painter->drawText(rectTemp, Qt::AlignCenter, m_strWeatherDatas.at(1) + "°");
-//        painter->drawLine(QPoint(rectTemp.right(), rectTemp.top() + 20), rectTemp.bottomRight());
 
         QRect rectRight(rectTemp.right() + 10, rectTemp.top() + 25, m_pixmapWeatherType.width(), m_pixmapWeatherType.height());
         painter->drawPixmap(rectRight, m_pixmapWeatherType);

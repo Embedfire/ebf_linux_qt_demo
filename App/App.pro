@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     statusbarwidget.cpp \
-    threadkey.cpp
+    threadkey.cpp \
+    threadmousecheck.cpp
 
 HEADERS += \
         mainwindow.h \
     statusbarwidget.h \
-    threadkey.h
+    threadkey.h \
+    threadmousecheck.h
 
 include($$PWD/common/common.pri)
 include($$PWD/ui/ui.pri)

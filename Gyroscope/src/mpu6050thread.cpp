@@ -135,7 +135,7 @@ quint8 Mpu6050Thread::i2c_write(int fd, quint8 reg, quint8 val)
 //MPU6050 read byte
 quint8 Mpu6050Thread::i2c_read(int fd, quint8 reg, quint8 * val)
 {
-    if (-1 == fd) {*val = (qrand() % 100);}
+    if (-1 == fd) {*val = (qrand() % 5);}
 
 #ifdef __arm__
     int retries;
@@ -148,7 +148,6 @@ quint8 Mpu6050Thread::i2c_read(int fd, quint8 reg, quint8 * val)
             {
                 return 0;
             }
-
         }
 
     }
@@ -182,7 +181,7 @@ void Mpu6050Thread::run()
 
     while (m_bRun)
     {
-        //printf("\033[2J");
+        // printf("\033[2J");
         usleep(1000 * 10);
         emit signalUpdate(0, ArgX, GetData(ACCEL_XOUT_H));
 

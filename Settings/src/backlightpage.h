@@ -28,7 +28,7 @@ public slots:
 
 private:
     QtKnobSwitch *m_knobSwitch;
-
+    int           m_nLevel;
 private:
     void InitWidget();
 

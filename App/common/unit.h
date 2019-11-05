@@ -17,8 +17,8 @@
 /**
  * 版本更新：更新录音功能、温湿度采集功能  2019年10月11日22:23:51
  */
-#define APP_VERSION         0x01010002
-#define APP_STR_VERSION     "1.1.0.2"
+#define APP_VERSION         0x01010003
+#define APP_STR_VERSION     "1.1.0.3"
 
 #define STATUSBAR_HEIGHT    80
 

@@ -18,6 +18,7 @@
 #include "qtwidgetbase.h"
 #include "aboutus.h"
 #include "threadkey.h"
+#include "threadmousecheck.h"
 
 class MusicPlayer;
 
@@ -43,13 +44,17 @@ private:
     int                  m_nCurrentIndex;
     bool                 m_bStartApp;
 
-    ThreadKey       *m_threadPowerKey;
-    ThreadKey       *m_threadKey;
+    ThreadMouseCheck    *m_threadUsbInsert;
+    ThreadKey           *m_threadPowerKey;
+    ThreadKey           *m_threadKey;
+
+#ifdef CHECK_MOUSE_BY_TIMER
     int              m_nMouseCheckId;
+#endif
 private:
     void InitWidget();
     void InitDesktop();
-    void InitKeyThread();
+    void InitThreads();
 private slots:
     void SltCurrentPageChanged(int index);
     void SltCurrentAppChanged(int index);
@@ -58,6 +63,8 @@ private slots:
     void SltChangeCursorShap(Qt::CursorShape shape);
     void SltAppStartOk();
 
+    void SltMouseInsert(bool bOk);
+
 protected:
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
@@ -65,9 +72,12 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 #endif
+
+#if CHECK_MOUSE_BY_TIMER
     // 新增鼠标检测
     bool CheckMouseInsert();
     void timerEvent(QTimerEvent *e);
+#endif
 };
 
 #endif // MAINWINDOW_H

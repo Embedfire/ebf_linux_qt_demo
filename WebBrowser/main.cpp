@@ -4,6 +4,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     BrowserWindow w;
 #ifdef __arm__
     w.showFullScreen();

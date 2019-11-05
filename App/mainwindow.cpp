@@ -71,14 +71,18 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
     InitWidget();
     InitDesktop();
-    InitKeyThread();
+    InitThreads();
 
+#ifdef CHECK_MOUSE_BY_TIMER
     m_nMouseCheckId = startTimer(3000);
+#endif
 }
 
 MainWindow::~MainWindow()
 {
+#ifdef CHECK_MOUSE_BY_TIMER
     killTimer(m_nMouseCheckId);
+#endif
 
     delete m_aboutUs;
     m_aboutUs = NULL;
@@ -190,8 +194,14 @@ void MainWindow::InitDesktop()
 #endif
 }
 
-void MainWindow::InitKeyThread()
+void MainWindow::InitThreads()
 {
+    m_threadUsbInsert = new ThreadMouseCheck(this);
+    connect(m_threadUsbInsert, SIGNAL(signalMouseInsert(bool)), this, SLOT(SltMouseInsert(bool)));
+#ifdef __arm__
+    m_threadUsbInsert->start();
+#endif
+
     m_threadPowerKey = new ThreadKey(this);
     m_threadKey = new ThreadKey(this, 1);
 
@@ -391,6 +401,23 @@ void MainWindow::SltAppStartOk()
     }
 }
 
+void MainWindow::SltMouseInsert(bool bOk)
+{
+    AppConfig::m_bMouseInsert = bOk;
+    if (this->cursor().shape() == Qt::BlankCursor &&
+            !AppConfig::m_bPlayVideo &&
+            AppConfig::m_bMouseInsert)
+    {
+        this->setCursor(Qt::ArrowCursor);
+        return;
+    }
+
+    bool bOn = AppConfig::ReadSetting("System", "mouse", true).toBool();
+    if (!bOk && !AppConfig::m_bPlayVideo) {
+        this->setCursor(bOn ? Qt::ArrowCursor : Qt::BlankCursor);
+    }
+}
+
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     m_aboutUs->resize(this->size());
@@ -428,6 +455,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 }
 #endif
 
+#if CHECK_MOUSE_BY_TIMER
 bool MainWindow::CheckMouseInsert()
 {
     QDir dir(MOUSE_DEV_PATH);
@@ -457,4 +485,6 @@ void MainWindow::timerEvent(QTimerEvent *e)
         }
     }
 }
+#endif
+
 

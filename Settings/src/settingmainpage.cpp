@@ -39,6 +39,7 @@ SettingMainPage::~SettingMainPage()
 void SettingMainPage::SltSwitchClicked(bool on)
 {
     AppConfig::SaveSetting("System", "mouse", on);
+    if (AppConfig::m_bMouseInsert) return;
     emit signalChangeCursorShape(on ? Qt::ArrowCursor : Qt::BlankCursor);
 }
 

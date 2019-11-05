@@ -18,7 +18,8 @@
 #include <QDebug>
 #include <QApplication>
 
-BackLightPage::BackLightPage(QWidget *parent) : QWidget(parent)
+BackLightPage::BackLightPage(QWidget *parent) : QWidget(parent),
+    m_nLevel(0)
 {
     InitWidget();
 }
@@ -42,9 +43,9 @@ void BackLightPage::InitWidget()
 
 void BackLightPage::SltValueChanged(int value)
 {
-    static int s_nLevel = 0;
-    if (s_nLevel == value || value < 10)  return;
-    s_nLevel = value;
+    if (m_nLevel == value)  return;
+
+    m_nLevel = (value < 5 ? 5 : value);
 #ifdef __arm__
     QString strFile = "/sys/class/backlight/backlight/brightness";
     QFile file(strFile);
@@ -54,7 +55,7 @@ void BackLightPage::SltValueChanged(int value)
     }
 
     QTextStream in(&file);
-    in << value;
+    in << m_nLevel;
     file.close();
 #endif
 }

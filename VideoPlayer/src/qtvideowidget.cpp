@@ -73,6 +73,8 @@ QtVideoWidget::~QtVideoWidget()
     if (m_timerShow->isActive()) {
         m_timerShow->stop();
     }
+
+    AppConfig::m_bPlayVideo = false;
 }
 
 void QtVideoWidget::setMedia(const QString &name, int index)
@@ -89,6 +91,9 @@ void QtVideoWidget::setMedia(const QString &name, int index)
         m_player->play();
     }
 
+    AppConfig::m_bPlayVideo = true;
+    this->setCursor(m_player->state() == QMediaPlayer::PlayingState ?
+                        Qt::BlankCursor : Qt::ArrowCursor);
     // 设置播放状态
     m_playBar->setPlayState(m_player->state() == QMediaPlayer::PlayingState);
 }
@@ -106,10 +111,7 @@ void QtVideoWidget::ShowToolBar()
         m_playBar->SetAnimation(QPoint(0, this->height() - m_playBar->height()), QPoint(0, this->height()));
     }
 
-    bool bOn = AppConfig::ReadSetting("System", "mouse", true).toBool();
-    if (bOn) {
-        this->setCursor(m_bToolBarShow ? Qt::ArrowCursor : Qt::BlankCursor);
-    }
+    this->setCursor(m_bToolBarShow ? Qt::ArrowCursor : Qt::BlankCursor);
 }
 
 void QtVideoWidget::SltAutoCloseToolBar()
@@ -127,6 +129,7 @@ void QtVideoWidget::SltBackClicked()
         m_player->pause();
     }
 
+    AppConfig::m_bPlayVideo = false;
     this->hide();
 }
 
@@ -164,8 +167,8 @@ void QtVideoWidget::SltShowMenuList()
 
 void QtVideoWidget::SltChangeVolume()
 {
-//    QPoint pos = m_titleBar->geometry().topRight();
-//    m_volumeSlider->move(pos.x() - 80, pos.y() - m_volumeSlider->height() + 20);
+    //    QPoint pos = m_titleBar->geometry().topRight();
+    //    m_volumeSlider->move(pos.x() - 80, pos.y() - m_volumeSlider->height() + 20);
     m_volumeSlider->setVisible(!m_volumeSlider->isVisible());
 }
 
@@ -195,6 +198,7 @@ void QtVideoWidget::mousePressEvent(QMouseEvent *)
     m_volumeSlider->setVisible(false);
 
     ShowToolBar();
+
     if (m_timerShow->isActive()) {
         m_timerShow->stop();
     }
