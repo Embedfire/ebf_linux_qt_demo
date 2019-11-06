@@ -61,6 +61,7 @@ void WavPlayListWidget::SltAddWavFile(const QString &file)
     m_playList->addMedia(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
     int nId = m_listItems.size();
     m_listItems.insert(nId, new QtListWidgetItem(nId, fileInfo.fileName(), fileInfo.absoluteFilePath()));
+    this->update();
 }
 
 // 绘制列表

@@ -39,15 +39,17 @@ DateConfigWidget::~DateConfigWidget()
 void DateConfigWidget::setSystemDate()
 {
     QDate date = m_timeConfig->getCurrentDate();
+    QTime time = QTime::currentTime();
+    QString strDatetime = date.toString("yyyy-MM-dd ")  + time.toString("hh:mm:ss");
 #ifdef __arm__
     QProcess cmd;
-    cmd.start("date", QStringList() << "-s" << date.toString("yyyy-MM-dd"));
+    cmd.start("date", QStringList() << "-s" << strDatetime);
     cmd.waitForFinished(500);
-    cmd.execute("hwclock -w");
+    cmd.start("hwclock -w");
     cmd.waitForFinished(500);
     cmd.kill();
 #endif
-    qDebug() << "date -s" << date.toString("yyyy-MM-dd");
+    qDebug() << "date -s" << strDatetime;
     emit signalChangePage(0, 2);
 }
 

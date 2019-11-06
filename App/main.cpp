@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     w.showFullScreen();
 #else
     w.resize(800, 480);
+//    w.resize(480, 272);
     w.show();
 #endif
 

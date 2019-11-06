@@ -40,14 +40,16 @@ TimeConfigWidget::~TimeConfigWidget()
 void TimeConfigWidget::setSystemTime(bool bOk)
 {
     QTime time = m_timeConfig->getCurrentTime();
+    QDate date = QDate::currentDate();
+    QString strDatetime = date.toString("yyyy-MM-dd ")  + time.toString("hh:mm:ss");
 #ifdef __arm__
     QProcess cmd;
     cmd.start("date", QStringList() << "-s" << time.toString("hh:mm:ss"));
     cmd.waitForFinished(500);
-    cmd.execute("hwclock -w");
+    cmd.start("hwclock -w");
     cmd.waitForFinished(500);
 #endif
-    qDebug() << "date -s" << time.toString("hh:mm:ss");
+    qDebug() << "date -s" << strDatetime;
     if (bOk) emit signalChangePage(0, 2);
 }
 

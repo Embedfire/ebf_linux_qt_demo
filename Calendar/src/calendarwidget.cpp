@@ -62,17 +62,18 @@ void CalendarWidget::InitWidget()
     m_labelDate->setVisible(false);
     m_labelDate->setStyleSheet(QString("color: #ffffff; font-family: '%1'; font: 24px;").arg(Skin::m_strAppFontBold));
 
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(54, 54);
+    m_btnHome = new QPushButton(this);
+    m_btnHome->setFixedSize(54, 54);
+
     QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
     horLayoutTitle->setContentsMargins(10, 0, 10, 0);
     horLayoutTitle->setSpacing(18);
     horLayoutTitle->addWidget(m_btnBack);
     horLayoutTitle->addWidget(m_labelDate);
     horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
+    horLayoutTitle->addWidget(m_btnHome);
+    connect(m_btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
+    m_btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
                                    "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
 
     m_stackedWidget = new QtStackedWidget(this);
@@ -178,6 +179,7 @@ void CalendarWidget::CreateConfigPage()
 void CalendarWidget::SltCurrentPageChanged(int index)
 {
     m_btnBack->setVisible(0 != index);
+    m_btnHome->setVisible(0 == index);
     m_labelDate->setVisible(1 == index);
     this->SetBackground(QPixmap(QString(":/images/calendar/%1.png").arg(1 == index ? "ic_background_none" : "ic_background")));
 }

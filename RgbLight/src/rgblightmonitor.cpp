@@ -116,10 +116,10 @@ void RgbLightMonitor::drawValue(QPainter *painter)
     painter->drawText(rectTitle, Qt::AlignCenter, QStringLiteral("RGB灯亮度调节"));
 
     // 绘制亮度灯
-    QRect rect(100, 140, 60, 60);
+    QRect rect(100, 126, 60, 60);
     drawRgbLight(painter, rect);
 
-    rect = QRect(rectTitle.right() - 180, 140, 80, 80);
+    rect = QRect(rectTitle.right() - 180, 110, 80, 80);
     drawRgbLight(painter, rect);
 
     font.setFamily("Arial");

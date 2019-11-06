@@ -35,6 +35,7 @@ signals:
 private:
     QtWidgetTitleBar    *m_widgetTitle;
     QPushButton         *m_btnBack;
+    QPushButton         *m_btnHome;
     QLabel              *m_labelDate;
 
     QtStackedWidget     *m_stackedWidget;

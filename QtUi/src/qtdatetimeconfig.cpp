@@ -22,7 +22,7 @@ NumberSelected::NumberSelected(QWidget *parent) : QWidget(parent),
     m_nItemHeight(30),m_nStartIndex(0),m_nIndex(0),m_nOffset(0),
     m_nDirection(None),m_nMinValue(1),m_nMaxValue(12)
 {
-    m_colorBackground = QColor("#f8f8f8");
+    m_colorBackground = QColor("#ffffff");
     m_colorText = QColor("#333333");
     m_colorBackroundSelected = QColor("#f2f2f2");
     m_colorTextSelected = QColor("#000000");
@@ -313,7 +313,7 @@ void QtDateTimeConfig::InitWidget()
     }
 
     QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
-    verLayoutAll->setContentsMargins(10, 10, 10, 10);
+    verLayoutAll->setContentsMargins(0, 10, 0, 10);
     verLayoutAll->setSpacing(10);
     verLayoutAll->addWidget(m_labelTitle);
     verLayoutAll->addLayout(horLayoutNumber, 1);
