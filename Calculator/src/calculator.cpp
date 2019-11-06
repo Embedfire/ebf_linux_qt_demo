@@ -24,6 +24,7 @@ Calculator::Calculator(QWidget *parent) : QtAnimationWidget(parent),
     m_bResult = false;
 
     express_lineEdit = new QLineEdit(this);
+    express_lineEdit->setContextMenuPolicy(Qt::NoContextMenu);
     express_lineEdit->setStyleSheet(QString("QLineEdit{border: none;font-family: '%1'; "
                                             "font: bold 40px; color: #333333;}").arg(Skin::m_strAppFontBold));
     express_lineEdit->setAlignment(Qt::AlignRight);

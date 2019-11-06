@@ -45,7 +45,9 @@ CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
     surface = NULL;
 
     m_configWidget = new CameraConfig(this);
-//    QTimer::singleShot(500, this, SLOT(InitCamera()));
+#if !TEST_PROCESS_CAMERA
+    QTimer::singleShot(500, this, SLOT(InitCamera()));
+#endif
 }
 
 CameraWidget::~CameraWidget()
@@ -69,8 +71,6 @@ void CameraWidget::TakePhotos()
             m_strInfoMsg = QString("相片保存：%1").arg(strFileName);
         }
     }
-
-    qDebug() << "take photos";
 
     this->update();
     QTimer::singleShot(1000, this, SLOT(SltClearMessage()));
@@ -120,7 +120,7 @@ void CameraWidget::showEvent(QShowEvent *e)
 void CameraWidget::resizeEvent(QResizeEvent *e)
 {
     m_rectMenu = QRect(this->width() - 10 - m_pixmapMenu.width(), 2, m_pixmapMenu.width(), m_pixmapMenu.height());
-#if 0
+#ifndef __arm__
     m_rectConfig = QRect(this->width() - 50 - 80, this->height() - 64, 80, 20);
 #endif
     m_configWidget->move((this->width() - m_configWidget->width()) / 2, -m_configWidget->height());
@@ -183,7 +183,7 @@ void CameraWidget::paintEvent(QPaintEvent *)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(this->rect(), QColor("#000000"));
 
-#if 0
+#ifndef __arm__
     if (!m_strInfoMsg.isEmpty()) {
         painter.setPen(Qt::white);
         painter.drawText(10, 10, this->width() - 20, 30, Qt::AlignVCenter, m_strInfoMsg);
@@ -194,13 +194,11 @@ void CameraWidget::paintEvent(QPaintEvent *)
             surface->paint(&painter);
         }
     } else {
-#if !TEST_PROCESS_CAMERA
         painter.setPen(Qt::white);
         QFont font = painter.font();
         font.setPixelSize(28);
         painter.setFont(font);
         painter.drawText(this->rect(), Qt::AlignCenter, tr("照相机打开失败！"));
-#endif
     }
 #endif
 
@@ -212,7 +210,7 @@ void CameraWidget::drawToolButton(QPainter *painter)
 {
     painter->save();
     painter->drawPixmap(m_rectMenu, m_pixmapMenu);
-#if 0
+#ifndef __arm__
     // draw big
     int radius = 80;
     int nX = (this->width() - radius) / 2;

@@ -30,6 +30,7 @@ TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent)
 {
     m_bPressed = false;
     m_scrollbar = this->verticalScrollBar();
+    this->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 void TextEdit::mousePressEvent(QMouseEvent *e)

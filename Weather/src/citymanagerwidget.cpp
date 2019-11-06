@@ -62,6 +62,7 @@ void CityManagerWidget::InitWidget()
 
 
     m_lineEdit = new QLineEdit(widgetInput);
+    m_lineEdit->setContextMenuPolicy(Qt::NoContextMenu);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(SltSearcCitys()));
     m_lineEdit->setMinimumHeight(30);
     m_lineEdit->setStyleSheet(QString("QLineEdit{border-radius:none; border-radius: 10px;"
