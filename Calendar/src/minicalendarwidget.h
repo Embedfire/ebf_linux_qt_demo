@@ -31,9 +31,7 @@ private:
     QPixmap     m_pixmapBackground;
 
 private:
-    bool isLoopYear(int year);
-    int getTotalMonthDays(int year, int month);
-    int getFirstDayOfWeek(int year, int month);
+    // 获取星期
     QString getCurrendDayOfWeek();
 
 protected:

@@ -46,6 +46,10 @@ VersionUpdatePage::VersionUpdatePage(QWidget *parent) : QWidget(parent)
     QHBoxLayout *horLayoutBtn = new QHBoxLayout();
     horLayoutBtn->setContentsMargins(0, 0, 0, 0);
     horLayoutBtn->setSpacing(20);
+
+    m_labelUpdateLogo = new QLabel(this);
+    horLayoutBtn->addWidget(m_labelUpdateLogo);
+
     horLayoutBtn->addStretch();
 
     m_btnCheckVersion = new QPushButton(this);
@@ -76,7 +80,8 @@ VersionUpdatePage::VersionUpdatePage(QWidget *parent) : QWidget(parent)
 
     this->setStyleSheet(QString("QPushButton{border: 1px solid #c6c6c6; border-radius: 5px; min-height: 30px; min-width: 80px;"
                                 "background-color: #f0f0f0; color: #333333; font: 18px;}"
-                                "QPushButton:!enabled{color: #aaaaaa;}"));
+                                "QPushButton:!enabled{color: #aaaaaa;}"
+                                "QLabel{color: #ffffff;}"));
 }
 
 VersionUpdatePage::~VersionUpdatePage()
@@ -132,6 +137,11 @@ quint32 VersionUpdatePage::GetVersionVal(QString &verNum)
     return ullVersion;
 }
 
+QString VersionUpdatePage::CalcFileSize(quint64 size)
+{
+    return QString("%1 Mb").arg(size * 1.0 / (1024 * 1024), 0, 'f', 2, QChar('0'));
+}
+
 /**
  * @brief MainWindow::SltDownloadProgress
  * @param bytesReceived
@@ -141,6 +151,9 @@ void VersionUpdatePage::SltDownloadProgress(qint64 bytesReceived, qint64 bytesTo
 {
     m_progressBar->setValue(bytesReceived);
     m_progressBar->setMaximum(bytesTotal);
+    m_labelUpdateLogo->setText(QString("已下载 %1 MB,总大小 %2 MB。")
+                               .arg(bytesReceived * 1.0 / (1024 * 1024), 0, 'f', 2, QChar('0'))
+                               .arg(bytesTotal * 1.0 / (1024 * 1024), 0, 'f', 2, QChar('0')));
 }
 
 /**
@@ -170,6 +183,7 @@ void VersionUpdatePage::SltDownloadOk(const QString &name)
     }
     else if (!QString::compare("tar.bz2", fileInfo.completeSuffix()))
     {
+        m_labelUpdateLogo->setText(tr("正在解压升级包，请勿断电或重启设备..."));
 #ifdef __arm__
         QProcess cmd;
         cmd.start("tar", QStringList() << "-jxvf" << name << "-C" << qApp->applicationDirPath());

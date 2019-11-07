@@ -130,6 +130,7 @@ void EBookWidget::InitWidget()
     connect(m_booksView, SIGNAL(currentItemClicked(QtPageListWidgetItem*)), this, SLOT(SltCurrentItemClicked(QtPageListWidgetItem*)));
 
     m_textBrowser = new TextBrowser(this);
+    m_textBrowser->setContextMenuPolicy(Qt::NoContextMenu);
     m_textBrowser->setVisible(false);
     m_textBrowser->setFont(QFont(Skin::m_strAppFontNormal, 14));
     m_textBrowser->setStyleSheet(QString("QTextBrowser {border: 1px solid #c5c5c5; border-top: none;background-color: #ffffff;}"));

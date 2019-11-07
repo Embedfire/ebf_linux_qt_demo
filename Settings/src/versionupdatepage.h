@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QLabel>
 
 #include "downloadnetworkmanager.h"
 #include "qttextbroswer.h"
@@ -45,10 +46,12 @@ private:
     QPushButton   *m_btnDownload;
     QProgressBar  *m_progressBar;
 
+    QLabel        *m_labelUpdateLogo;
 private:
     QString GetServerConf(const QString &cmd, const QString &app);
     bool    CheckNewVersion(QString oldVersion, QString newVersion);
     quint32 GetVersionVal(QString &verNum);
+    QString CalcFileSize(quint64 size);
 
 private slots:
     void SltDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);

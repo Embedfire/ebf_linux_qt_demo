@@ -30,6 +30,9 @@ RgbLightMonitor::RgbLightMonitor(QWidget *parent) : QtAnimationWidget(parent)
     m_lightObjs.insert(0, new LightObect(0, QRect(105, 383, 66, 66), 75, QStringLiteral("红灯")));
     m_lightObjs.insert(1, new LightObect(1, QRect(368, 383, 66, 66), 200, QStringLiteral("绿灯")));
     m_lightObjs.insert(2, new LightObect(2, QRect(633, 383, 66, 66), 185, QStringLiteral("蓝灯")));
+
+    // 读取值
+    ReadRgbLightValues();
 }
 
 RgbLightMonitor::~RgbLightMonitor()
@@ -40,7 +43,7 @@ RgbLightMonitor::~RgbLightMonitor()
 void RgbLightMonitor::ChangeRgbLightValue()
 {
 #ifdef __arm__
-    const static QStringList strLights = QStringList() << "red" << "green" << "blue";
+    QStringList strLights = QStringList() << "red" << "green" << "blue";
     QString strLight = QString("/sys/class/leds/%1/brightness").arg(strLights.at(m_nCurrentLight));
     QFile file(strLight);
     if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -51,6 +54,29 @@ void RgbLightMonitor::ChangeRgbLightValue()
     QTextStream in(&file);
     in << m_lightObjs.value(m_nCurrentLight)->m_nValue;
     file.close();
+#endif
+}
+
+void RgbLightMonitor::ReadRgbLightValues()
+{
+#ifdef __arm__
+    QStringList strLights = QStringList() << "red" << "green" << "blue";
+    for (int i = 0; i < 3; i++) {
+        QString strLight = QString("/sys/class/leds/%1/brightness").arg(strLights.at(i));
+        QFile file(strLight);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "open Leds failed!" << strLight;
+            return;
+        }
+
+        QString strValue = file.readAll();
+        m_lightObjs.value(i)->m_nValue = strValue.toInt();
+//        qDebug() << "Read value:" << strLights.at(i) << strValue << m_lightObjs.value(i)->m_nValue;
+        file.close();
+    }
+
+    m_nValue = (m_lightObjs.value(m_nCurrentLight)->m_nValue * 100) / 255;
+    this->update();
 #endif
 }
 
@@ -270,7 +296,10 @@ void RgbLightMonitor::mousePressEvent(QMouseEvent *e)
 
 void RgbLightMonitor::mouseReleaseEvent(QMouseEvent *e)
 {
-    m_bPressed = false;
+    if (m_bPressed) {
+        m_bPressed = false;
+    }
+
     if (m_btnHome->isPressed()) {
         m_btnHome->setPressed(false);
         this->update();
@@ -286,7 +315,7 @@ void RgbLightMonitor::mouseMoveEvent(QMouseEvent *e)
     if (m_bPressed && (nXoffset > 100 * m_scaleX) && (nXoffset <= (700 * m_scaleX))) {
         int nValue = (nXoffset - 100 * m_scaleX) * 255 / (600 * m_scaleX);
         m_nValue = (nValue * 100) / 255;
-        m_lightObjs.value(m_nCurrentLight)->m_nValue = nValue;
+        m_lightObjs.value(m_nCurrentLight)->m_nValue = (m_nValue * 255 / 100);
         ChangeRgbLightValue();
         this->update();
     }

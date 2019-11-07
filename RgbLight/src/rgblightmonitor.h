@@ -53,6 +53,7 @@ private:
     qreal m_scaleY;
 private:
     void ChangeRgbLightValue();
+    void ReadRgbLightValues();
 
     void ScalcRect(QRect &rectRet, const QRect &rect);
 protected:
