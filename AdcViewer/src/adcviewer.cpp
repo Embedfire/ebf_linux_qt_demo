@@ -23,6 +23,8 @@
 
 #define ADC_DEVICE "/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
 
+#define FILTER_CNT 20
+
 AdcViewer::AdcViewer(QWidget *parent) : QtAnimationWidget(parent)
 {
     this->SetBackground(QPixmap(":/images/adc/adc_background.png"));
@@ -97,20 +99,27 @@ void AdcViewer::SltAdcValueChanged(int value)
 
 void AdcViewer::SltTestValue()
 {
+    int count=0;
     int nValue = 0;
 #ifdef __arm__
-    QFile file(ADC_DEVICE);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "read failed!";
-        return;
-    }
+    for (count=0; count<FILTER_CNT; count++) {
+        QFile file(ADC_DEVICE);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "read failed!";
+            return;
+        }
 
-    QString strValue = file.readAll();
-    nValue = strValue.toInt();
-    file.close();
+        QString strValue = file.readAll();
+        nValue += strValue.toInt();
+
+        file.close();
+    }
+    
+    nValue = nValue/FILTER_CNT;
 #else
     nValue = qrand() % 4096;
 #endif
+
     int nTemp = nValue * 330 / 4096;
     m_adcValueDisplay->setCurrentValue(nTemp);
 }

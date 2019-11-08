@@ -62,7 +62,7 @@ void SettingMainPage::InitWidget()
         QHBoxLayout *horLayout = new QHBoxLayout(widget);
         horLayout->setContentsMargins(0, 0, 20, 0);
 
-        horLayout->addWidget(new QLabel(tr("打开/关闭鼠标"), widget));
+        horLayout->addWidget(new QLabel(tr("显示/隐藏鼠标"), widget));
         horLayout->addStretch();
 
         QtSwitchButton *btnSwitch = new QtSwitchButton(widget);
