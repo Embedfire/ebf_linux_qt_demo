@@ -14,7 +14,7 @@
 
 **野火提供直接安装的SDK，安装后可以直接编译**
 
-SDK下载地址：链接：[https://pan.baidu.com/s/1g5NiXLwYYEo52iARnCbG3w](https://pan.baidu.com/s/1g5NiXLwYYEo52iARnCbG3w) 提取码：`u2ri`
+SDK下载地址：链接：[野火i.MX 6ULL Linux开发板](https://github.com/Embdefire/products/wiki/%E9%87%8E%E7%81%ABi.MX-6ULL-Linux%E5%BC%80%E5%8F%91%E6%9D%BF)：<https://url.cn/5Iv5apg>，在`5-编译工具链`目录下。
 
 在 `i.MX6ULL系列\5-编译工具链\qt交叉编译工具` 目录下找到 `fsl-imx-x11-glibc-x86_64-meta-toolchain-qt5-cortexa7hf-neon-toolchain-4.1.15-2.1.0.sh` 脚本并且下载
 
