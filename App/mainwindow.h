@@ -12,7 +12,6 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
-#include <QPushButton>
 
 #include "launcherwidget.h"
 #include "qtwidgetbase.h"
@@ -34,9 +33,6 @@ private:
     LauncherWidget      *m_launcherWidget;
     QMap<int, LauncherItem*> m_launchItems;
 
-    QPushButton         *m_btnPrevPage;
-    QPushButton         *m_btnNextPage;
-
     AboutUs             *m_aboutUs;
     QtAnimationWidget   *m_widgetWorkSpace;
     MusicPlayer         *m_musicWidget;
@@ -56,7 +52,6 @@ private:
     void InitDesktop();
     void InitThreads();
 private slots:
-    void SltCurrentPageChanged(int index);
     void SltCurrentAppChanged(int index);
 
     void SltBackHome();
@@ -67,15 +62,15 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *e);
-    void paintEvent(QPaintEvent *);
 #ifdef Q_OS_WIN32
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 #endif
 
-#if CHECK_MOUSE_BY_TIMER
     // 新增鼠标检测
     bool CheckMouseInsert();
+
+#if CHECK_MOUSE_BY_TIMER
     void timerEvent(QTimerEvent *e);
 #endif
 };

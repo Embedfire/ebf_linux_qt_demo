@@ -12,9 +12,9 @@
 #ifndef ABOUTBOARD_H
 #define ABOUTBOARD_H
 
-#include <QWidget>
+#include "qtlistwidget.h"
 
-class AboutBoard : public QWidget
+class AboutBoard : public QtListWidget
 {
     Q_OBJECT
 public:
@@ -30,8 +30,14 @@ private:
     void InitBoardInfo();
     void InitWidget();
 
+private slots:
+    void SltCurrentIndexClicked(int index);
+
 private:
     QString m_strNandSize;
+
+protected:
+    void drawItemInfo(QPainter *painter, QtListWidgetItem *item);
 };
 
 #endif // ABOUTBOARD_H

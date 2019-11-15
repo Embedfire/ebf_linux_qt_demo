@@ -29,21 +29,23 @@ public:
 
 private:
     CircularProgressBar     *m_adcValueDisplay;
-    QLabel                  *m_labelAdcValue;
+    int                      m_nAdcValue;
     QTimer *m_timer;
 
-    QVBoxLayout             *m_verLayoutAll;
 private:
     void InitWidget();
 
 private slots:
-    void SltAdcValueChanged(int value);
     void SltTestValue();
 
 protected:
     void resizeEvent(QResizeEvent *e);
     void showEvent(QShowEvent *e);
     void hideEvent(QHideEvent *e);
+
+    void paintEvent(QPaintEvent *);
+    void drawBoardLogo(QPainter *painter);
+    void drawValue(QPainter *painter);
 };
 
 #endif // ADCVIEWER_H

@@ -27,38 +27,30 @@
 
 #define REFRESH_HEIGHT      42
 
-WeatherView::WeatherView(QWidget *parent) : QWidget(parent)
+WeatherView::WeatherView(QWidget *parent) : QtWidgetBase(parent)
 {
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 225;
+
     m_bPressed = false;
     m_nYOffset = 0;
     m_bRefresh = false;
-    m_strErrorMsg = "正在获取天气信息...";
+    m_strErrorMsg = tr("正在获取天气信息...");
 
-    m_widgetRefresh = new QWidget(this);
-    m_widgetRefresh->setStyleSheet(QString("QLabel{font-family: '%1'; font: 18px; color: #ffffff;}").arg(Skin::m_strAppFontNormal));
-    m_widgetRefresh->setGeometry(0, - REFRESH_HEIGHT + m_nYOffset, this->width(), REFRESH_HEIGHT);
+    m_widgetRefresh = new QtWaitWidget(this);
+    m_widgetRefresh->SetPixmap(QPixmap(":/images/weather/ic_refresh.png"));
+    m_widgetRefresh->SetText(tr("正在刷新..."));
 
-    m_btnRefesh = new QtRefreshButton(m_widgetRefresh);
-    m_btnRefesh->SetPixmap(QPixmap(":/images/weather/ic_refresh.png"));
-    m_btnRefesh->setFixedSize(42, 42);
+    m_rectCenter = QRect(1, 1, m_nBaseWidth - 2, m_nBaseHeight - 26);\
 
-    QHBoxLayout *horLayout = new QHBoxLayout(m_widgetRefresh);
-    horLayout->setContentsMargins(0, 0, 0, 0);
-    horLayout->setSpacing(10);
-    horLayout->addStretch();
-    horLayout->addWidget(m_btnRefesh);
-    horLayout->addWidget(new QLabel(tr("正在刷新..."), m_widgetRefresh));
-    horLayout->addStretch();
-
-    m_btns.insert(0, new QtPixmapButton(0, QRect(0, 0, 0, 0), QPixmap(":/images/weather/ic_setting.png"), QPixmap(":/images/weather/ic_setting.png")));
-    m_btns.insert(1, new QtPixmapButton(1, QRect(0, 0, 0, 0), QPixmap(":/images/weather/menu_icon.png"), QPixmap(":/images/weather/menu_icon_pressed.png")));
+    m_btns.insert(0, new QtPixmapButton(0, QRect(15, 6, 42, 42), QPixmap(":/images/weather/ic_setting.png"), QPixmap(":/images/weather/ic_setting.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(m_nBaseWidth - 10 - 54, 1, 54, 54), QPixmap(":/images/weather/menu_icon.png"), QPixmap(":/images/weather/menu_icon_pressed.png")));
     m_pixmapWeatherType = QPixmap(":/images/weather/ic_weath_type.png");
     m_pixmapWeatherBackground = QPixmap(":/images/weather/background/多云.png");
 }
 
 WeatherView::~WeatherView()
 {
-
 }
 
 void WeatherView::setWeatherData(const QStringList &weatherData)
@@ -80,12 +72,12 @@ void WeatherView::setWeatherData(const QStringList &weatherData)
 
 void WeatherView::startRefresh()
 {
-    m_nYOffset = REFRESH_HEIGHT;
-    m_widgetRefresh->setGeometry(0, -REFRESH_HEIGHT + m_nYOffset, this->width(), REFRESH_HEIGHT);
-    m_btnRefesh->Start(2000);
+    m_nYOffset = REFRESH_HEIGHT * m_scaleY;
+    m_widgetRefresh->move(0, 0);
+    m_widgetRefresh->Start(1000);
     m_bRefresh = true;
     this->update();
-    QTimer::singleShot(2000, this, SLOT(SltResetWidget()));
+    QTimer::singleShot(1000, this, SLOT(SltResetWidget()));
 }
 
 void WeatherView::showErrorMessage(const QString &text)
@@ -97,20 +89,22 @@ void WeatherView::showErrorMessage(const QString &text)
 QString WeatherView::getTodayOfWeek()
 {
     QString strWeek = "";
+#if 0
     if (m_strWeatherDatas.size() < 5) {
-        int week = QDate::currentDate().dayOfWeek();
-        if (1 == week) strWeek = QString("星期一");
-        else if (2 == week) strWeek = QString("星期二");
-        else if (3 == week) strWeek = QString("星期三");
-        else if (4 == week) strWeek = QString("星期四");
-        else if (5 == week) strWeek = QString("星期五");
-        else if (6 == week) strWeek = QString("星期六");
-        else if (7 == week) strWeek = QString("星期日");
+
     }
     else {
         strWeek = m_strWeatherDatas.at(2);
     }
-
+#endif
+    int week = QDate::currentDate().dayOfWeek();
+    if (1 == week) strWeek = tr("星期一");
+    else if (2 == week) strWeek = tr("星期二");
+    else if (3 == week) strWeek = tr("星期三");
+    else if (4 == week) strWeek = tr("星期四");
+    else if (5 == week) strWeek = tr("星期五");
+    else if (6 == week) strWeek = tr("星期六");
+    else if (7 == week) strWeek = tr("星期日");
     return strWeek;
 }
 
@@ -118,23 +112,24 @@ void WeatherView::SltResetWidget()
 {
     m_nYOffset = 0;
     m_bRefresh = false;
-    m_widgetRefresh->setGeometry(0, - REFRESH_HEIGHT + m_nYOffset, this->width(), REFRESH_HEIGHT);
+    m_widgetRefresh->move(0, -REFRESH_HEIGHT * m_scaleY + m_nYOffset);
     this->update();
 }
 
 void WeatherView::resizeEvent(QResizeEvent *e)
 {
-    m_widgetRefresh->setGeometry(0, - REFRESH_HEIGHT + m_nYOffset, this->width(), REFRESH_HEIGHT);
-    m_rectCenter = QRect(1, 1, this->width() - 2, this->height() - 26);
-    m_btns.value(0)->setRect(QRect(15, 6, 42, 42));
-    m_btns.value(1)->setRect(QRect(this->width() - 10 - 54, 1, 54, 54));
+    SetScaleValue();
+    m_widgetRefresh->resize(this->width(), REFRESH_HEIGHT * m_scaleY);
+    m_widgetRefresh->move(0, -REFRESH_HEIGHT * m_scaleY + m_nYOffset);
     QWidget::resizeEvent(e);
 }
 
 void WeatherView::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.drawPixmap(this->rect(), m_pixmapWeatherBackground);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.drawPixmap(0, 0, m_pixmapWeatherBackground);
 
     drawWeatherInfo(&painter);
     drawStatusBar(&painter);
@@ -160,11 +155,11 @@ void WeatherView::drawWeatherInfo(QPainter *painter)
     }
     else {
         int nW = painter->fontMetrics().width(m_strWeatherDatas.at(0));
-        painter->drawText((this->width() - nW) / 2, m_nYOffset + 10, nW, 25, Qt::AlignCenter, m_strWeatherDatas.at(0));
+        painter->drawText((m_nBaseWidth - nW) / 2, m_nYOffset + 10, nW, 25, Qt::AlignCenter, m_strWeatherDatas.at(0));
         font.setPixelSize(100);
         painter->setFont(font);
         nW = painter->fontMetrics().width(m_strWeatherDatas.at(1) + "°");
-        QRect rectTemp((this->width() -  nW - 90) / 2, m_nYOffset + 35, nW, 140);
+        QRect rectTemp((m_nBaseWidth -  nW - 90) / 2, m_nYOffset + 35, nW, 140);
         painter->drawText(rectTemp, Qt::AlignCenter, m_strWeatherDatas.at(1) + "°");
 
         QRect rectRight(rectTemp.right() + 10, rectTemp.top() + 25, m_pixmapWeatherType.width(), m_pixmapWeatherType.height());
@@ -190,18 +185,28 @@ void WeatherView::drawStatusBar(QPainter *painter)
     font.setPixelSize(18);
     painter->setFont(font);
     painter->setPen(QColor("#797979"));
-    painter->drawText(25, this->height() - 25, 40, 25, Qt::AlignCenter, QString("预报"));
-    painter->drawText(this->width() - 125, this->height() - 25, 40, 25, Qt::AlignCenter, QString("今天"));
+    QString strTemp = tr("预报");
+    int nW = painter->fontMetrics().width(strTemp);
+    painter->drawText(25, this->height() - 25, nW, 25, Qt::AlignCenter, strTemp);
+
+    strTemp = tr("今天");
+    nW = painter->fontMetrics().width(strTemp);
+    painter->drawText(m_nBaseWidth - nW - 85, m_nBaseHeight - 25, nW, 25, Qt::AlignCenter, strTemp);
     painter->setPen(QColor("#ffffff"));
-    painter->drawText(this->width() - 85, this->height() - 25, 60, 25, Qt::AlignCenter, getTodayOfWeek());
+
+    strTemp = getTodayOfWeek();
+    nW = painter->fontMetrics().width(strTemp);
+    painter->drawText(m_nBaseWidth - 85, m_nBaseHeight - 25, 60, 25, Qt::AlignCenter, strTemp);
     painter->restore();
 }
 
 void WeatherView::mousePressEvent(QMouseEvent *e)
 {
     bool bOk = false;
+    QRect rect;
     foreach (QtPixmapButton *btn, m_btns) {
-        if (btn->rect().contains(e->pos())) {
+        ScaleRect(rect, btn->rect());
+        if (rect.contains(e->pos())) {
             btn->setPressed(true);
             this->update();
             bOk = true;
@@ -219,14 +224,14 @@ void WeatherView::mouseMoveEvent(QMouseEvent *e)
 {
     if (m_bPressed && (e->y() > m_startPos.y()) && !m_bRefresh) {
         m_nYOffset += e->y() > m_startPos.y();
-        if (m_nYOffset > 15){
-            m_nYOffset = REFRESH_HEIGHT;
-            m_btnRefesh->Start(2000);
+        if (m_nYOffset > 15 * m_scaleY){
+            m_nYOffset = REFRESH_HEIGHT * m_scaleY;
+            m_widgetRefresh->Start(1000);
             m_bRefresh = true;
-            QTimer::singleShot(2000, this, SLOT(SltResetWidget()));
+            QTimer::singleShot(1000, this, SLOT(SltResetWidget()));
         }
         m_startPos = e->pos();
-        m_widgetRefresh->setGeometry(0, - REFRESH_HEIGHT + m_nYOffset, this->width(), REFRESH_HEIGHT);
+        m_widgetRefresh->move(0, -REFRESH_HEIGHT * m_scaleY + m_nYOffset);
         this->update();
     }
 }
@@ -255,6 +260,8 @@ void WeatherView::mouseReleaseEvent(QMouseEvent *e)
 WeatherReport::WeatherReport(QWidget *parent) : QtListWidget(parent)
 {
     this->SetBackground(Qt::transparent);
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 225;
     m_bHorizontal = true;
     m_nItemSize = 150;
     m_nMargin = 10;
@@ -340,7 +347,6 @@ WeatherWidget::~WeatherWidget()
 void WeatherWidget::InitWidget()
 {
     m_weatherView = new WeatherView(this);
-    m_weatherView->setMinimumHeight(250);
     connect(m_weatherView, SIGNAL(signalToolBtnClicked(int)), this, SLOT(SltToolBtnClicked(int)));
 
     m_weatherReport = new WeatherReport(this);
@@ -363,7 +369,7 @@ void WeatherWidget::InitWidget()
     QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
     verLayoutAll->setContentsMargins(0, 0, 0, 0);
     verLayoutAll->setSpacing(0);
-    verLayoutAll->addWidget(m_weatherView);
+    verLayoutAll->addWidget(m_weatherView, 1);
     verLayoutAll->addWidget(m_weatherReport, 1);
     verLayoutAll->addWidget(widgetBottom);
 }
@@ -371,7 +377,7 @@ void WeatherWidget::InitWidget()
 QString WeatherWidget::getTemperature(const QString &high, const QString &low)
 {
     QString strResult = "";
-    QRegExp regExp("(\\d+)");
+    QRegExp regExp("([-.0-9]{1,6})");
     if (-1 != regExp.indexIn(low)) {
         strResult += QString("%1°") .arg(regExp.cap(1).toInt());
     }
@@ -440,7 +446,7 @@ void WeatherWidget::SltWeatherReply(const QByteArray &jsonData)
         strTodayData << jsonCity.value("city").toString();
         QtJson::JsonObject jsonCityData = result.value("data").toMap();
         strTodayData << jsonCityData.value("wendu").toString();
-        m_labelDate->setText(jsonCity.value("updateTime").toString() + "发布");
+        m_labelDate->setText(jsonCity.value("updateTime").toString() + tr("发布"));
         QtJson::JsonArray jsonForecast = jsonCityData.value("forecast").toList();
 
         int nMonty = QDate::currentDate().month();
@@ -448,7 +454,7 @@ void WeatherWidget::SltWeatherReply(const QByteArray &jsonData)
             QtJson::JsonObject jsonObj = jsonForecast.at(i).toMap();
             QStringList strForeacast;
             int day = jsonObj.value("date").toString().toInt();
-            strForeacast << (QString("%1月%2日 ").arg(nMonty).arg(day) + jsonObj.value("week").toString());
+            strForeacast << (tr("%1月%2日 ").arg(nMonty).arg(day) + jsonObj.value("week").toString());
             QString strType = jsonObj.value("type").toString();
             strForeacast << strType;
             strForeacast << getTemperature(jsonObj.value("high").toString(), jsonObj.value("low").toString());
@@ -469,4 +475,13 @@ void WeatherWidget::SltWeatherReply(const QByteArray &jsonData)
     else {
         qDebug() << "get weather failed";
     }
+}
+
+void WeatherWidget::resizeEvent(QResizeEvent *e)
+{
+    if (NULL != m_cityManager) {
+        m_cityManager->resize(this->size());
+    }
+
+    QWidget::resizeEvent(e);
 }

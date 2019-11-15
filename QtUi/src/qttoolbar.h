@@ -12,14 +12,14 @@
 #ifndef QTTOOLBAR_H
 #define QTTOOLBAR_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QPropertyAnimation>
 
 #ifdef QtUi
 #include <QtUi>
-class QTUISHARED_EXPORT QtToolBar : public QWidget {
+class QTUISHARED_EXPORT QtToolBar : public QtWidgetBase {
 #else
-class QtToolBar : public QWidget {
+class QtToolBar : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:

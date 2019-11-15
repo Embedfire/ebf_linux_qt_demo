@@ -39,7 +39,6 @@ signals:
 public slots:
 
 private:
-    QtWidgetTitleBar *m_widgetTitle;
     WidgetRecord     *m_recorder;
     LyricWidget      *m_lyricWidget;
     WidgetToolBar    *m_playerToolBar;

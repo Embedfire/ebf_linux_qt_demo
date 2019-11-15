@@ -16,16 +16,18 @@
 #include <QPainter>
 #include <QDebug>
 
-#define LYRIC_LINE_HEIGHT       40
+#define LYRIC_LINE_HEIGHT       44
 
-LyricWidget::LyricWidget(QWidget *parent) : QWidget(parent)
+LyricWidget::LyricWidget(QWidget *parent) : QtWidgetBase(parent)
 {
-    this->setAttribute(Qt::WA_TranslucentBackground);
     m_nShowCount = 7;
     m_bLyricLoad = true;
     m_bError = false;
 
-    m_strSongName = "加载中...";
+    m_nBaseWidth = 400;
+    m_nBaseHeight = 360;
+
+    m_strSongName = tr("加载中...");
     m_nCurrentIndex = 0;
 
     // 歌词处理
@@ -114,37 +116,33 @@ void LyricWidget::SltLoadNetLyric(const QString &file)
     this->update();
 }
 
-void LyricWidget::resizeEvent(QResizeEvent *e)
-{
-    m_nShowCount = (this->height()  - 50) / LYRIC_LINE_HEIGHT;
-    QWidget::resizeEvent(e);
-}
 
 void LyricWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::TextAntialiasing);
-    painter.fillRect(this->rect(), Qt::transparent);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.fillRect(0, 0, m_nBaseWidth, m_nBaseHeight, Qt::transparent);
 
     QFont font(Skin::m_strAppFontNormal);
     font.setPixelSize(20);
     font.setBold(true);
     painter.setFont(font);
     painter.setPen("#80FFFF");
-    painter.drawText(0, 0, this->width(), 60, Qt::AlignCenter, m_strSongName);
+    painter.drawText(0, 0, m_nBaseWidth, 52, Qt::AlignCenter, m_strSongName);
 
     font.setPixelSize(18);
     font.setBold(false);
     painter.setFont(font);
     if (m_strLyricLines.isEmpty()) {
         painter.setPen("#ffffff");
-        QRect rect(0, 60, this->width(), this->height() - 60);
+        QRect rect(0, 60, m_nBaseWidth, m_nBaseHeight - 52);
         if (m_bError) {
-            painter.drawText(rect, Qt::AlignCenter, QStringLiteral("音乐文件格式解析错误"));
+            painter.drawText(rect, Qt::AlignCenter, tr("音乐文件格式解析错误"));
         } else {
             painter.drawText(rect, Qt::AlignCenter,
-                             m_bLyricLoad ? QStringLiteral("正在加载歌曲...") :
-                                            QStringLiteral("未找到歌词文件"));
+                             m_bLyricLoad ? tr("正在加载歌曲...") :
+                                            tr("未找到歌词文件"));
         }
     }
     else {
@@ -159,7 +157,7 @@ void LyricWidget::drawLyricLines(QPainter *painter)
     option.setWrapMode(QTextOption::WordWrap);
     option.setAlignment(Qt::AlignCenter);
 
-    QRect rect(0, 0, this->width(), 60);
+    QRect rect(0, 0, m_nBaseWidth, 52);
     int index = 0;
     for (int i = 0; i < m_nShowCount; i++) {
         rect = QRect(rect.left(), rect.bottom(), rect.width(), LYRIC_LINE_HEIGHT);

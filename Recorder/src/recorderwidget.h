@@ -20,18 +20,17 @@
 #include "arecordwidget.h"
 #include "qtsliderbar.h"
 #include "wavplaylistwidget.h"
+#include "qtpixmapbutton.h"
 
 class RecorderWidget : public QtAnimationWidget
 {
     Q_OBJECT
-
 public:
     RecorderWidget(QWidget *parent = 0);
     ~RecorderWidget();
 
 private:
     void InitWidget();
-    void CreatePlayBar(QWidget *parent);
     QTime GetTimeByPostion(int postion);
 
 private slots:
@@ -42,20 +41,23 @@ private slots:
     void SltPostionChanged(qint64 postion);
     void stateChanged(QMediaPlayer::State newState);
     void SltChangePostion(int postion);
-private:
-    ARecordWidget *m_recordWidget;
 
+    void SltBtnClicked(int index);
+
+private:
+    ARecordWidget       *m_recordWidget;
     WavPlayListWidget   *m_playlistWidget;
 
-    QtSliderBar     *m_progressBar;
-    QLabel          *m_labelCurrTime;
-    QLabel          *m_labelDuraTime;
-    QPushButton     *m_btnPlay;
+    QtSliderBar         *m_progressBar;
+    QtSliderBar         *m_sliderVolume;
+
+    QString             m_strCurrTime;
+    QString             m_strDuration;
 
     QMediaPlayer    *m_player;
-
 protected:
     void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // RECORDERWIDGET_H

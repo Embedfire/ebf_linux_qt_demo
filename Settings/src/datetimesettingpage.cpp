@@ -12,43 +12,36 @@
 #include "datetimesettingpage.h"
 #include "skin.h"
 
+#include <QPainter>
 #include <QDateTime>
 #include <QProcess>
 #include <QBoxLayout>
 #include <QPushButton>
+#include <QMouseEvent>
 
 #include <QDebug>
 
 DateTimeSettingPage::DateTimeSettingPage(QWidget *parent,
                                          QtDateTimeConfig::ConfigFromat format) :
-    QWidget(parent)
+    QtWidgetBase(parent)
 {
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
+
     m_timeConfig = new QtDateTimeConfig(this);
-    m_timeConfig->setFixedSize(375, 241);
     m_timeConfig->SetFont(Skin::m_strAppFontNormal);
     m_timeConfig->setConfigFormat(format);
-    m_timeConfig->setStyleSheet(QString("QWidget{background-color: #ffffff; border: none; border-radius: 10px;}"
-                                        "QLabel{ font-family: '%1'; font: 24px; color: #333333; border-radius: 0px;}")
-                                .arg(Skin::m_strAppFontBold));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(24);
+    m_timeConfig->setFont(font);
 
-    QPushButton *btnConfig = new QPushButton(this);
-    btnConfig->setText(tr("确定"));
-    btnConfig->setFixedSize(166, 70);
-    connect(btnConfig, SIGNAL(clicked(bool)), this, SLOT(SetSystemDatetime()));
-    btnConfig->setStyleSheet(QString("QPushButton{ border-image: url(:/images/calendar/ic_btn.png);"
-                                     "color: #ffffff; font: 30px; font-family:'%1';}"
-                                     "QPushButton::pressed{border-image: url(:/images/calendar/ic_btn_pre.png);}").arg(Skin::m_strAppFontBold));
-
-    QVBoxLayout *verLayout = new QVBoxLayout(this);
-    verLayout->setContentsMargins(20, 20, 20, 20);
-    verLayout->setSpacing(50);
-    verLayout->addWidget(m_timeConfig, 0, Qt::AlignHCenter);
-    verLayout->addWidget(btnConfig, 0, Qt::AlignHCenter);
+    m_btnOk = new QtPixmapButton(0, QRect(317, 320, 166, 70), QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png"));
 }
 
 DateTimeSettingPage::~DateTimeSettingPage()
 {
-
+    delete m_btnOk;
+    m_btnOk = NULL;
 }
 
 void DateTimeSettingPage::SetSystemDatetime()
@@ -56,8 +49,11 @@ void DateTimeSettingPage::SetSystemDatetime()
     if (QtDateTimeConfig::TimeFormat == m_timeConfig->getFormat()) {
 #ifdef __arm__
         QTime time = m_timeConfig->getCurrentTime();
+        QDate date = QDate::currentDate();
+        QString strDatetime = date.toString("yyyy-MM-dd ")  + time.toString("hh:mm:ss");
+
         QProcess cmd;
-        cmd.start("date", QStringList() << "-s" << time.toString("hh:mm:ss"));
+        cmd.start("date", QStringList() << "-s" << strDatetime);
         cmd.waitForFinished(500);
         cmd.execute("hwclock -w");
         cmd.waitForFinished(500);
@@ -66,8 +62,11 @@ void DateTimeSettingPage::SetSystemDatetime()
     else {
 #ifdef __arm__
         QDate date = m_timeConfig->getCurrentDate();
+        QTime time = QTime::currentTime();
+        QString strDatetime = date.toString("yyyy-MM-dd ")  + time.toString("hh:mm:ss");
+
         QProcess cmd;
-        cmd.start("date", QStringList() << "-s" << date.toString("yyyy-MM-dd"));
+        cmd.start("date", QStringList() << "-s" << strDatetime);
         cmd.waitForFinished(500);
         cmd.execute("hwclock -w");
         cmd.waitForFinished(500);
@@ -75,4 +74,49 @@ void DateTimeSettingPage::SetSystemDatetime()
     }
 
     emit signalFinished();
+}
+
+void DateTimeSettingPage::resizeEvent(QResizeEvent *e)
+{
+    SetScaleValue();
+    m_timeConfig->resize(375 * m_scaleX, 280 * m_scaleY);
+    m_timeConfig->move((this->width() - m_timeConfig->width()) / 2, 20 * m_scaleY);
+    QWidget::resizeEvent(e);
+}
+
+void DateTimeSettingPage::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.drawPixmap(m_btnOk->rect(), m_btnOk->pixmap());
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(30);
+    painter.setFont(font);
+    painter.setPen(QColor("#ffffff"));
+    painter.drawText(m_btnOk->rect(), Qt::AlignCenter, tr("确定"));
+}
+
+void DateTimeSettingPage::mousePressEvent(QMouseEvent *e)
+{
+    QRect rect;
+    ScaleRect(rect, m_btnOk->rect());
+    if (rect.contains(e->pos())) {
+        m_btnOk->setPressed(true);
+        this->update();
+    }
+}
+
+void DateTimeSettingPage::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (m_btnOk->isPressed()) {
+        m_btnOk->setPressed(false);
+        this->update();
+
+        QRect rect;
+        ScaleRect(rect, m_btnOk->rect());
+        if (rect.contains(e->pos())) {
+            SetSystemDatetime();
+        }
+    }
 }

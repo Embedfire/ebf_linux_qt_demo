@@ -11,11 +11,10 @@
 #ifndef CIRCULARPROGRESSBAR_H
 #define CIRCULARPROGRESSBAR_H
 
-#include <QWidget>
-
+#include "qtwidgetbase.h"
 #include <QPropertyAnimation>
 
-class CircularProgressBar : public QWidget
+class CircularProgressBar : public QtWidgetBase
 {
     Q_OBJECT
 public:

@@ -30,6 +30,9 @@ private:
     int                  m_nLevel;
 private slots:
     void SltValueChanged(int value);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // BACKLIGHTWIDGET_H

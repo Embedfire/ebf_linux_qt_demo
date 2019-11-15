@@ -12,7 +12,7 @@
 #ifndef WIDGETRECORD_H
 #define WIDGETRECORD_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QTimer>
 #include <QPropertyAnimation>
 
@@ -34,7 +34,7 @@ private:
     QPixmap m_pixmap;
 };
 
-class WidgetRecord : public QWidget
+class WidgetRecord : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -68,7 +68,6 @@ private slots:
 
 protected:
     void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent *e);
 };
 
 #endif // WIDGETRECORD_H

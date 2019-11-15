@@ -20,6 +20,9 @@ VideoListViewer::VideoListViewer(QWidget *parent) : QtPageListWidget(parent)
 {
     this->SetItemLayoutSpace(5, 20);
     this->SetItemLayut(3, 5);
+
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
 }
 
 VideoListViewer::~VideoListViewer()

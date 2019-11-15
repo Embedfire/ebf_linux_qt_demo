@@ -30,18 +30,11 @@ public slots:
 
 private:
     void InitButtons();
-    void ScalcRect(QRect &rectRet, const QRect &rect);
 
     void KeyPressed(int index);
     void ChangeRgbLightValue(QString led, bool on);
 
-private:
-    QMap<int, QtPixmapButton*> m_btns;
-    qreal m_scaleX;
-    qreal m_scaleY;
-
 protected:
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);

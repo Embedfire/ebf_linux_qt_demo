@@ -33,8 +33,7 @@ private:
     QtWidgetTitleBar    *m_widgetTitle;
     QStringList          m_strListTitle;
 
-    QPushButton         *m_btnBack;
-    QPushButton         *m_btnHome;
+    QtPixmapButton       *m_btnBack;
 
     QtStackedWidget     *m_stackedWidget;
     QList <int>          m_pageStack;
@@ -44,6 +43,7 @@ private:
     void InitSettingPage();
 
 private slots:
+    void SltToolBtnClicked(int index);
     void SltBtnBackClicked();
     void SltCurrentPageChanged(int index);
     void SltChangePage(int index);

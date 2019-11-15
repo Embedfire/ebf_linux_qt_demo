@@ -64,9 +64,9 @@ private:
 private:
     void CreatePanel(QRect rect);
     void ColorPanelClicked(QPoint pos);
+    void InitValues();
 
 protected:
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
 
     void drawFontConfig(QPainter *painter);

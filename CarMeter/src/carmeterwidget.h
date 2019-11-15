@@ -86,7 +86,6 @@ private:
 
 private:
     void InitData();
-    void ScalcRect(QRect &rectRet, const QRect &rect);
 
 protected:
     void paintEvent(QPaintEvent *);

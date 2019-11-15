@@ -13,9 +13,6 @@
 #include "appconfig.h"
 #include "unit.h"
 #include "skin.h"
-#ifdef Q_OS_WIN32
-#include "JlCompress.h"
-#endif
 
 #include <QFile>
 #include <QFileInfo>
@@ -34,14 +31,8 @@ VersionUpdatePage::VersionUpdatePage(QWidget *parent) : QWidget(parent)
     connect(m_download, SIGNAL(signalVersionInfo(QString,QString)), this, SLOT(SltVersionInfo(QString,QString)));
     connect(m_download, SIGNAL(signalDownFinish(QString)), this, SLOT(SltDownloadOk(QString)));
 
-    QLabel *labelCurVersion = new QLabel(this);
-    labelCurVersion->setStyleSheet(QString("QLabel{color: #ffffff; font: 20px;}"));
-    labelCurVersion->setTextFormat(Qt::RichText);
-    labelCurVersion->setText(tr("当前版本： 【<font: color=#008800;> V%1 </font>】 build at %2 %3 .").arg(APP_STR_VERSION).arg(APP_BUILD_DATE).arg(__TIME__));
-
-    m_labelVersionInfo = new QtTextBroswer(this);
-    m_labelVersionInfo->setText(tr("正在更新版本..."));
-    m_labelVersionInfo->setStyleSheet(QString("QWidget{font: 20px;}"));
+    m_textBrowserInfo = new QtTextBroswer(this);
+    m_textBrowserInfo->setText(tr("当前版本： V%1 build at %2 %3 .").arg(APP_STR_VERSION).arg(APP_BUILD_DATE).arg(__TIME__));
 
     QHBoxLayout *horLayoutBtn = new QHBoxLayout();
     horLayoutBtn->setContentsMargins(0, 0, 0, 0);
@@ -68,18 +59,17 @@ VersionUpdatePage::VersionUpdatePage(QWidget *parent) : QWidget(parent)
                                          "QProgressBar::chunk{border: none; border-radius: 5px;background-color: #008000;}"));
 
     QVBoxLayout *verLayout = new QVBoxLayout(this);
-    verLayout->setContentsMargins(20, 20, 20, 20);
+    verLayout->setContentsMargins(10, 10, 10, 10);
     verLayout->setSpacing(10);
-    verLayout->addWidget(labelCurVersion);
-    verLayout->addWidget(m_labelVersionInfo, 1);
+    verLayout->addWidget(m_textBrowserInfo, 1);
     verLayout->addWidget(m_progressBar);
     verLayout->addLayout(horLayoutBtn);
 
     connect(m_btnCheckVersion, SIGNAL(clicked(bool)), this, SLOT(SltCheckAppVersion()));
     connect(m_btnDownload, SIGNAL(clicked(bool)), this, SLOT(SltDownloadNewApp()));
 
-    this->setStyleSheet(QString("QPushButton{border: 1px solid #c6c6c6; border-radius: 5px; min-height: 30px; min-width: 80px;"
-                                "background-color: #f0f0f0; color: #333333; font: 18px;}"
+    this->setStyleSheet(QString("QPushButton{border: 1px solid #c6c6c6; border-radius: 5px; min-height: 25px; min-width: 80px;"
+                                "background-color: #f0f0f0; color: #333333;}"
                                 "QPushButton:!enabled{color: #aaaaaa;}"
                                 "QLabel{color: #ffffff;}"));
 }
@@ -166,7 +156,7 @@ void VersionUpdatePage::SltDownloadOk(const QString &name)
     QFileInfo fileInfo(name);
     if (!QString::compare("zip", fileInfo.completeSuffix()))
     {
-#ifdef Q_OS_WIN32
+#if 0
         QStringList strFiles = JlCompress::getFileList(name);
         if (strFiles.isEmpty()) return;
 
@@ -209,13 +199,13 @@ void VersionUpdatePage::SltVersionInfo(const QString &verNum, const QString &ver
     {
         m_btnDownload->setEnabled(true);
         QString strText = QString("发现新版本[ %1 ] \n\n").arg(verNum);
-        m_labelVersionInfo->setText(strText + verInfo);
+        m_textBrowserInfo->setText(strText + verInfo);
     }
     else {
-        m_labelVersionInfo->setText(bError ? tr("版本更新发生异常...") :
+        m_textBrowserInfo->setText(bError ? tr("版本更新发生异常...") :
                                              tr("恭喜你！当前为最新版本，不用更新。"));
         if (!bError) {
-            m_labelVersionInfo->append(verInfo);
+            m_textBrowserInfo->append(verInfo);
         }
     }
 
@@ -232,6 +222,21 @@ void VersionUpdatePage::SltDownloadNewApp()
     m_download->downloadFile(GetServerConf("up", m_strAppName));
     m_btnDownload->setEnabled(false);
     m_btnCheckVersion->setEnabled(false);
+}
+
+void VersionUpdatePage::resizeEvent(QResizeEvent *e)
+{
+    QFont font(Skin::m_strAppFontNormal);
+    if (this->height() < 400) {
+        font.setPixelSize(14);
+    } else {
+        font.setPixelSize(20);
+    }
+
+    m_textBrowserInfo->setFont(font);
+    m_textBrowserInfo->setText(m_textBrowserInfo->text());
+
+    QWidget::resizeEvent(e);
 }
 
 void VersionUpdatePage::showEvent(QShowEvent *e)

@@ -12,7 +12,7 @@
 #ifndef QTCALENDARWIDGET_H
 #define QTCALENDARWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QDate>
 #include <QPropertyAnimation>
 
@@ -91,9 +91,9 @@ private:
 };
 
 #ifdef QtUi
-class QTUISHARED_EXPORT QtCalendarWidget : public QWidget {
+class QTUISHARED_EXPORT QtCalendarWidget : public QtWidgetBase {
 #else
-class QtCalendarWidget : public QWidget {
+class QtCalendarWidget : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -146,11 +146,7 @@ private:
 private:
     void CalcRectSize();
 
-protected:
-    void resizeEvent(QResizeEvent *e);
-    QSize sizeHint() const;
-    QSize minimumSize() const;
-
+protected:    
     void paintEvent(QPaintEvent *);
     void drawTitle(QPainter *painter);
     void drawDays(QPainter *painter, const QDate &date, int nStartPos);

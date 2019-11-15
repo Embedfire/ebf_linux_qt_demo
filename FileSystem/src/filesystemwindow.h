@@ -47,9 +47,9 @@ private slots:
     void SltAddressChanged(const QString &addr);
     void SltNotePadHide();
     void SltBtnRecentClicked(int index);
+
 protected:
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // FILESYSTEMWINDOW_H

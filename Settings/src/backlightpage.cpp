@@ -18,10 +18,11 @@
 #include <QDebug>
 #include <QApplication>
 
-BackLightPage::BackLightPage(QWidget *parent) : QWidget(parent),
+BackLightPage::BackLightPage(QWidget *parent) : QtWidgetBase(parent),
     m_nLevel(0)
 {
     InitWidget();
+    m_nBaseHeight = 400;
 }
 
 BackLightPage::~BackLightPage()
@@ -33,12 +34,7 @@ void BackLightPage::InitWidget()
 {
     m_knobSwitch = new QtKnobSwitch(this);
     m_knobSwitch->setFont(QFont(Skin::m_strAppFontBold));
-    m_knobSwitch->setFixedSize(350, 350);
     connect(m_knobSwitch, SIGNAL(valueChanged(int)), this, SLOT(SltValueChanged(int)));
-
-    QHBoxLayout *horLayout = new QHBoxLayout(this);
-    horLayout->setContentsMargins(10, 20, 10, 20);
-    horLayout->addWidget(m_knobSwitch, 1);
 }
 
 void BackLightPage::SltValueChanged(int value)
@@ -58,4 +54,12 @@ void BackLightPage::SltValueChanged(int value)
     in << m_nLevel;
     file.close();
 #endif
+}
+
+void BackLightPage::resizeEvent(QResizeEvent *e)
+{
+    m_scaleX = (this->width() * 1.0 / m_nBaseWidth);
+    m_scaleY = (this->height() * 1.0 / m_nBaseHeight);
+    m_knobSwitch->setGeometry(242 * m_scaleX, 20 * m_scaleY, 316 * m_scaleY, 316 * m_scaleY);
+    QWidget::resizeEvent(e);
 }

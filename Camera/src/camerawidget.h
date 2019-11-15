@@ -69,7 +69,6 @@ private slots:
     void SltClearMessage();
 
 protected:
-    QSize sizeHint() const;
     void showEvent(QShowEvent *e);
 
     void resizeEvent(QResizeEvent *e);

@@ -44,6 +44,11 @@ CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
     m_camera = NULL;
     surface = NULL;
 
+    m_rectMenu = QRect(m_nBaseWidth - 10 - m_pixmapMenu.width(), 2, m_pixmapMenu.width(), m_pixmapMenu.height());
+#ifndef __arm__
+    m_rectConfig = QRect(m_nBaseWidth - 50 - 80, m_nBaseHeight - 64, 80, 20);
+#endif
+
     m_configWidget = new CameraConfig(this);
 #if !TEST_PROCESS_CAMERA
     QTimer::singleShot(500, this, SLOT(InitCamera()));
@@ -102,11 +107,6 @@ void CameraWidget::SltClearMessage()
     this->update();
 }
 
-QSize CameraWidget::sizeHint() const
-{
-    return QSize(800, 480);
-}
-
 void CameraWidget::showEvent(QShowEvent *e)
 {
 #if TEST_PROCESS_CAMERA
@@ -119,35 +119,41 @@ void CameraWidget::showEvent(QShowEvent *e)
 
 void CameraWidget::resizeEvent(QResizeEvent *e)
 {
-    m_rectMenu = QRect(this->width() - 10 - m_pixmapMenu.width(), 2, m_pixmapMenu.width(), m_pixmapMenu.height());
-#ifndef __arm__
-    m_rectConfig = QRect(this->width() - 50 - 80, this->height() - 64, 80, 20);
-#endif
+    SetScaleValue();
+    m_configWidget->setFixedSize(434 * m_scaleX, 360 * m_scaleY);
     m_configWidget->move((this->width() - m_configWidget->width()) / 2, -m_configWidget->height());
     QWidget::resizeEvent(e);
 }
 
 void CameraWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (m_rectPhoto.contains(e->pos())) {
+    QRect rect;
+    ScaleRect(rect, m_rectPhoto);
+    if (rect.contains(e->pos())) {
         m_bPhotoPressed = true;
         this->update();
-    } else if (m_rectMenu.contains(e->pos())) {
+        return;
+    }
+
+    ScaleRect(rect, m_rectMenu);
+    if (rect.contains(e->pos())) {
         m_bMenuPressed = true;
         m_pixmapMenu = QPixmap(":/images/camera/menu_icon_pressed.png");
         this->update();
+        return;
     }
-    else if (m_rectConfig.contains(e->pos())) {
+
+    ScaleRect(rect, m_rectConfig);
+    if (rect.contains(e->pos())) {
         m_bConfigPressed = true;
         this->update();
+        return;
     }
 #if TEST_PROCESS_CAMERA
-    else {
-        if  (m_cmd->state() != QProcess::NotRunning) {
-            m_cmd->kill();
-        }
-        emit signalBackHome();
+    if  (m_cmd->state() != QProcess::NotRunning) {
+        m_cmd->kill();
     }
+    emit signalBackHome();
 #endif
 }
 
@@ -181,12 +187,13 @@ void CameraWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(this->rect(), QColor("#000000"));
+    painter.scale(m_scaleX, m_scaleY);
+    painter.fillRect(QRect(0, 0, m_nBaseWidth, m_nBaseHeight), QColor("#000000"));
 
 #ifndef __arm__
     if (!m_strInfoMsg.isEmpty()) {
         painter.setPen(Qt::white);
-        painter.drawText(10, 10, this->width() - 20, 30, Qt::AlignVCenter, m_strInfoMsg);
+        painter.drawText(10, 10, m_nBaseWidth - 20, 30, Qt::AlignVCenter, m_strInfoMsg);
     }
 
     if (NULL  != m_camera) {
@@ -198,7 +205,7 @@ void CameraWidget::paintEvent(QPaintEvent *)
         QFont font = painter.font();
         font.setPixelSize(28);
         painter.setFont(font);
-        painter.drawText(this->rect(), Qt::AlignCenter, tr("照相机打开失败！"));
+        painter.drawText(QRect(0, 0, m_nBaseWidth, m_nBaseHeight), Qt::AlignCenter, tr("照相机打开失败！"));
     }
 #endif
 
@@ -213,14 +220,14 @@ void CameraWidget::drawToolButton(QPainter *painter)
 #ifndef __arm__
     // draw big
     int radius = 80;
-    int nX = (this->width() - radius) / 2;
-    int nY = this->height() - radius - 24;
+    int nX = (m_nBaseWidth - radius) / 2;
+    int nY = m_nBaseHeight - radius - 24;
     painter->setPen(QPen(QColor("#ffffff"), 4));
     painter->drawArc(nX, nY, radius, radius, 0, 360 * 16);
     m_rectPhoto = QRect(nX, nY, radius, radius);
 
     radius = 60;
-    nX = (this->width() - radius) / 2;
+    nX = (m_nBaseWidth - radius) / 2;
     nY += 10;
     painter->setPen(Qt::NoPen);
     painter->setBrush(m_bPhotoPressed ? QColor("#02a7f0") : QColor("#ffffff"));

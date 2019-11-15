@@ -11,10 +11,11 @@
 #ifndef LAUNCHERWIDGET_H
 #define LAUNCHERWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
+#include "qtpixmapbutton.h"
+
 #include <QMap>
 #include <QTimer>
-#include <QPropertyAnimation>
 
 ////////////////////////////////////////////////////////
 /// \brief The LauncherItem class
@@ -40,9 +41,9 @@ public:
 ////////////////////////////////////////////////////////
 /// \brief The LauncherWidget class
 #ifdef QtUi
-class QTUISHARED_EXPORT LauncherWidget : public QWidget {
+class QTUISHARED_EXPORT LauncherWidget : public QtWidgetBase {
 #else
-class LauncherWidget : public QWidget {
+class LauncherWidget : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -66,6 +67,7 @@ public:
 signals:
     void currentItemClicked(int index);
     void currentPageChanged(int index);
+    void signalAboutClicked();
 
 public slots:
     void SltShowNextPage();
@@ -93,6 +95,9 @@ private:
 
     int         m_nDirection;
 
+    QtPixmapButton  *m_btnPrev;
+    QtPixmapButton  *m_btnNext;
+
     QTimer      *m_timerMove;
     bool        m_bLoopbackChange;
     QPropertyAnimation *m_animation;
@@ -102,7 +107,12 @@ private:
     int     m_nStartPos;
     int     m_nMoveEndValue;
     bool    m_bRecovery;
+
+    QRect   m_rectPage;
+    QRect   m_rectAbout;
+
 private:
+    void Init();
     void setXPos(int nValue);
     int Xpos(){return m_nStartPos;}
 
@@ -110,12 +120,13 @@ private slots:
     void SltChangePage();
 
 protected:
-    void resizeEvent(QResizeEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 
     void paintEvent(QPaintEvent *);
+    void drawCenter(QPainter *painter);
+
     void drawAppItem(QPainter *painter, int page, int xOffset = 0);
     void drawItemSpot(QPainter *painter);
     void drawAppInfo(QPainter *painter, QRect rect, LauncherItem *item);

@@ -31,35 +31,21 @@ LauncherItem::LauncherItem(int id, int index, const QString &name, const QPixmap
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief LauncherWidget::LauncherWidget
 /// \param parent
-LauncherWidget::LauncherWidget(QWidget *parent) : QWidget(parent)
+LauncherWidget::LauncherWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_pixmapWallpaper = QPixmap();
     m_backgroundColor = QColor("#c6c6c6");
 
-    m_nPageCnt = 3;
-    m_nCurrentPage = 0;
-    m_nPrevPage = -1;
-    m_nCurrentIndex = -1;
-    m_nLayoutRows = 3;
-    m_nLayoutColumns = 4;
-
-    m_nDirection = None;
-    m_bLoopbackChange = false;
-    m_bRecovery = false;
-
-    m_bPressed = false;
-    m_startPos = QPoint(0, 0);
-    m_nStartPos = 0;
-    m_nMoveEndValue = 0;
-
-    m_animation = new QPropertyAnimation(this, "xPos");
-    m_animation->setDuration(200);
-    //    this->setMouseTracking(true);
+    Init();
 }
 
 LauncherWidget::~LauncherWidget()
 {
+    delete m_btnNext;
+    m_btnNext = NULL;
 
+    delete m_btnPrev;
+    m_btnPrev = NULL;
 }
 
 void LauncherWidget::AddItem(int id, LauncherItem *item)
@@ -94,11 +80,12 @@ void LauncherWidget::SetPageCount(int count)
     if (count < 1) return;
     this->m_nPageCnt = count;
     m_rectPageSpot.clear();
-    int nStartX = (this->width() - SPOT_WIDTH * (m_nPageCnt * 2 - 1)) / 2;
+    int nStartX = (m_nBaseWidth - SPOT_WIDTH * (m_nPageCnt * 2 - 1)) / 2;
     for (int i = 0; i < m_nPageCnt; i++) {
-        QRect rect(nStartX + i * 2 * SPOT_WIDTH, this->height() - SPOT_WIDTH * 2, SPOT_WIDTH, SPOT_WIDTH);
+        QRect rect(nStartX + i * 2 * SPOT_WIDTH, m_rectPage.bottom() - SPOT_WIDTH * 2, SPOT_WIDTH, SPOT_WIDTH);
         m_rectPageSpot.insert(i, rect);
     }
+
     this->update();
 }
 
@@ -120,7 +107,7 @@ void LauncherWidget::SltShowNextPage()
 {
     if (m_nCurrentPage < (m_nPageCnt - 1)) {
         m_nDirection = LeftDirection;
-        m_nMoveEndValue = -this->width();
+        m_nMoveEndValue = -m_nBaseWidth;
         m_animation->setStartValue(0);
         m_animation->setEndValue(m_nMoveEndValue);
         m_animation->start();
@@ -131,11 +118,48 @@ void LauncherWidget::SltShowPrevPage()
 {
     if (m_nCurrentPage > 0) {
         m_nDirection = RightDirection;
-        m_nMoveEndValue = this->width();
+        m_nMoveEndValue = m_nBaseWidth;
         m_animation->setStartValue(0);
         m_animation->setEndValue(m_nMoveEndValue);
         m_animation->start();
     }
+}
+
+void LauncherWidget::Init()
+{
+    m_nBaseWidth = 800;
+    m_nBaseHeight = 480;
+    m_rectPage = QRect(60, 0, 680, 400);
+    m_rectAbout = QRect(0, 400, m_nBaseWidth, 80);
+
+    m_nPageCnt = 3;
+    m_nCurrentPage = 0;
+    m_nPrevPage = -1;
+    m_nCurrentIndex = -1;
+    m_nLayoutRows = 3;
+    m_nLayoutColumns = 4;
+    m_nItemWidth = 145;
+    m_nItemHeight = 100;
+
+    m_nDirection = None;
+    m_bLoopbackChange = false;
+    m_bRecovery = false;
+
+    m_bPressed = false;
+    m_startPos = QPoint(0, 0);
+    m_nStartPos = 0;
+    m_nMoveEndValue = 0;
+
+    m_animation = new QPropertyAnimation(this, "xPos");
+    m_animation->setDuration(200);
+
+    // 切换按钮
+    m_btnPrev = new QtPixmapButton(0, QRect( 10, 180, 40, 40), QPixmap(":/images/mainwindow/ic_prev.png"), QPixmap(":/images/mainwindow/ic_prev_pre.png"));
+    m_btnPrev->setPressed(true);
+    m_btnNext = new QtPixmapButton(0, QRect(750, 180, 40, 40), QPixmap(":/images/mainwindow/ic_next.png"), QPixmap(":/images/mainwindow/ic_next_pre.png"));
+
+    // 设置移动点
+    SetPageCount(3);
 }
 
 void LauncherWidget::setXPos(int nValue)
@@ -150,12 +174,16 @@ void LauncherWidget::setXPos(int nValue)
         else if (!m_bRecovery && RightDirection == m_nDirection) {
             m_nCurrentPage = m_nCurrentPage - 1;
             if (m_nCurrentPage < 0) m_nCurrentPage = 0;
+
             emit currentPageChanged(m_nCurrentPage);
         }
 
         m_nDirection = None;
         m_bRecovery = false;
         m_nStartPos = 0;
+
+        m_btnNext->setPressed(m_nCurrentPage == (m_nPageCnt - 1));
+        m_btnPrev->setPressed(0 == m_nCurrentPage);
     }
     this->update();
 }
@@ -165,21 +193,35 @@ void LauncherWidget::SltChangePage()
 
 }
 
-void LauncherWidget::resizeEvent(QResizeEvent *e)
-{
-    SetPageCount(m_nPageCnt);
-    m_nItemHeight = (this->height() -  (m_nLayoutRows + 1) * ITEM_SPACE - SPOT_WIDTH * 2) / m_nLayoutRows;
-    m_nItemWidth = (this->width() -  (m_nLayoutColumns + 1) * ITEM_SPACE) / m_nLayoutColumns;
-    QWidget::resizeEvent(e);
-}
-
 void LauncherWidget::mousePressEvent(QMouseEvent *e)
 {
     if (!this->isEnabled()) return;
     bool bOk = false;
+    QRect rectScale;
+
+    ScaleRect(rectScale, m_rectAbout);
+    if (rectScale.contains(e->pos())) {
+        emit signalAboutClicked();
+        return;
+    }
+
+    ScaleRect(rectScale, m_btnPrev->rect());
+    if (rectScale.contains(e->pos())) {
+        m_btnPrev->setPressed(true);
+        this->update();
+        return;
+    }
+
+    ScaleRect(rectScale, m_btnNext->rect());
+    if (rectScale.contains(e->pos())) {
+        m_btnNext->setPressed(true);
+        this->update();
+        return;
+    }
 
     foreach (QRect rect, m_rectPageSpot) {
-        if (rect.contains(e->pos())) {
+        ScaleRect(rectScale, rect);
+        if (rectScale.contains(e->pos())) {
             int nKey = m_rectPageSpot.key(rect);
             if (m_nCurrentPage != nKey) {
                 m_nPrevPage = m_nCurrentPage;
@@ -192,7 +234,8 @@ void LauncherWidget::mousePressEvent(QMouseEvent *e)
     }
 
     foreach (LauncherItem *item, m_itemApps) {
-        if (item->m_rect.contains(e->pos())) {
+        ScaleRect(rectScale, item->m_rect);
+        if (rectScale.contains(e->pos())) {
             m_nCurrentIndex = item->m_nAppId;
             this->update();
             break;
@@ -209,6 +252,21 @@ void LauncherWidget::mousePressEvent(QMouseEvent *e)
 
 void LauncherWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+    m_bPressed = false;
+    bool m_bMove = (0 != m_nStartPos);
+    // 上一个
+    if (m_btnPrev->isPressed() && m_nCurrentPage > 0) {
+        m_btnPrev->setPressed(false);
+        this->SltShowPrevPage();
+    }
+
+    // 下一个
+    if (m_btnNext->isPressed() && m_nCurrentPage < (m_nPageCnt - 1)) {
+        m_btnNext->setPressed(false);
+        this->SltShowNextPage();
+    }
+
+    // 判断是否有app点击
     if (None == m_nDirection && -1 != m_nCurrentIndex) {
         emit currentItemClicked(m_nCurrentIndex);
     }
@@ -216,11 +274,11 @@ void LauncherWidget::mouseReleaseEvent(QMouseEvent *e)
     m_nCurrentIndex = -1;
     this->update();
 
-    m_bPressed = false;
+    if (!m_bMove) return;
     m_animation->setStartValue(m_nStartPos);
 
-    if (qAbs(m_nStartPos) > 100) {
-        m_nMoveEndValue = (m_nStartPos < 0) ? -this->width() : this->width();
+    if (qAbs(m_nStartPos) > 100 * m_scaleX) {
+        m_nMoveEndValue = (m_nStartPos < 0) ? -m_nBaseWidth : m_nBaseWidth;
         m_nDirection = (m_nStartPos < 0) ? LeftDirection : RightDirection;
     }
     else {
@@ -239,15 +297,16 @@ void LauncherWidget::mouseMoveEvent(QMouseEvent *e)
     if (m_bPressed) {
         int nXoffset = e->pos().x() - m_startPos.x();
         m_startPos = e->pos();
+        if (m_bZoom) nXoffset = nXoffset;
 
         // 向左滑动--显示下一页
         m_nDirection = (nXoffset < 0) ? LeftDirection : RightDirection;
         m_nStartPos += nXoffset;
-        if (RightDirection == m_nDirection && m_nCurrentPage == 0 && m_nStartPos > 50) {
-            m_nStartPos = 50;
+        if (RightDirection == m_nDirection && m_nCurrentPage == 0 && m_nStartPos > 50 * m_scaleX) {
+            m_nStartPos = 50 * m_scaleX;
         }
-        else if (LeftDirection == m_nDirection && ((m_nCurrentPage + 1) == m_nPageCnt) && m_nStartPos < -50) {
-            m_nStartPos = -50;
+        else if (LeftDirection == m_nDirection && ((m_nCurrentPage + 1) == m_nPageCnt) && m_nStartPos < -50 * m_scaleX) {
+            m_nStartPos = -50 * m_scaleX;
         }
         this->update();
     }
@@ -258,38 +317,57 @@ void LauncherWidget::mouseMoveEvent(QMouseEvent *e)
 void LauncherWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::NoPen);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+
+    if (m_bZoom) painter.scale(m_scaleX, m_scaleY);
     if (!m_pixmapWallpaper.isNull()) {
-        painter.drawPixmap(0, 0, this->width(), this->height(), m_pixmapWallpaper);
+        painter.drawPixmap(0, 0, m_pixmapWallpaper);
     } else {
         painter.setBrush(m_backgroundColor);
         painter.drawRect(this->rect());
     }
 
     // 绘制中心区域
+    drawCenter(&painter);
+
+    // 绘制界面切换按钮
+    painter.drawPixmap(m_btnPrev->rect().topLeft(), m_btnPrev->pixmap());
+    painter.drawPixmap(m_btnNext->rect().topLeft(), m_btnNext->pixmap());
+
+    // 绘制底部广告标语
+    painter.drawPixmap(m_rectAbout, QPixmap(":/images/mainwindow/statusbar_bg.png"));
+}
+
+void LauncherWidget::drawCenter(QPainter *painter)
+{
+    painter->save();
+    painter->setClipRect(m_rectPage);
+    painter->setPen(Qt::NoPen);
     if (None == m_nDirection) {
-        drawAppItem(&painter, m_nCurrentPage);
+        drawAppItem(painter, m_nCurrentPage, m_rectPage.left());
     }
     else {
-        drawAppItem(&painter, m_nCurrentPage, m_nStartPos);
+        int nXoffset = m_rectPage.left() + m_nStartPos;
+        drawAppItem(painter, m_nCurrentPage, nXoffset);
         if (m_nStartPos < 0) {
-            drawAppItem(&painter, m_nCurrentPage + 1, this->width() + m_nStartPos);
+            drawAppItem(painter, m_nCurrentPage + 1, m_rectPage.width() + nXoffset);
         }
         else {
-            drawAppItem(&painter, m_nCurrentPage - 1, -this->width() + m_nStartPos);
+            drawAppItem(painter, m_nCurrentPage - 1, -m_rectPage.width() + nXoffset);
         }
     }
     //  绘制底部的点
-    drawItemSpot(&painter);
+    drawItemSpot(painter);
+    painter->restore();
 }
 
+// 绘制item
 void LauncherWidget::drawAppItem(QPainter *painter, int page, int xOffset)
 {
     QRect rect;
     int nIndex = 0;
     foreach (LauncherItem *item, m_itemApps) {
-        item->m_rect = QRect(0, 0, 0, 0);
+        item->m_rect = QRect(m_rectPage.left() , m_rectPage.top(), 0, 0);
         if (page == item->m_nPageIndex) {
             if (0 == (nIndex % m_nLayoutColumns)) {
                 rect = QRect(xOffset, (nIndex / m_nLayoutColumns) * (m_nItemHeight + ITEM_SPACE) + ITEM_SPACE, 0, 0);
@@ -304,6 +382,7 @@ void LauncherWidget::drawAppItem(QPainter *painter, int page, int xOffset)
     }
 }
 
+// 绘制底部小圆圈
 void LauncherWidget::drawItemSpot(QPainter *painter)
 {
     painter->save();
@@ -316,6 +395,7 @@ void LauncherWidget::drawItemSpot(QPainter *painter)
     painter->restore();
 }
 
+// 绘制app图标文字详细信息
 void LauncherWidget::drawAppInfo(QPainter *painter, QRect rect, LauncherItem *item)
 {
     painter->save();

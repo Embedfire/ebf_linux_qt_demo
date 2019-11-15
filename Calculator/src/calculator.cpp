@@ -42,33 +42,23 @@ Calculator::~Calculator()
 
 void Calculator::InitData()
 {
+    m_realTemp = 0.0;
+    m_strResult = "0";
+    m_rectHome = QRect(m_nBaseWidth - 60, 3, 54, 54);
+
     QStringList strLabes = QStringList() << "bin" << "oct" << "dec" << "hex" << "AC" << "←" << "/"
                                          << "x^2" << "x^y" << "ln" << "7" << "8" << "9" << "*"
                                          << "x!" << "log" << "√" << "4" << "5" << "6" << "-"
                                          << "sin" << "cos" << "tan" << "1" << "2" << "3" << "+"
                                          << "mod" << "(" << ")" << "±" << "0" << "." << "=";
 
-    for (int i = 0; i < strLabes.size(); i++) {
-        m_calcBtns.insert(i, new CalcButton(i, QRect(0, 0, 0, 0), strLabes.at(i)));
-    }
-    m_realTemp = 0.0;
-    m_strResult = "0";
-}
-
-void Calculator::CalcButtonResize()
-{
     int space = 1;
-    int nWidth = (this->width() - 8 - (space * 6)) / 7;
-    int nHeight = (this->height() - 180 - 4 - space * 4) / 5;
-    foreach (CalcButton *btn, m_calcBtns) {
-        int index = btn->id();
-        QRect rect(4 + (index % 7) * (nWidth + space) , 180 + (index / 7) * (nHeight + space), nWidth, nHeight);
-        btn->setRect(rect);
+    int nWidth = (m_nBaseWidth - 8 - (space * 6)) / 7;
+    int nHeight = (m_nBaseHeight - 180 - 4 - space * 4) / 5;
+    for (int i = 0; i < strLabes.size(); i++) {
+        QRect rect(4 + (i % 7) * (nWidth + space) , 180 + (i / 7) * (nHeight + space), nWidth, nHeight);
+        m_calcBtns.insert(i, new CalcButton(i, rect, strLabes.at(i)));
     }
-
-    express_lineEdit->setGeometry(14, 119, this->width() - 14 * 2, 57);
-    m_rectHome = QRect(this->width() - 60, 3, 54, 54);
-    this->update();
 }
 
 void Calculator::onButtonClicked(CalcButton *btn)
@@ -210,22 +200,32 @@ void Calculator::onButtonClicked(CalcButton *btn)
 
 void Calculator::resizeEvent(QResizeEvent *e)
 {
-    CalcButtonResize();
+    m_scaleX = (this->width() * 1.0 / m_nBaseWidth);
+    m_scaleY = (this->height() * 1.0 / m_nBaseHeight);
+    express_lineEdit->setGeometry(14 * m_scaleX, 119 * m_scaleY, (m_nBaseWidth - 14 * 2) * m_scaleX, 57 * m_scaleY);
+    QFont font = express_lineEdit->font();
+    int nSize = 40 * m_scaleX * m_scaleY;
+    font.setPixelSize(nSize > 40 ? 40 : nSize);
+    express_lineEdit->setFont(font);
     QWidget::resizeEvent(e);
 }
 
 void Calculator::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
+    painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
     painter.fillRect(this->rect(), QColor("#000000"));
 
-    QRect rectTitle(0, 0, this->width(), 60);
+    // 设置缩放因子
+    if (m_bZoom) painter.scale(m_scaleX, m_scaleY);
+
+    QRect rectTitle(0, 0, m_nBaseWidth, 60);
     QFont font(Skin::m_strAppFontBold);
     font.setBold(true);
     font.setPixelSize(22);
     painter.setFont(font);
     painter.setPen(QColor("#ffffff"));
-    painter.drawText(rectTitle, Qt::AlignCenter, QString("计算器"));
+    painter.drawText(rectTitle, Qt::AlignCenter, tr("计算器"));
 
     painter.drawPixmap(m_rectHome, QPixmap(QString(":/images/music/menu_icon%1.png")
                                            .arg(m_bRectHomePressed ? "_pressed" : "")));
@@ -240,8 +240,8 @@ void Calculator::drawHistory(QPainter *painter)
     painter->save();
     QFont font = painter->font();
     painter->setPen(Qt::NoPen);
-    painter->setRenderHint(QPainter::Antialiasing);
-    QRect rect(4, 63, this->width() - 8, 114);
+
+    QRect rect(4, 63, m_nBaseWidth - 8, 114);
     painter->setBrush(QColor("#ffffff"));
     painter->drawRoundedRect(rect, 6, 6);
     // 历史及公式
@@ -268,7 +268,7 @@ void Calculator::drawButtons(QPainter *painter)
     painter->save();
     painter->setPen(Qt::NoPen);
     painter->setBrush(QColor("#c2c4c3"));
-    QRect rectBtns(4, 180, this->width() - 8, this->height() - 185);
+    QRect rectBtns(4, 180, m_nBaseWidth - 8, m_nBaseHeight - 185);
     painter->drawRoundedRect(rectBtns, 6, 6);
     painter->setPen(QColor("#000000"));
     // 绘制网格
@@ -324,13 +324,17 @@ void Calculator::drawButtons(QPainter *painter)
 
 void Calculator::mousePressEvent(QMouseEvent *e)
 {
-    if (m_rectHome.contains(e->pos())) {
+    QRect rect;
+    ScaleRect(rect, m_rectHome);
+    if (rect.contains(e->pos())) {
         m_bRectHomePressed = true;
         this->update();
+        return;
     }
 
     foreach (CalcButton *btn, m_calcBtns) {
-        if (btn->rect().contains(e->pos())) {
+        ScaleRect(rect, btn->rect());
+        if (rect.contains(e->pos())) {
             m_nCurrentIndex = btn->id();
             this->update();
             break;

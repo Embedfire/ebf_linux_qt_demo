@@ -17,9 +17,9 @@
 #include <QLabel>
 #include <QTimer>
 #include <QPushButton>
+#include <QMouseEvent>
 
-
-TextBoardWidget::TextBoardWidget(QWidget *parent) : QWidget(parent)
+TextBoardWidget::TextBoardWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_nPitchValue = 0;
     m_nRollValue = 0;
@@ -29,7 +29,9 @@ TextBoardWidget::TextBoardWidget(QWidget *parent) : QWidget(parent)
 
     m_strLabels = QStringList() << "X" << "Y" << "Z";
     m_strUnits = QStringList() << "°/s" << "°/s" << "°/s";
-    this->setFixedSize(256, 296);
+    m_nBaseWidth = 256;
+    m_nBaseHeight = 296;
+//    this->setFixedSize(256, 296);
 }
 
 TextBoardWidget::~TextBoardWidget()
@@ -83,11 +85,12 @@ void TextBoardWidget::paintEvent(QPaintEvent *)
     QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(32);
     painter.setFont(font);
+    painter.scale(m_scaleX, m_scaleY);
 
-    QRect rectData(this->rect());
+    QRect rectData(0, 0, m_nBaseWidth, m_nBaseHeight);
     painter.setPen("#aaaaaa");
     painter.setBrush(QColor("#00509b"));
-    painter.drawRoundedRect(1, 1, this->width() - 2, this->height() - 2, 6, 6);
+    painter.drawRoundedRect(1, 1, m_nBaseWidth - 2, m_nBaseHeight - 2, 6, 6);
 
     font.setPixelSize(24);
     painter.setFont(font);
@@ -139,16 +142,17 @@ Gyroscope::Gyroscope(QWidget *parent) : QtAnimationWidget(parent)
 
 Gyroscope::~Gyroscope()
 {
+    delete m_btnHome;
+    m_btnHome = NULL;
+
     m_threadTest->Stop();
 }
 
 void Gyroscope::InitWidget()
 {
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(54, 54);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
+    m_btnHome = new QtPixmapButton(0, QRect(m_nBaseWidth - 54 - 10, 16, 54, 54),
+                                   QPixmap(":/images/music/menu_icon.png"),
+                                   QPixmap(":/images/music/menu_icon_pressed.png"));
 
     m_textBoardLeft = new TextBoardWidget(this);
     m_textBoardLeft->setTitle(tr("加速度"));
@@ -176,10 +180,10 @@ void Gyroscope::InitWidget()
 #endif
 
     QVBoxLayout *verLayout = new QVBoxLayout(this);
-    verLayout->setContentsMargins(10, 10, 10, 10);
-    verLayout->setSpacing(20);
-    verLayout->addWidget(btnHome, 0, Qt::AlignRight | Qt::AlignTop);
-    verLayout->addLayout(horLayout, 1);
+    verLayout->setContentsMargins(0, 0, 0, 0);
+    verLayout->setSpacing(10);
+    verLayout->addStretch(1);
+    verLayout->addLayout(horLayout, 7);
 }
 
 void Gyroscope::SltStartTest()
@@ -216,16 +220,54 @@ void Gyroscope::SltUpdateValues(int type, int index, qint16 value)
     }
 }
 
+void Gyroscope::resizeEvent(QResizeEvent *e)
+{
+    m_scaleX = (this->width() * 1.0) / m_nBaseWidth;
+    m_scaleY = (this->height() * 1.0) / m_nBaseHeight;
+
+    m_textBoardLeft->setFixedSize(256 * m_scaleX, 296 * m_scaleY);
+    m_textBoardRight->setFixedSize(256 * m_scaleX, 296 * m_scaleY);
+    QWidget::resizeEvent(e);
+}
+
 void Gyroscope::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
-    painter.drawPixmap(this->rect(), QPixmap(":/images/gry/background.png"));
+    painter.scale(m_scaleX, m_scaleY);
+    painter.drawPixmap(0, 0, QPixmap(":/images/gry/background.png"));
 
     QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(32);
     painter.setFont(font);
     painter.setPen("#ffffff");
-    painter.drawText(0, 0, this->width(), 100, Qt::AlignCenter, QString("陀螺仪"));
+    painter.drawText(0, 0, m_nBaseWidth, 80, Qt::AlignCenter, tr("陀螺仪"));
+
+    // home按键
+    painter.drawPixmap(m_btnHome->rect(), m_btnHome->pixmap());
+}
+
+void Gyroscope::mousePressEvent(QMouseEvent *e)
+{
+    QRect rect;
+    ScaleRect(rect, m_btnHome->rect());
+    if (rect.contains(e->pos())) {
+        m_btnHome->setPressed(true);
+        this->update();
+    }
+}
+
+void Gyroscope::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (m_btnHome->isPressed()) {
+        m_btnHome->setPressed(false);
+        this->update();
+        // 执行释放触发信号
+        QRect rect;
+        ScaleRect(rect, m_btnHome->rect());
+        if (rect.contains(e->pos())) {
+            emit signalBackHome();
+        }
+    }
 }
 

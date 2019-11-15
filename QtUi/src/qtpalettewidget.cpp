@@ -11,11 +11,12 @@
 #include "qtpalettewidget.h"
 #include <QPainter>
 #include <QMouseEvent>
-#include <QDebug>
 
 QtPaletteWidget::QtPaletteWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
-    this->setFixedSize(436, 432);
+    m_nBaseWidth = 436;
+    m_nBaseWidth = 432;
+
     m_nFontSize = 18;
     m_currentColor = QColor("#000000");
     m_nIndex = 0;
@@ -26,6 +27,7 @@ QtPaletteWidget::QtPaletteWidget(QWidget *parent) : QtAnimationWidget(parent)
                                 << "#d9001b" << "#f59a23" << "#ffff00" << "#95f204" << "#00ffff" << "#02a7f0" << "#0000ff" << "#8400ff"
                                 << "#a30014" << "#b8741a" << "#bfbf00" << "#70b603" << "#00bfbf" << "#027db4" << "#0000bf" << "#6300bf"
                                 << "#6d000e" << "#7b4d12" << "#808000" << "#4b7902" << "#008080" << "#015478" << "#000080" << "#420080";
+    InitValues();
 }
 
 QtPaletteWidget::~QtPaletteWidget()
@@ -75,9 +77,9 @@ void QtPaletteWidget::ColorPanelClicked(QPoint pos)
     this->update();
 }
 
-void QtPaletteWidget::resizeEvent(QResizeEvent *e)
+void QtPaletteWidget::InitValues()
 {
-    m_rectPanel = QRect(20, 90, this->width() - 35, this->height() - 175);
+    m_rectPanel = QRect(20, 90, m_nBaseWidth - 35, m_nBaseHeight - 175);
     // 创建颜色面板
     CreatePanel(m_rectPanel);
 
@@ -90,15 +92,14 @@ void QtPaletteWidget::resizeEvent(QResizeEvent *e)
         QRect rectColor(m_rectPanel.left() + (i % nCol) * (nSpace + nW) + nSpace, m_rectPanel.top() + (i / nCol) * (nH + nSpace) + nSpace, nW, nH);
         m_colorRects.insert(i, ColorRole(i, QColor(m_strColors.at(i)), rectColor));
     }
-    QWidget::resizeEvent(e);
 }
 
 void QtPaletteWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter.drawPixmap(this->rect(), QPixmap(":/images/ebook/ic_palette.png"));
-
+    painter.scale(m_scaleX, m_scaleY);
     drawFontConfig(&painter);
     drawColorBoard(&painter);
 }
@@ -111,7 +112,7 @@ void QtPaletteWidget::drawFontConfig(QPainter *painter)
     painter->setFont(font);
     QString strTitle = QString("设置字体大小");
     int nTW = painter->fontMetrics().width(strTitle);
-    QRect rectTitle(15, 15, this->width() / 2 + nTW / 2, 40);
+    QRect rectTitle(15, 15, m_nBaseWidth / 2 + nTW / 2, 40);
     painter->setPen(QColor("#5fbae2"));
     painter->setBrush(Qt::NoBrush);
     painter->drawRoundedRect(rectTitle, 2, 2);
@@ -138,7 +139,7 @@ void QtPaletteWidget::drawFontConfig(QPainter *painter)
 void QtPaletteWidget::drawColorBoard(QPainter *painter)
 {
     painter->save();
-    painter->setClipRect(10, 60, this->width() - 20, this->height() - 80);
+    painter->setClipRect(10, 60, m_nBaseWidth - 20, m_nBaseHeight - 80);
     painter->setPen(QColor("#5fbae2"));
     painter->setBrush(Qt::NoBrush);
     QFont font = painter->font();
@@ -149,10 +150,11 @@ void QtPaletteWidget::drawColorBoard(QPainter *painter)
     QPainterPath path;
     int nTW = painter->fontMetrics().width(strTitle);
     int nTH = painter->fontMetrics().height();
-    QRect rectTitle((this->width() - nTW) / 2, 60, nTW, nTH);
+    QRect rectTitle((m_nBaseWidth - nTW) / 2, 60, nTW, nTH);
     path.addRoundedRect(rectTitle, 2, 2);
     path.moveTo(10, rectTitle.bottom());
-    QRect rectCenter(15, rectTitle.bottom(), this->width(), this->height() - 80 - nTH);
+
+    QRect rectCenter(15, rectTitle.bottom(), m_nBaseWidth, m_nBaseHeight - 80 - nTH);
     path.addRoundedRect(rectCenter, 2, 2);
     painter->drawPath(path);
     painter->setPen(QColor("#333333"));
@@ -185,43 +187,53 @@ void QtPaletteWidget::drawColorBoard(QPainter *painter)
     painter->fillRect(m_rectOther, m_currentColor);
     painter->setPen(QColor("#333333"));
     painter->drawText(m_rectOther.right() + 10, m_rectOther.top(), rectBottom.width() - m_rectOther.width(), m_rectOther.height(),
-                      Qt::AlignVCenter, QString("选择其他颜色"));
+                      Qt::AlignVCenter, tr("选择其他颜色"));
     painter->restore();
 }
 
 void QtPaletteWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (m_rectMinus.contains(e->pos())) {
+    QRect rect;
+    ScaleRect(rect, m_rectMinus);
+    if (rect.contains(e->pos())) {
         m_nFontSize -= 1;
-        this->update();
         emit signalFontChanged(m_nFontSize);
-    } else if (m_rectAdd.contains(e->pos())) {
+        this->update();
+        return;
+    }
+
+    ScaleRect(rect, m_rectAdd);
+    if (rect.contains(e->pos())) {
         m_nFontSize += 1;
         emit signalFontChanged(m_nFontSize);
         this->update();
-    }
-    else if (m_rectOther.contains(e->pos())) {
-        m_bColorPanel = !m_bColorPanel;
-        this->update();
-    }
-    else {
-        if (m_bColorPanel) {
-            if (m_rectPanel.contains(e->pos())) {
-                m_selectPos = e->pos();
-                ColorPanelClicked(e->pos());
-            }
-        }
-        else {
-            foreach (ColorRole color, m_colorRects) {
-                if (color.m_rect.contains(e->pos())) {
-                    m_nIndex = color.m_nId;
-                    m_currentColor = color.m_color;
-                    this->update();
-                    emit signalColorChanged(m_currentColor);
-                    break;
-                }
-            }
-        }
+        return;
     }
 
+    ScaleRect(rect, m_rectOther);
+    if (rect.contains(e->pos())) {
+        m_bColorPanel = !m_bColorPanel;
+        this->update();
+        return;
+    }
+
+    if (m_bColorPanel) {
+        ScaleRect(rect, m_rectPanel);
+        if (rect.contains(e->pos())) {
+            m_selectPos = QPoint(e->x() / m_scaleX, e->y() / m_scaleY);
+            ColorPanelClicked(m_selectPos);
+        }
+    }
+    else {
+        foreach (ColorRole color, m_colorRects) {
+            ScaleRect(rect, color.m_rect);
+            if (rect.contains(e->pos())) {
+                m_nIndex = color.m_nId;
+                m_currentColor = color.m_color;
+                this->update();
+                emit signalColorChanged(m_currentColor);
+                break;
+            }
+        }
+    }
 }

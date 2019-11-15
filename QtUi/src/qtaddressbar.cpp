@@ -16,11 +16,15 @@
 #include <QFontMetrics>
 #include <QPushButton>
 #include <QBoxLayout>
-#include <QDebug>
 
-AddressLineEdit::AddressLineEdit(QWidget *parent) : QWidget(parent)
+#define FONT_FAMILY "思源黑体 CN Normal"
+
+AddressLineEdit::AddressLineEdit(QWidget *parent) : QtWidgetBase(parent)
 {
-    m_font = this->font();
+    m_nBaseWidth = 620;
+    m_nBaseHeight = 40;
+
+    m_font.setFamily(FONT_FAMILY);
     m_font.setPixelSize(18);
     m_nMargin = 10;
 
@@ -39,9 +43,11 @@ void AddressLineEdit::setAddress(const QString &addr)
     m_strAddrPath = addr;
     QStringList strAddress = addr.split("/");
     ClearItem();
-    QFontMetrics fm(m_font);
+    QFont font(FONT_FAMILY);
+    font.setPixelSize(18);
+    QFontMetrics fm(font);
 
-    QRect rect(0, 0, m_nMargin, this->height());
+    QRect rect(0, 0, m_nMargin, m_nBaseHeight);
 
     for (int i = 0; i < strAddress.size(); i++) {
         QString strAddr = strAddress.at(i);
@@ -109,32 +115,33 @@ void AddressLineEdit::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor("#fafafa"));
-    painter.drawRoundedRect(this->rect(), 8, 8);
+    painter.drawRoundedRect(QRect(0, 0, m_nBaseWidth, m_nBaseHeight), 8, 8);
 
-    painter.setFont(m_font);
-#if 1
+    QFont font(FONT_FAMILY);
+    font.setPixelSize(18);
+    painter.setFont(font);
+
     painter.setBrush(Qt::NoBrush);
     foreach (AddressItem *item, m_addressItems) {
         painter.setPen(m_nIndex == item->id() ? QColor("#00ff00") : QColor("#3c3c3c"));
         painter.drawText(item->rect(), Qt::AlignCenter, item->address());
 
         if (item->id() < (m_addressItems.size() - 1)) {
-            painter.drawText(QRect(item->rect().right(), item->rect().top(), m_nSplitWidth, this->height()),
+            painter.drawText(QRect(item->rect().right(), item->rect().top(), m_nSplitWidth, m_nBaseHeight),
                              Qt::AlignCenter, "/");
         }
     }
-#else
-    QRect rectText(m_nMargin, 0, this->width() - m_nMargin * 2, this->height());
-    painter.drawText(rectText, Qt::AlignVCenter, m_strAddrPath);
-#endif
 }
 
 void AddressLineEdit::mousePressEvent(QMouseEvent *e)
 {
+    QRect rect;
     foreach (AddressItem *item, m_addressItems) {
-        if (item->rect().contains(e->pos())) {
+        ScaleRect(rect, item->rect());
+        if (rect.contains(e->pos())) {
             CurrentPathChanged(item->id());
             this->update();
             break;
@@ -144,9 +151,12 @@ void AddressLineEdit::mousePressEvent(QMouseEvent *e)
 
 
 /////////////////////////////////////////////////////////////////////////////////
-QtAddressBar::QtAddressBar(QWidget *parent) : QWidget(parent)
+QtAddressBar::QtAddressBar(QWidget *parent) : QtWidgetTitleBar(parent)
 {
-    this->setFixedHeight(60);
+    this->SetBackground(QColor("#474540"));
+    m_nBaseWidth = 800;
+    m_nBaseHeight = 60;
+
     InitWidget();
 }
 
@@ -165,45 +175,31 @@ QString QtAddressBar::getAddress()
     return m_addrLineEdit->getAddress();
 }
 
+void QtAddressBar::SltBtnClicked(int index)
+{
+    if (0 == index) {
+        emit signalBackHome();
+    } else if (1 == index) {
+        m_addrLineEdit->SltBackAddress();
+    } else if (2 == index) {
+        m_addrLineEdit->SltNextAddress();
+    }
+}
+
 void QtAddressBar::InitWidget()
 {
-    QHBoxLayout *horLayout = new QHBoxLayout(this);
-    horLayout->setContentsMargins(3, 3, 3, 3);
-    horLayout->setSpacing(10);
-
-    QPushButton *btnPrev = new QPushButton(this);
-    horLayout->addWidget(btnPrev);
-    btnPrev->setFixedSize(30, 30);
-    btnPrev->setStyleSheet(QString("QPushButton {border-image: url(:/images/file/ic_prev.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/file/ic_prev_pre.png);}"));
-
-
-    QPushButton *btnNext = new QPushButton(this);
-    btnNext->setFixedSize(30, 30);
-    horLayout->addWidget(btnNext);
-    btnNext->setStyleSheet(QString("QPushButton {border-image: url(:/images/file/ic_next.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/file/ic_next_pre.png);}"));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(10, 10, 40, 40), QPixmap(":/images/file/ic_prev.png"), QPixmap(":/images/file/ic_prev_pre.png")));
+    m_btns.insert(2, new QtPixmapButton(2, QRect(60, 10, 40, 40), QPixmap(":/images/file/ic_next.png"), QPixmap(":/images/file/ic_next_pre.png")));
 
     m_addrLineEdit = new AddressLineEdit(this);
-    m_addrLineEdit->setFixedHeight(36);
-    horLayout->addWidget(m_addrLineEdit, 1);
-    connect(btnPrev, SIGNAL(clicked(bool)), m_addrLineEdit, SLOT(SltBackAddress()));
-    connect(btnNext, SIGNAL(clicked(bool)), m_addrLineEdit, SLOT(SltNextAddress()));
     connect(m_addrLineEdit, SIGNAL(signalAddress(QString)), this, SIGNAL(signalAddress(QString)));
-
-    QPushButton *btnHome = new QPushButton(this);
-    horLayout->addWidget(btnHome, 1);
-
-    btnHome->setFixedSize(54, 54);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/file/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/file/menu_icon_pressed.png);}"));
 }
 
-void QtAddressBar::paintEvent(QPaintEvent *)
+void QtAddressBar::resizeEvent(QResizeEvent *e)
 {
-    QPainter painter(this);
-    painter.fillRect(this->rect(), QColor("#474540"));
+    SetScaleValue();
+    m_addrLineEdit->setFixedSize(620 * m_scaleX, 40 * m_scaleY);
+    m_addrLineEdit->move(110 * m_scaleX, 10 * m_scaleY);
+    QWidget::resizeEvent(e);
 }
-
 

@@ -63,21 +63,18 @@ signals:
     void signalMuenList();
 
 private:
-    QtSliderBar *m_sliderBar;
-    QLabel      *m_labelPostion;
-    QLabel      *m_labelDuration;
+    QtSliderBar *m_progressBar;
 
-    QPushButton *m_btnPrev;
-    QPushButton *m_btnPlay;
-    QPushButton *m_btnNext;
-
-    QPushButton *m_btnVolume;
-    QPushButton *m_btnMenuList;
-
+    QString             m_strCurrTime;
+    QString             m_strDuration;
 private:
     void InitWidget();
 
+private slots:
+    void SltBtnClicked(int index);
+
 protected:
+    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
 };
 

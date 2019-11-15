@@ -23,8 +23,7 @@
 #include <QTimer>
 #include <QMouseEvent>
 
-FileSystemWindow::FileSystemWindow(QWidget *parent)
-    : QtAnimationWidget(parent)
+FileSystemWindow::FileSystemWindow(QWidget *parent) : QtAnimationWidget(parent)
 {
 #ifdef __arm__
     m_strRootPath = QString("/");
@@ -60,13 +59,12 @@ void FileSystemWindow::InitWidget()
 
     QWidget *widgetRecent = new QWidget(this);
     widgetRecent->setObjectName("widgetRecent");
-    widgetRecent->setFixedWidth(133);
     widgetRecent->setStyleSheet(QString("QWidget#widgetRecent{background-color: #605d53;}"
                                         "QPushButton{border:none; border-bottom: 1px solid #aaaaaa;"
                                         "background-color: none; font-family:'%1';"
                                         "font: 18px; color: #ffffff; min-height: 35px; text-align: left; padding-left: 10px}"
                                         "QPushButton:pressed{background-color: #f17a49;}").arg(Skin::m_strAppFontNormal));
-    horLayout->addWidget(widgetRecent);
+    horLayout->addWidget(widgetRecent, 1);
 
 
     QVBoxLayout *verLayoutRecent = new QVBoxLayout(widgetRecent);
@@ -90,13 +88,13 @@ void FileSystemWindow::InitWidget()
     m_listView = new QtPressMoveListView(this);
     m_listView->SetIconMode();
     m_listView->setDragDropMode(QListView::NoDragDrop);
-    horLayout->addWidget(m_listView, 1);
+    horLayout->addWidget(m_listView, 6);
 
     QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
     verLayoutAll->setContentsMargins(0, 0, 0, 0);
     verLayoutAll->setSpacing(0);
-    verLayoutAll->addWidget(m_addressBar);
-    verLayoutAll->addLayout(horLayout, 1);
+    verLayoutAll->addWidget(m_addressBar, 1);
+    verLayoutAll->addLayout(horLayout, 7);
 
     m_notePadWidget = new NotePadWidget(this);
     connect(m_notePadWidget, SIGNAL(signalBackHome()), this, SLOT(SltNotePadHide()));
@@ -128,6 +126,8 @@ void FileSystemWindow::SltItemClicked(const QModelIndex &index)
     else {
         QFileInfo fileInfo(m_model->filePath(index));
         if (fileInfo.isFile() && (fileInfo.suffix() == "txt" ||
+                                  fileInfo.suffix() == "cpp" ||
+                                  fileInfo.suffix() == "h" ||
                                   fileInfo.suffix() == "c" ||
                                   fileInfo.suffix() == "sh"))
         {
@@ -159,13 +159,11 @@ void FileSystemWindow::SltBtnRecentClicked(int index)
     }
 }
 
-QSize FileSystemWindow::minimumSizeHint() const
+void FileSystemWindow::resizeEvent(QResizeEvent *e)
 {
-    return QSize(800, 480);
-}
-
-QSize FileSystemWindow::sizeHint() const
-{
-    return QSize(800, 480);
+    SetScaleValue();
+    m_listView->setIconSize(QSize(60 * m_scaleX, 60 * m_scaleY));
+    m_listView->setGridSize(QSize(100 * m_scaleX, 100 * m_scaleY));
+    QWidget::resizeEvent(e);
 }
 

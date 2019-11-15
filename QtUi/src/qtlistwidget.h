@@ -11,7 +11,7 @@
 #ifndef QTLISTWIDGET_H
 #define QTLISTWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QMap>
 #include <QTimer>
 #include <QPropertyAnimation>
@@ -47,9 +47,9 @@ public:
 ////////////////////////////////////////////////////////
 /// \brief The QtListWidget class
 #ifdef QtUi
-class QTUISHARED_EXPORT QtListWidget : public QWidget {
+class QTUISHARED_EXPORT QtListWidget : public QtWidgetBase {
 #else
-class QtListWidget : public QWidget {
+class QtListWidget : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -70,6 +70,7 @@ public:
     void setHoriazontal(bool bOk);
 
     void setAlignment(Qt::Alignment aligns);
+    void setScaleSize(int w, int h);
 
 public slots:
     void setPrevIndex();

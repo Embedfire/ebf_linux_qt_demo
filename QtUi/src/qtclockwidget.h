@@ -11,15 +11,15 @@
 #ifndef QTCLOCKWIDGET_H
 #define QTCLOCKWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QTimer>
 #include <QPropertyAnimation>
 
 #ifdef QtUi
 #include <QtUi>
-class QTUISHARED_EXPORT QtClockWidget : public QWidget {
+class QTUISHARED_EXPORT QtClockWidget : public QtWidgetBase {
 #else
-class QtClockWidget : public QWidget {
+class QtClockWidget : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -28,12 +28,11 @@ public:
 
     typedef enum {DefaultStyle, BlackStyle, LightStyle, StyleCount} ClockStyle;
 
-    void SetClockStyle(QtClockWidget::ClockStyle style);
-
 signals:
     void signalClicked(int index = 1, int direction = 1, int resize = -1);
 
 public slots:
+    void SetClockStyle(QtClockWidget::ClockStyle style);
 
 private:
     QPixmap     m_pixmapBackground;

@@ -11,14 +11,14 @@
 #ifndef ARECORDWIDGET_H
 #define ARECORDWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QTimer>
 
 #ifdef __arm__
 #include "wavobject.h"
 #endif
 
-class ARecordWidget : public QWidget
+class ARecordWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -56,7 +56,6 @@ private:
     void StartRecording();
     void StopRecording();
     void PauseRecording();
-    void ScalcRect(QRect &rectRet, const QRect &rect);
 
 private slots:
     void SltBegingRecord();

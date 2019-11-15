@@ -96,7 +96,6 @@ private slots:
 
 protected:
     void showEvent(QShowEvent *e);
-    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // CAMERACONFIG_H

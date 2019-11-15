@@ -14,11 +14,10 @@
 #include <QPainter>
 #include <QDebug>
 
-DisplayRealData::DisplayRealData(QWidget *parent) : QWidget(parent)
+DisplayRealData::DisplayRealData(QWidget *parent) : QtWidgetBase(parent)
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
     m_pixmap = QPixmap(":/images/dht/dht_background.png");
-    this->setMinimumSize(m_pixmap.size());
 }
 
 DisplayRealData::~DisplayRealData()
@@ -29,13 +28,9 @@ DisplayRealData::~DisplayRealData()
 void DisplayRealData::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-#ifdef BUILD_WITH_HDMI
-    if (this->height() > 480) {
-        painter.scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / 336);
-    }
-#endif
-    painter.drawPixmap(0, 0, m_pixmap.width(), m_pixmap.height(), m_pixmap);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / 343);
+    painter.drawPixmap(0, 0, m_pixmap);
     painter.setPen(QPen(Qt::white, 3, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(QPoint(280, 140), QPoint(280, 240));
 
@@ -47,7 +42,7 @@ void DisplayRealData::paintEvent(QPaintEvent *)
     QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(24);
     painter.setFont(font);
-    painter.drawText(QRect(202, 240, 127, 66), QString("插入DHT11\n采集温湿度"), option);
+    painter.drawText(QRect(202, 240, 127, 66), tr("插入DHT11\n采集温湿度"), option);
 
     // 绘制温湿度
     drawValues(&painter);
@@ -79,5 +74,15 @@ void DisplayRealData::drawValues(QPainter *painter)
                      Qt::AlignCenter, QString("℃"));
 
     painter->drawText(rectHumidity.right() - nTextWidth, rectHumidity.bottom() - nTextHeight, nTextHeight, nTextHeight,
-                     Qt::AlignCenter, QString("%"));
+                      Qt::AlignCenter, QString("%"));
+}
+
+void DisplayRealData::mousePressEvent(QMouseEvent *e)
+{
+    QWidget::mousePressEvent(e);
+}
+
+void DisplayRealData::mouseReleaseEvent(QMouseEvent *e)
+{
+    QWidget::mouseReleaseEvent(e);
 }

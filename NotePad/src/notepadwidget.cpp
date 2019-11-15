@@ -30,6 +30,7 @@ TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent)
 {
     m_bPressed = false;
     m_scrollbar = this->verticalScrollBar();
+    this->setUndoRedoEnabled(false);
     this->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
@@ -116,56 +117,43 @@ void NotePadWidget::SaveDocument(const QString &fileName)
 void NotePadWidget::InitWidget()
 {
     m_widgetTitle= new QtWidgetTitleBar(this);
-    m_widgetTitle->setFixedHeight(44);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 48);
     m_widgetTitle->SetBackground(Qt::transparent);
-    m_widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
-    m_widgetTitle->SetTitle("记事本", "#333333", 18);
+    m_widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
+    m_widgetTitle->SetTitle(tr("记事本"), "#333333", 20);
+    m_widgetTitle->SetBtnHomePixmap(QPixmap(":/images/notepad/menu_icon.png"), QPixmap(":/images/notepad/menu_icon_pressed.png"));
 
-    QPushButton *btnMenu = new QPushButton(m_widgetTitle);
-    btnMenu->setFixedSize(30, 30);
-    btnMenu->setStyleSheet(QString("QPushButton {border-image: url(:/images/notepad/ic_file.png);}"
-                                   "QPushButton::menu-indicator {width: 0px; height: 0px;}"));
+    QtPixmapButton *btnMenu = new QtPixmapButton(1, QRect(10, 2, 40, 40), QPixmap(":/images/notepad/ic_file.png"), QPixmap(":/images/notepad/ic_file.png"));
+    QtPixmapButton *btnSetting = new QtPixmapButton(2, QRect(60, 2, 40, 40), QPixmap(":/images/notepad/ic_setting.png"), QPixmap(":/images/notepad/ic_setting_Press.png"));
+    QMap<int,QtPixmapButton *> btns;
+    btns.insert(1, btnMenu);
+    btns.insert(2, btnSetting);
+    m_widgetTitle->SetToolButtons(btns);
+    connect(m_widgetTitle, SIGNAL(signalBtnClicked(int)), this, SLOT(SltToolBtnClicked(int)));
 
-    QMenu *menuFile = new QMenu(this);
+    m_menuFile = new QMenu(this);
     QAction *actionNew = new QAction(tr("新建"), this);
     actionNew->setShortcut(QKeySequence(QKeySequence::New));
-    menuFile->addAction(actionNew);
+    m_menuFile->addAction(actionNew);
+    connect(actionNew, SIGNAL(triggered(bool)), this, SLOT(NewDocument()));
 
     QAction *actionOpen = new QAction(tr("打开"), this);
     actionOpen->setShortcut(QKeySequence(QKeySequence::Open));
-    menuFile->addAction(actionOpen);
+    connect(actionOpen, SIGNAL(triggered(bool)), this, SLOT(ActionOpen()));
+    m_menuFile->addAction(actionOpen);
 
     QAction *actionSave = new QAction(tr("保存"), this);
     actionSave->setShortcut(QKeySequence(QKeySequence::Save));
-    menuFile->addAction(actionSave);
+    connect(actionSave, SIGNAL(triggered(bool)), this, SLOT(SaveDocument()));
+    m_menuFile->addAction(actionSave);
 
     QAction *actionExit = new QAction(tr("退出"), this);
     actionExit->setShortcut(QKeySequence(QKeySequence::Close));
-    menuFile->addAction(actionExit);
-    btnMenu->setMenu(menuFile);
-    connect(menuFile, SIGNAL(triggered(QAction*)), this, SLOT(SltActionTriggered(QAction*)));
+    m_menuFile->addAction(actionExit);
+    connect(actionExit, SIGNAL(triggered(bool)), this, SIGNAL(signalBackHome()));
+//    connect(m_menuFile, SIGNAL(triggered(QAction*)), this, SLOT(SltActionTriggered(QAction*)));
 
     //////////////////////////////////////////////////////////////
-    QPushButton *btnSetting = new QPushButton(m_widgetTitle);
-    btnSetting->setFixedSize(30, 30);
-    btnSetting->setStyleSheet(QString("QPushButton {border-image: url(:/images/notepad/ic_setting.png);}"
-                                      "QPushButton:pressed {border-image: url(:/images/notepad/ic_setting_Press.png);}"));
-    connect(btnSetting, SIGNAL(clicked(bool)), this, SLOT(SltSetPaletteConfig()));
-
-    QPushButton *btnHome = new QPushButton(m_widgetTitle);
-    btnHome->setFixedSize(44, 44);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SLOT(SltBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/notepad/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/notepad/menu_icon_pressed.png);}"));
-
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(9, 0, 10, 0);
-    horLayoutTitle->setSpacing(18);
-    horLayoutTitle->addWidget(btnMenu);
-    horLayoutTitle->addWidget(btnSetting);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
-
     m_textEdit = new TextEdit(this);
     m_textEdit->setFont(QFont(Skin::m_strAppFontNormal, 14));
     m_textEdit->setStyleSheet(QString("QTextEdit {border: 1px solid #c5c5c5; border-top: none;"
@@ -175,15 +163,15 @@ void NotePadWidget::InitWidget()
     QVBoxLayout *verLayout = new QVBoxLayout(this);
     verLayout->setContentsMargins(0, 0, 0, 0);
     verLayout->setSpacing(0);
-    verLayout->addWidget(m_widgetTitle);
-    verLayout->addWidget(m_textEdit, 1);
+    verLayout->addWidget(m_widgetTitle, 1);
+    verLayout->addWidget(m_textEdit, 9);
 
     m_paletteWidget = new QtPaletteWidget(this);
     connect(m_paletteWidget, SIGNAL(signalFontChanged(int)), this, SLOT(SltFontSizeChanged(int)));
     connect(m_paletteWidget, SIGNAL(signalColorChanged(QColor)), this, SLOT(SltColorChanged(QColor)));
 }
 
-void NotePadWidget::actionOpen()
+void NotePadWidget::ActionOpen()
 {
     m_fileDialog->setSaveFileMode(false);
     m_fileDialog->StartAnimation(QPoint(0, this->height()), QPoint(0, 0), 200, true);
@@ -206,7 +194,7 @@ void NotePadWidget::SaveDocument()
 void NotePadWidget::SltBackHome()
 {
     if (m_paletteWidget->pos().x() < this->width()) {
-        m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436, 432);
+        m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436 * m_scaleX, 432 * m_scaleY);
     }
     emit signalBackHome();
 }
@@ -216,7 +204,7 @@ void NotePadWidget::SltActionTriggered(QAction *action)
     if (action->text() == "新建") {
         NewDocument();
     } else if (action->text() == "打开") {
-        actionOpen();
+        ActionOpen();
     } else if (action->text() == "保存") {
         SaveDocument();
     } else if (action->text() == "退出") {
@@ -227,9 +215,11 @@ void NotePadWidget::SltActionTriggered(QAction *action)
 void NotePadWidget::SltSetPaletteConfig()
 {
     if (m_paletteWidget->pos().x() > (this->width() / 2)) {
-        m_paletteWidget->StartAnimation(QPoint(this->width(), 44), QPoint(this->width() - m_paletteWidget->width(), 44), 200, true);
+        m_paletteWidget->StartAnimation(QPoint(this->width(), m_widgetTitle->rect().bottom()),
+                                        QPoint(this->width() - m_paletteWidget->width(), m_widgetTitle->rect().bottom()), 200, true);
     } else {
-        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 44), QPoint(this->width(), 44), 200, true);
+        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), m_widgetTitle->rect().bottom()),
+                                        QPoint(this->width(), m_widgetTitle->rect().bottom()), 200, true);
     }
 }
 
@@ -249,7 +239,8 @@ void NotePadWidget::SltColorChanged(const QColor &color)
 void NotePadWidget::SltClosePalette()
 {
     if (m_paletteWidget->pos().x() < (this->width() / 2)) {
-        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58), QPoint(this->width(), 58), 200, true);
+        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), m_widgetTitle->rect().bottom()),
+                                        QPoint(this->width(), m_widgetTitle->rect().bottom()), 200, true);
     }
 }
 
@@ -270,11 +261,28 @@ void NotePadWidget::SltFileDialogClose()
     m_fileDialog->StartAnimation(QPoint(0, 0), QPoint(0, -this->height()), 200, false);
 }
 
+void NotePadWidget::SltToolBtnClicked(int index)
+{
+    if (0 == index) {
+        emit signalBackHome();
+    } else if (1 == index) {
+        QPoint pos = m_widgetTitle->geometry().bottomLeft();
+        pos = this->mapToGlobal(pos);
+        m_menuFile->exec(QPoint(pos.x() + 2, pos.y() + 2));
+    } else if (2 == index) {
+        SltSetPaletteConfig();
+    }
+
+    m_textEdit->clearFocus();
+}
+
 void NotePadWidget::resizeEvent(QResizeEvent *e)
 {
-    m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436, 432);
+    m_scaleX = (this->width() * 1.0) / m_nBaseWidth;
+    m_scaleY = (this->height() * 1.0) / m_nBaseHeight;
+
+    m_paletteWidget->setGeometry(this->width(), m_widgetTitle->rect().bottom(), 436 * m_scaleX, 432 * m_scaleY);
     m_fileDialog->setFixedSize(this->size());
-    qDebug() << m_fileDialog->size();
     QWidget::resizeEvent(e);
 }
 

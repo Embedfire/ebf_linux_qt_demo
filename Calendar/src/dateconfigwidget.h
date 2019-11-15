@@ -12,11 +12,11 @@
 #ifndef DATECONFIGWIDGET_H
 #define DATECONFIGWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include "qtpixmapbutton.h"
 #include "qtdatetimeconfig.h"
 
-class DateConfigWidget : public QWidget
+class DateConfigWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -26,7 +26,8 @@ public:
 signals:
     void signalChangePage(int index, int direction);
 
-public slots:
+private slots:
+    void SltBtnClicked(int index);
 
 private:
     QtPixmapButton  m_btnPrev;
@@ -37,13 +38,9 @@ private:
     void setSystemDate();
 
 protected:
-    QSize sizeHint() const;
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawButton(QPainter *painter);
-
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 

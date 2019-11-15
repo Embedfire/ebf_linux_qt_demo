@@ -26,7 +26,10 @@ public:
     ~QtTextBroswer();
 
     void setAlignment(Qt::Alignment align);
+
     void setText(const QString &text);
+    QString text() const;
+
     void append(const QString &text);
 
 signals:

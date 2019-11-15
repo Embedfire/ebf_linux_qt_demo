@@ -12,7 +12,9 @@ HEADERS += \
     $$PWD/src/datetimesettingpage.h \
     $$PWD/src/clickedwidget.h \
     $$PWD/src/versionupdatepage.h \
-    $$PWD/src/downloadnetworkmanager.h
+    $$PWD/src/downloadnetworkmanager.h \
+    $$PWD/src/languagepage.h \
+    $$PWD/qtmessagebox.h
 
 SOURCES += \
     $$PWD/src/settingwidget.cpp \
@@ -22,9 +24,6 @@ SOURCES += \
     $$PWD/src/datetimesettingpage.cpp \
     $$PWD/src/clickedwidget.cpp \
     $$PWD/src/versionupdatepage.cpp \
-    $$PWD/src/downloadnetworkmanager.cpp
-
-win32 {
-INCLUDEPATH += $$PWD/../thirdpart/quazip
-LIBS += -L$$PWD/../thirdpart/libzip -lquazip
-}
+    $$PWD/src/downloadnetworkmanager.cpp \
+    $$PWD/src/languagepage.cpp \
+    $$PWD/qtmessagebox.cpp

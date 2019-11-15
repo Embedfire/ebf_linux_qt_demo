@@ -32,22 +32,11 @@ InfoNesWidget::~InfoNesWidget()
 void InfoNesWidget::InitWidget()
 {
     QtWidgetTitleBar *m_widgetTitle = new QtWidgetTitleBar(this);
-    m_widgetTitle->setMinimumHeight(82);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 82);
     m_widgetTitle->SetBackground(Qt::transparent);
     m_widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
     m_widgetTitle->SetTitle(tr("InfoNes 模拟器"), QColor("#ffffff"), 32);
-
-    QPushButton *m_btnHome = new QPushButton(this);
-    m_btnHome->setFixedSize(54, 54);
-
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(10, 0, 10, 0);
-    horLayoutTitle->setSpacing(18);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(m_btnHome);
-    connect(m_btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    m_btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/infones/menu_icon.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/infones/menu_icon_pressed.png);}"));
+    connect(m_widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
     InfoNesListWidget *infoListWidget = new InfoNesListWidget(this);
     infoListWidget->LoadNesResource(qApp->applicationDirPath() + "/nes");

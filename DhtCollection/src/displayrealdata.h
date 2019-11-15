@@ -11,9 +11,9 @@
 #ifndef DISPLAYREALDATA_H
 #define DISPLAYREALDATA_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 
-class DisplayRealData : public QWidget
+class DisplayRealData : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -29,6 +29,9 @@ private:
 protected:
     void paintEvent(QPaintEvent *);
     void drawValues(QPainter *painter);
+
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // DISPLAYREALDATA_H

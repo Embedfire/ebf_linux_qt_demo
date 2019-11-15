@@ -295,5 +295,6 @@
         <file>images/keyled/menu_icon.png</file>
         <file>images/keyled/menu_icon_pressed.png</file>
         <file>images/mainwindow/ic_key.png</file>
+        <file>images/weather/type/zh/雪.png</file>
     </qresource>
 </RCC>

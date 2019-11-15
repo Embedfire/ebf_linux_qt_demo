@@ -26,7 +26,6 @@ KeyPressWidget::KeyPressWidget(QWidget *parent) : QtAnimationWidget(parent)
 
 KeyPressWidget::~KeyPressWidget()
 {
-
 }
 
 void KeyPressWidget::InitButtons()
@@ -43,18 +42,6 @@ void KeyPressWidget::InitButtons()
     m_btns.value(BtnUser)->setText("USER");
     m_btns.value(BtnOnOff)->setText("ON/OFF");
     m_btns.value(BtnKey)->setText("KEY");
-}
-
-void KeyPressWidget::ScalcRect(QRect &rectRet, const QRect &rect)
-{
-#ifdef BUILD_WITH_HDMI
-    rectRet.setX(rect.x() * m_scaleX);
-    rectRet.setY(rect.y() * m_scaleY);
-    rectRet.setWidth(rect.width() * m_scaleX);
-    rectRet.setHeight(rect.height() * m_scaleY);
-#else
-    rectRet = rect;
-#endif
 }
 
 void KeyPressWidget::KeyPressed(int index)
@@ -121,13 +108,6 @@ void KeyPressWidget::SltKeyPressed(const quint8 &type)
     this->update();
 }
 
-void KeyPressWidget::resizeEvent(QResizeEvent *e)
-{
-    m_scaleX = (this->width() * 1.0 / Skin::m_nScreenWidth);
-    m_scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-    QWidget::resizeEvent(e);
-}
-
 void KeyPressWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -169,7 +149,7 @@ void KeyPressWidget::mousePressEvent(QMouseEvent *e)
         if (btn->id() > BtnKey) break;
 
         QRect rect;
-        ScalcRect(rect, btn->rect());
+        ScaleRect(rect, btn->rect());
 
         if (rect.contains(e->pos())) {
             btn->setPressed(true);

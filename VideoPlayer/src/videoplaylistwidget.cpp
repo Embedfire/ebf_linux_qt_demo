@@ -25,6 +25,9 @@ VideoPlayListWidget::VideoPlayListWidget(QWidget *parent) : QtListWidget(parent)
     m_nMargin = 0;
     m_backgroundColor = Qt::transparent;
     m_nCurrentIndex = 0;
+
+    m_nBaseWidth = 405;
+    m_nBaseHeight = 270;
 }
 
 VideoPlayListWidget::~VideoPlayListWidget()
@@ -37,8 +40,7 @@ void VideoPlayListWidget::drawItemInfo(QPainter *painter, QtListWidgetItem *item
 {
     painter->save();
     QRect rect = item->m_rect;
-    painter->setRenderHint(QPainter::Antialiasing, false);
-    painter->setPen(QPen(QColor("#797979"), 1));
+    painter->setPen(QColor("#797979"));
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
 
     painter->setPen(m_nCurrentIndex == item->m_nId ? QColor("#02A7F0") : QColor("#ffffff"));
@@ -54,28 +56,22 @@ void VideoPlayListWidget::drawItemInfo(QPainter *painter, QtListWidgetItem *item
 MediaPlayListWidget::MediaPlayListWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
+    m_nBaseWidth = 405;
+    m_nBaseHeight = 328;
     m_colorBackground = QColor("#BC182E3A");
-
-    m_labelTitle = new QLabel(this);
-    m_labelTitle->setAlignment(Qt::AlignCenter);
-    m_labelTitle->setText(tr("播放列表"));
-    m_labelTitle->setMinimumHeight(40);
 
     m_listWidget = new VideoPlayListWidget(this);
     QVBoxLayout *verLayout = new QVBoxLayout(this);
     verLayout->setContentsMargins(0, 10, 0, 10);
     verLayout->setSpacing(0);
-    verLayout->addWidget(m_labelTitle);
-    verLayout->addWidget(m_listWidget, 1);
+    verLayout->addStretch(1);
+    verLayout->addWidget(m_listWidget, 9);
 
     // 播放列表
     m_playList = new QMediaPlaylist(this);
     m_playList->setPlaybackMode(QMediaPlaylist::Loop);
     connect(m_playList, SIGNAL(currentIndexChanged(int)), this, SLOT(SltCurrMediaChanged(int)));
     connect(m_listWidget, SIGNAL(currentIndexClicked(int)), m_playList, SLOT(setCurrentIndex(int)));
-
-    this->setStyleSheet(QString("QLabel{color: #ffffff; font: 24px; font-family: '%1';"
-                                "border: none; border-bottom: 1px solid #797979;}").arg(Skin::m_strAppFontNormal));
 }
 
 MediaPlayListWidget::~MediaPlayListWidget()
@@ -155,8 +151,15 @@ void MediaPlayListWidget::SltCurrMediaChanged(int index)
 void MediaPlayListWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
     painter.setPen(Qt::NoPen);
     painter.setBrush(m_colorBackground);
-    painter.drawRoundedRect(0, 0, this->width() + 5, this->height(), 10, 10);
+    painter.drawRoundedRect(0, 0, m_nBaseWidth + 5, m_nBaseHeight, 10, 10);
+
+    painter.setPen(QColor("#ffffff"));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(24);
+    painter.setFont(font);
+    painter.drawText(0, 0, m_nBaseWidth, 40, Qt::AlignCenter, tr("播放列表"));
 }

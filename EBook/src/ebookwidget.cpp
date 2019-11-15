@@ -10,6 +10,7 @@
 *******************************************************************/
 #include "ebookwidget.h"
 #include "skin.h"
+#include "qtpixmapbutton.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -25,10 +26,11 @@
 #include <QFile>
 #include <QMouseEvent>
 
-
 TextBrowser::TextBrowser(QWidget *parent) : QTextBrowser(parent)
 {
     m_bPressed = false;
+    this->setContextMenuPolicy(Qt::NoContextMenu);
+    this->setUndoRedoEnabled(false);
     m_scrollbar = this->verticalScrollBar();
 }
 
@@ -85,52 +87,33 @@ EBookWidget::~EBookWidget()
 void EBookWidget::InitWidget()
 {
     m_widgetTitle= new QtWidgetTitleBar(this);
-    m_widgetTitle->setMinimumHeight(58);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 60);
     m_widgetTitle->SetBackground(QColor("#f0f0f0"));
-    m_widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
-    m_widgetTitle->SetTitle("电子书", "#333333", 18);
+    m_widgetTitle->SetBtnHomePixmap(QPixmap(":/images/ebook/menu_icon.png"), QPixmap(":/images/ebook/menu_icon_pressed.png"));
+    m_widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
+    m_widgetTitle->SetTitle(tr("电子书"), "#333333", 22);
+    connect(m_widgetTitle, SIGNAL(signalBtnClicked(int)), this, SLOT(SltToolBtnClicked(int)));
 
-    m_btnAdd = new QPushButton(m_widgetTitle);
-    m_btnAdd->setFixedSize(40, 40);
-    m_btnAdd->setStyleSheet(QString("QPushButton {border-image: url(:/images/ebook/ic_add.png);}"
-                                    "QPushButton:pressed {border-image: url(:/images/ebook/ic_add_pressed.png);}"));
-    connect(m_btnAdd, SIGNAL(clicked(bool)), this, SLOT(SltAddEbool()));
-
-    m_btnBack = new QPushButton(m_widgetTitle);
+    m_btnBack = new QtPixmapButton(BtnBack, QRect(10, 10, 40, 40), QPixmap(":/images/ebook/ic_back.png"), QPixmap(":/images/ebook/ic_back.png"));
     m_btnBack->setVisible(false);
-    m_btnBack->setFixedSize(40, 40);
-    m_btnBack->setStyleSheet(QString("QPushButton {border-image: url(:/images/ebook/ic_back.png);}"));
-    connect(m_btnBack, SIGNAL(clicked(bool)), this, SLOT(SltBtnBack()));
 
-    m_btnSetting = new QPushButton(m_widgetTitle);
+    m_btnAdd = new QtPixmapButton(BtnAdd, QRect(10, 10, 40, 40), QPixmap(":/images/ebook/ic_add.png"), QPixmap(":/images/ebook/ic_add_pressed.png"));
+    m_btnSetting = new QtPixmapButton(BtnSetting, QRect(750, 10, 40, 40), QPixmap(":/images/ebook/ic_setting.png"), QPixmap(":/images/ebook/ic_setting_Press.png"));
     m_btnSetting->setVisible(false);
-    m_btnSetting->setFixedSize(40, 40);
-    m_btnSetting->setStyleSheet(QString("QPushButton {border-image: url(:/images/ebook/ic_setting.png);}"
-                                        "QPushButton:pressed {border-image: url(:/images/ebook/ic_setting_Press.png);}"));
-    connect(m_btnSetting, SIGNAL(clicked(bool)), this, SLOT(SltSetColorStyle()));
 
-    m_btnHome = new QPushButton(m_widgetTitle);
-    m_btnHome->setFixedSize(54, 54);
-    connect(m_btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    m_btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/ebook/menu_icon.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/ebook/menu_icon_pressed.png);}"));
+    QMap<int,QtPixmapButton*> btngroup;
+    btngroup.insert(BtnBack, m_btnBack);
+    btngroup.insert(BtnAdd, m_btnAdd);
+    btngroup.insert(BtnSetting, m_btnSetting);
+    m_widgetTitle->SetToolButtons(btngroup);
 
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(9, 0, 10, 0);
-    horLayoutTitle->setSpacing(18);
-    horLayoutTitle->addWidget(m_btnAdd);
-    horLayoutTitle->addWidget(m_btnBack);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(m_btnSetting);
-    horLayoutTitle->addWidget(m_btnHome);
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     m_booksView = new QtEbookList(this);
     m_booksView->SetBackground(Qt::transparent);
     m_booksView->SetPageCount(1);
     connect(m_booksView, SIGNAL(currentItemClicked(QtPageListWidgetItem*)), this, SLOT(SltCurrentItemClicked(QtPageListWidgetItem*)));
 
     m_textBrowser = new TextBrowser(this);
-    m_textBrowser->setContextMenuPolicy(Qt::NoContextMenu);
     m_textBrowser->setVisible(false);
     m_textBrowser->setFont(QFont(Skin::m_strAppFontNormal, 14));
     m_textBrowser->setStyleSheet(QString("QTextBrowser {border: 1px solid #c5c5c5; border-top: none;background-color: #ffffff;}"));
@@ -167,7 +150,7 @@ void EBookWidget::LoadFileToBrowser(const QString &fileName)
 void EBookWidget::ChangePage(int index)
 {
     m_btnAdd->setVisible(0 == index);
-    m_btnHome->setVisible(0 == index);
+    m_widgetTitle->SetBtnVisible(0 == index);
     m_btnBack->setVisible(1 == index);
     m_btnSetting->setVisible(1 == index);
 
@@ -178,7 +161,7 @@ void EBookWidget::ChangePage(int index)
 void EBookWidget::SltBtnBack()
 {
     ChangePage(0);
-    m_widgetTitle->SetTitle("电子书");
+    m_widgetTitle->SetTitle(tr("电子书"));
     if (m_paletteWidget->pos().x() < this->width()) {
         m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436, 432);
     }
@@ -210,15 +193,6 @@ void EBookWidget::SltCurrentItemClicked(QtPageListWidgetItem *item)
     LoadFileToBrowser(item->m_strText);
 }
 
-void EBookWidget::SltSetColorStyle()
-{
-    if (m_paletteWidget->pos().x() > (this->width() / 2)) {
-        m_paletteWidget->StartAnimation(QPoint(this->width(), 58), QPoint(this->width() - m_paletteWidget->width(), 58), 200, true);
-    } else {
-        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58), QPoint(this->width(), 58), 200, true);
-    }
-}
-
 void EBookWidget::SltFontSizeChanged(int size)
 {
     QFont font = m_textBrowser->font();
@@ -235,7 +209,7 @@ void EBookWidget::SltColorChanged(const QColor &color)
 void EBookWidget::SltClosePalette()
 {
     if (m_paletteWidget->pos().x() < (this->width() / 2)) {
-        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58), QPoint(this->width(), 58), 200, true);
+        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58 * m_scaleY), QPoint(this->width(), 58 * m_scaleY), 200, true);
     }
 }
 
@@ -259,17 +233,43 @@ void EBookWidget::SltFileDialogClose()
     m_fileDialog->StartAnimation(QPoint(0, 0), QPoint(0, -this->height()), 200, false);
 }
 
+void EBookWidget::SltToolBtnClicked(int index)
+{
+    if (BtnHome == index) {
+        emit signalBackHome();
+    } else if (BtnBack == index) {
+        ChangePage(0);
+        m_widgetTitle->SetTitle(tr("电子书"));
+        if (m_paletteWidget->pos().x() < this->width()) {
+            m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436, 432);
+        }
+    } else if (BtnAdd == index) {
+        m_fileDialog->setSaveFileMode(false);
+        m_fileDialog->StartAnimation(QPoint(0, this->height()), QPoint(0, 0), 200, true);
+    } else if (BtnSetting == index) {
+        if (m_paletteWidget->pos().x() > (this->width() / 2)) {
+            m_paletteWidget->StartAnimation(QPoint(this->width(), 58 * m_scaleY), QPoint(this->width() - m_paletteWidget->width(), 58 * m_scaleY), 200, true);
+        } else {
+            m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58 * m_scaleY), QPoint(this->width(), 58 * m_scaleY), 200, true);
+        }
+    }
+}
+
 void EBookWidget::resizeEvent(QResizeEvent *e)
 {
     m_fileDialog->resize(this->size());
-    m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436, 432);
+    m_scaleX = (this->width() * 1.0) / m_nBaseWidth;
+    m_scaleY = (this->height() * 1.0) / m_nBaseHeight;
+
+    m_paletteWidget->setGeometry(this->width(), m_widgetTitle->geometry().bottom(), 436 * m_scaleX, 432 * m_scaleY);
     QWidget::resizeEvent(e);
 }
 
 void EBookWidget::mousePressEvent(QMouseEvent *)
 {
     if (m_paletteWidget->pos().x() < this->width() / 2) {
-        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58), QPoint(this->width(), 58), 200, true);
+        m_paletteWidget->StartAnimation(QPoint(this->width() - m_paletteWidget->width(), 58 * m_scaleY),
+                                        QPoint(this->width(), 58 * m_scaleY), 200, true);
     }
 }
 

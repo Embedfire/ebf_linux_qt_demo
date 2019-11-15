@@ -12,10 +12,10 @@
 #ifndef CLOCKBACKGROUNDCFG_H
 #define CLOCKBACKGROUNDCFG_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include "qtpixmapbutton.h"
 
-class ClockBackgroundCfg : public QWidget
+class ClockBackgroundCfg : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -41,8 +41,6 @@ private:
     QtPixmapButton  m_btnNext;
 
 protected:
-    QSize sizeHint() const;
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawButton(QPainter *painter);
 

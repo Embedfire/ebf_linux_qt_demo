@@ -11,9 +11,9 @@
 #ifndef MINICALENDARWIDGET_H
 #define MINICALENDARWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 
-class MiniCalendarWidget : public QWidget
+class MiniCalendarWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -35,7 +35,6 @@ private:
     QString getCurrendDayOfWeek();
 
 protected:
-    QSize sizeHint() const;
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 };

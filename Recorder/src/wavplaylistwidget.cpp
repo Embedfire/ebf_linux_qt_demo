@@ -18,6 +18,9 @@
 
 WavPlayListWidget::WavPlayListWidget(QWidget *parent) : QtListWidget(parent)
 {
+    m_nBaseWidth = 500;
+    m_nBaseHeight = 300;
+
     m_bHorizontal = false;
     m_nItemSize = 37;
     m_backgroundColor = Qt::transparent;
@@ -71,8 +74,7 @@ void WavPlayListWidget::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
     QRect rect = QRect(item->m_rect.left() + 20, item->m_rect.top(), item->m_rect.width() - 90, item->m_rect.height());
     painter->setPen(QPen(QColor("#797979"), 1));
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
-
-
+    // 设置选中画笔
     painter->setPen(m_nCurrentIndex == item->m_nId ? QColor("#02A7F0") : QColor("#333333"));
     QFont font(Skin::m_strAppFontRegular);
     font.setPixelSize(24);

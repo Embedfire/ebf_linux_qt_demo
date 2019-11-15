@@ -11,7 +11,7 @@
 #ifndef QTADDRESSBAR_H
 #define QTADDRESSBAR_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QMap>
 
 class AddressItem {
@@ -38,13 +38,7 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-
-#ifdef QtUi
-#include <QtUi>
-class QTUISHARED_EXPORT AddressLineEdit : public QWidget {
-#else
-class AddressLineEdit : public QWidget {
-#endif
+class AddressLineEdit : public QtWidgetBase {
     Q_OBJECT
 public:
     explicit AddressLineEdit(QWidget *parent = 0);
@@ -80,11 +74,10 @@ protected:
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-
 #ifdef QtUi
-class QTUISHARED_EXPORT QtAddressBar : public QWidget {
+class QTUISHARED_EXPORT QtAddressBar : public QtWidgetTitleBar {
 #else
-class QtAddressBar : public QWidget {
+class QtAddressBar : public QtWidgetTitleBar {
 #endif
     Q_OBJECT
 public:
@@ -98,7 +91,8 @@ signals:
     void signalBackHome();
     void signalAddress(const QString &strAddr);
 
-public slots:
+protected:
+    void SltBtnClicked(int index);
 
 private:
     AddressLineEdit *m_addrLineEdit;
@@ -107,7 +101,7 @@ private:
     void InitWidget();
 
 protected:
-    void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // QTADDRESSBAR_H

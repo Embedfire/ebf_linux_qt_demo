@@ -18,23 +18,44 @@
 #include <QDebug>
 #include <QTime>
 
-TimeConfigWidget::TimeConfigWidget(QWidget *parent) : QWidget(parent)
+TimeConfigWidget::TimeConfigWidget(QWidget *parent) : QtWidgetBase(parent)
 {
-    m_btnPrev = QtPixmapButton(QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png"));
-    m_btnSure = QtPixmapButton(QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png"));
-    m_btnNext = QtPixmapButton(QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png"));
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
 
     m_timeConfig = new QtDateTimeConfig(this);
     m_timeConfig->SetFont(Skin::m_strAppFontNormal);
     m_timeConfig->setConfigFormat(QtDateTimeConfig::TimeFormat);
-    m_timeConfig->setStyleSheet(QString("QWidget{background-color: #ffffff; border: none; border-radius: 10px;}"
-                                        "QLabel{ font-family: '%1'; font: 24px; color: #333333; border-radius: 0px;}")
-                                .arg(Skin::m_strAppFontBold));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(24);
+    m_timeConfig->setFont(font);
+
+    m_btns.insert(0, new QtPixmapButton(0, QRect(68, 308, 166, 70), QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(317, 308, 166, 70), QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png")));
+    m_btns.insert(2, new QtPixmapButton(2, QRect(565, 308, 166, 70), QPixmap(":/images/calendar/ic_btn.png"), QPixmap(":/images/calendar/ic_btn_pre.png")));
+    m_btns.value(0)->setText(tr("上一步"));
+    m_btns.value(1)->setText(tr("确  定"));
+    m_btns.value(2)->setText(tr("下一步"));
+
+    connect(this, SIGNAL(signalBtnClicked(int)), this, SLOT(SltBtnClicked(int)));
 }
 
 TimeConfigWidget::~TimeConfigWidget()
 {
 
+}
+
+void TimeConfigWidget::SltBtnClicked(int index)
+{
+    if (0 == index) {
+        setSystemTime(false);
+        emit signalChangePage(3, 2);
+    } else if (1 == index) {
+        setSystemTime(true);
+    } else if (2 == index) {
+        setSystemTime(false);
+        emit signalChangePage(5, 1);
+    }
 }
 
 void TimeConfigWidget::setSystemTime(bool bOk)
@@ -55,19 +76,9 @@ void TimeConfigWidget::setSystemTime(bool bOk)
 
 void TimeConfigWidget::resizeEvent(QResizeEvent *e)
 {
-    int nW = m_btnSure.size().width();
-    int nH = m_btnSure.size().height();
-
-    QRect rect(this->width() / 2 - nW / 2, this->height() * 0.86 - nH / 2, nW, nH);
-    m_btnSure.setRect(rect);
-
-    QRect rectPrev = QRect(rect.left() - nW / 2 - rect.width(), rect.top(), rect.width(), rect.height());
-    m_btnPrev.setRect(rectPrev);
-
-    QRect rectNext = QRect(rect.right() + nW / 2, rect.top(), rect.width(), rect.height());
-    m_btnNext.setRect(rectNext);
-
-    m_timeConfig->setGeometry(this->width() / 4, 0, this->width() / 2, 280);
+    SetScaleValue();
+    m_timeConfig->resize(375 * m_scaleX, 280 * m_scaleY);
+    m_timeConfig->move((this->width() - m_timeConfig->width()) / 2, 20 * m_scaleY);
     QWidget::resizeEvent(e);
 }
 
@@ -75,7 +86,7 @@ void TimeConfigWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
-
+    painter.scale(m_scaleX, m_scaleY);
     // 绘制底部确定按钮
     drawButton(&painter);
 }
@@ -83,73 +94,14 @@ void TimeConfigWidget::paintEvent(QPaintEvent *)
 void TimeConfigWidget::drawButton(QPainter *painter)
 {
     painter->save();
-    QFont font(this->font());
+    QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(30);
     painter->setFont(font);
     painter->setPen(QColor("#ffffff"));
-
-    painter->drawPixmap(m_btnPrev.rect(), m_btnPrev.pixmap());
-    painter->drawText(m_btnPrev.rect(), Qt::AlignCenter, QString("上一步"));
-
-    painter->drawPixmap(m_btnSure.rect(), m_btnSure.pixmap());
-    painter->drawText(m_btnSure.rect(), Qt::AlignCenter, QString("完成"));
-
-    painter->drawPixmap(m_btnNext.rect(), m_btnNext.pixmap());
-    painter->drawText(m_btnNext.rect(), Qt::AlignCenter, QString("下一步"));
+    foreach (QtPixmapButton *btn, m_btns) {
+        painter->drawPixmap(btn->rect(), btn->pixmap());
+        painter->drawText(btn->rect(), Qt::AlignCenter, btn->text());
+    }
     painter->restore();
 }
 
-QSize TimeConfigWidget::sizeHint() const
-{
-    return QSize(800, 390);
-}
-
-void TimeConfigWidget::mousePressEvent(QMouseEvent *e)
-{
-    if (m_btnPrev.rect().contains(e->pos())) {
-        m_btnPrev.setPressed(true);
-        this->update();
-        return;
-    }
-
-    if (m_btnSure.rect().contains(e->pos())) {
-        m_btnSure.setPressed(true);
-        this->update();
-        return;
-    }
-
-    if (m_btnNext.rect().contains(e->pos())) {
-        m_btnNext.setPressed(true);
-        this->update();
-        return;
-    }
-}
-
-void TimeConfigWidget::mouseReleaseEvent(QMouseEvent *e)
-{
-    if (m_btnPrev.isPressed()) {
-        m_btnPrev.setPressed(false);
-        this->update();
-        if (m_btnPrev.rect().contains(e->pos())) {
-            setSystemTime(false);
-            emit signalChangePage(3, 2);
-        }
-    }
-
-    if (m_btnSure.isPressed()) {
-        m_btnSure.setPressed(false);
-        this->update();
-        if (m_btnSure.rect().contains(e->pos())) {
-            setSystemTime(true);
-        }
-    }
-
-    if (m_btnNext.isPressed()) {
-        m_btnNext.setPressed(false);
-        this->update();
-        if (m_btnNext.rect().contains(e->pos())) {
-            setSystemTime(false);
-            emit signalChangePage(5, 1);
-        }
-    }
-}

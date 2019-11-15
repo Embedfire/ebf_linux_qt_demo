@@ -19,6 +19,8 @@
 #include <QDesktopWidget>
 #include <QScreen>
 #include <QDir>
+#include <QTranslator>
+#include <QDebug>
 
 void CheckDir(const QString &path) {
     QDir dir(path);
@@ -36,21 +38,32 @@ void CheckDirs(const QString &path, const QStringList &dirs) {
 
 int main(int argc, char *argv[])
 {
+    // 设置输入法
 #if 1
     qputenv("QT_IM_MODULE", QByteArray("xyinput"));
 #else
     qputenv("QT_IM_MODULE", QByteArray("qtkeyboard"));
 #endif
+
     QApplication a(argc, argv);
+    // 初始化皮肤文件
     Skin::InitSkin();
+
     // 检查目录
     CheckDirs(a.applicationDirPath() + "/",
-              QStringList() << "conf" << "music" << "video" << "nes"
+              QStringList() << "conf" << "music" << "video" << "nes" << "translations"
               << "ebook" << "notepad" << "photos" << "record" << "download");
 
+    // 设置程序中文编码
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
     // 设置配置文件路径
     AppConfig::m_strSettingsFile = a.applicationDirPath() + "/conf/config.ini";
+
+    // 安装翻译文件
+    QString strTemp = qApp->applicationDirPath() + "/translations/";
+    strTemp += AppConfig::ReadSetting("System", "language", "qt_zh.qm").toString();
+    QTranslator translator;
+    if (translator.load(strTemp)) a.installTranslator(&translator);
 
 #if 0
     // 启动界面
@@ -67,6 +80,7 @@ int main(int argc, char *argv[])
 #ifdef __arm__
     QSize size = a.primaryScreen()->availableGeometry().size();
     w.resize(size.width(), size.height() + 48);
+    qDebug() << "primaryScreen availableGeometry" << size;
     w.showFullScreen();
 #else
     w.resize(800, 480);

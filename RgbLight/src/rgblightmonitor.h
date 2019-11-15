@@ -49,15 +49,12 @@ private:
 
 private:
     bool m_bPressed;
-    qreal m_scaleX;
-    qreal m_scaleY;
+
 private:
     void ChangeRgbLightValue();
     void ReadRgbLightValues();
 
-    void ScalcRect(QRect &rectRet, const QRect &rect);
 protected:
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawBackground(QPainter *painter);
     void drawValue(QPainter *painter);

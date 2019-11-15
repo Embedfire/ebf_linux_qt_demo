@@ -9,19 +9,18 @@
            2019/9/8
 *******************************************************************/
 #include "qtebooklist.h"
+#include "skin.h"
+
 #include <QMouseEvent>
 #include <QPainter>
 #include <QDebug>
 #include <QFileInfo>
 
-#define ITEM_SPACE          18
-#define SPOT_WIDTH          10
-#define MOVE_STEP           20
-#define ICON_SIZE           80
-
 QtEbookList::QtEbookList(QWidget *parent) : QtPageListWidget(parent)
 {
-
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
+    this->SetItemLayut(3, 4);
 }
 
 QtEbookList::~QtEbookList()
@@ -42,7 +41,7 @@ void QtEbookList::drawItemInfo(QPainter *painter, QtPageListWidgetItem *item)
     painter->drawRect(rectText);
 
     QFileInfo fileInfo(item->m_strText);
-    QFont font("思源黑体 CN Normal");
+    QFont font(Skin::m_strAppFontNormal);
     font.setPixelSize(18);;
     painter->setFont(font);
     painter->setPen("#333333");

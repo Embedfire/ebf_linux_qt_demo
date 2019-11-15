@@ -22,7 +22,7 @@
 #include <QApplication>
 
 //////////////////////////////////////////////////////////////////////////////////////
-QtVideoWidget::QtVideoWidget(QWidget *parent) : QWidget(parent)
+QtVideoWidget::QtVideoWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_urlMedia = QUrl();
     m_bToolBarShow = false;
@@ -35,7 +35,6 @@ QtVideoWidget::QtVideoWidget(QWidget *parent) : QWidget(parent)
     m_player->setVideoOutput(surface);
 
     m_playList = new MediaPlayListWidget(this);
-    m_playList->setFixedWidth(405);
     m_playList->setVisible(false);
     m_player->setPlaylist(m_playList->palyList());
 
@@ -61,8 +60,6 @@ QtVideoWidget::QtVideoWidget(QWidget *parent) : QWidget(parent)
 
     m_volumeSlider = new QtSliderBar(this);
     m_volumeSlider->SetHorizontal(false);
-    m_volumeSlider->SetSliderSize(4, 36);
-    m_volumeSlider->setFixedSize(36, 136);
     m_volumeSlider->SetValue(100);
     m_volumeSlider->hide();
     connect(m_volumeSlider, SIGNAL(currentValueChanged(int)), m_player, SLOT(setVolume(int)));
@@ -174,12 +171,24 @@ void QtVideoWidget::SltChangeVolume()
 
 void QtVideoWidget::resizeEvent(QResizeEvent *event)
 {
+    SetScaleValue();
     surface->updateVideoRect();
-    m_volumeSlider->move(this->width() - 120, this->height() - m_playBar->height() - m_volumeSlider->height() + 20);
-    m_titleBar->setGeometry(0, -m_titleBar->height(), this->width(), m_titleBar->height());
-    m_playBar->setGeometry(0, this->height(), this->width(), m_playBar->height());
-    m_playList->setGeometry(this->width() - m_playList->width() + 5, m_titleBar->height() + 2,
-                            m_playList->width(), this->height() - m_titleBar->height() - m_playBar->height() - 5);
+
+    m_titleBar->resize(this->width(), 50 * m_scaleY);
+    m_titleBar->move(0, -m_titleBar->height());
+
+    m_playBar->resize(this->width(), 102 * m_scaleY);
+    m_playBar->move(0, this->height()  + m_playBar->height());
+
+    m_playList->resize(405 * m_scaleX, 328 * m_scaleY);
+    m_playList->move(this->width() - m_playList->width() + 5, m_titleBar->height() + 2);
+
+    m_volumeSlider->resize(36 * m_scaleX, 136 * m_scaleY);
+    int nW = 4 * m_scaleX;
+    m_volumeSlider->SetSliderSize(nW < 1 ? 1 : nW, 36 * m_scaleX);
+    m_volumeSlider->SetValue(m_volumeSlider->value());
+    m_volumeSlider->move(670 * m_scaleX, 258 * m_scaleY);
+
     QWidget::resizeEvent(event);
 }
 

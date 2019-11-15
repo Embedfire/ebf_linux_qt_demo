@@ -19,9 +19,10 @@
 InfoNesListWidget::InfoNesListWidget(QWidget *parent) : QtListWidget(parent)
 {
     m_backgroundColor = Qt::transparent;
-    m_nItemSize = 50;
+    m_nItemSize = 60;
     m_bHorizontal = false;
-    m_nMargin = 0;
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
 }
 
 InfoNesListWidget::~InfoNesListWidget()
@@ -46,23 +47,19 @@ void InfoNesListWidget::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
 {
     painter->save();
     painter->setPen(QColor("#797979"));
-    painter->drawLine(item->m_rect.bottomLeft(), item->m_rect.bottomRight());
+    painter->drawLine(QPoint(item->m_rect.left() - m_nMargin, item->m_rect.bottom()),
+                      QPoint(item->m_rect.right() + m_nMargin, item->m_rect.bottom()));
 
     QRect rect(item->m_rect.left() + 20, item->m_rect.top(), item->m_rect.width() - 40, item->m_rect.height());
     QFont font(Skin::m_strAppFontNormal);
     font.setPixelSize(24);
     painter->setFont(font);
-    painter->setPen(m_nCurrentIndex == item->m_nId ? QColor("#02A7F0") : QColor("#ffffff"));
+    painter->setPen(QColor("#ffffff"));
     painter->drawText(rect, Qt::AlignVCenter, item->m_strBaseName);
 
     QPixmap pixmap = item->m_pixmapIcon;
-    painter->drawPixmap(this->width() - pixmap.width() - 20, rect.top() + (rect.height() - pixmap.height()) / 2, pixmap);
+    painter->drawPixmap(m_nBaseWidth - pixmap.width() - 20, rect.top() + (rect.height() - pixmap.height()) / 2, pixmap);
 
     painter->restore();
 }
 
-void InfoNesListWidget::mousePressEvent(QMouseEvent *e)
-{
-    QtListWidget::mousePressEvent(e);
-    QWidget::mousePressEvent(e);
-}

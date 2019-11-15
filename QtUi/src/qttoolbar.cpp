@@ -11,7 +11,7 @@
 *******************************************************************/
 #include "qttoolbar.h"
 
-QtToolBar::QtToolBar(QWidget *parent) : QWidget(parent)
+QtToolBar::QtToolBar(QWidget *parent) : QtWidgetBase(parent)
 {
     m_animation = new QPropertyAnimation(this, "pos");
     m_animation->setDuration(200);

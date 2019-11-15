@@ -37,21 +37,12 @@ VideoPlayer::~VideoPlayer()
 
 void VideoPlayer::InitWidget()
 {
-    QtWidgetTitleBar *m_widgetTitle= new QtWidgetTitleBar(this);
-    m_widgetTitle->setMinimumHeight(80);
+    QtWidgetTitleBar *m_widgetTitle = new QtWidgetTitleBar(this);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 80);
     m_widgetTitle->SetBackground(Qt::transparent);
     m_widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
-    m_widgetTitle->SetTitle("视频播放器", "#ffffff", 32);
-
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(54, 54);
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(0, 0, 10, 0);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
+    m_widgetTitle->SetTitle(tr("视频播放器"), "#ffffff", 32);
+    connect(m_widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
     QVBoxLayout *verLayoutCentor = new QVBoxLayout(this);
     verLayoutCentor->setContentsMargins(0, 0, 0, 0);

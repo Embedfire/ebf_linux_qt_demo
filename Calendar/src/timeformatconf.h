@@ -12,11 +12,11 @@
 #ifndef TIMEFORMATCONF_H
 #define TIMEFORMATCONF_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include "qtswitchbutton.h"
 #include "qtpixmapbutton.h"
 
-class TimeFormatConf : public QWidget
+class TimeFormatConf : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -31,23 +31,15 @@ public slots:
 
 private slots:
     void SltSwitchBtnClicked(bool on);
+    void SltBtnClicked(int index);
 
 private:
-    QtPixmapButton  m_btnPrev;
-    QtPixmapButton  m_btnSure;
-    QtPixmapButton  m_btnNext;
-
     QtSwitchButton  *m_timeFormat;
     QRect           m_rectCenter;
-
 protected:
-    QSize sizeHint() const;
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawButton(QPainter *painter);
-
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // TIMEFORMATCONF_H

@@ -12,10 +12,11 @@
 #ifndef SETTINGMAINPAGE_H
 #define SETTINGMAINPAGE_H
 
-#include <QWidget>
+#include "qtlistwidget.h"
+#include "qtswitchbutton.h"
 
 /////////////////////////////////////////////////////////////////////////////
-class SettingMainPage : public QWidget
+class SettingMainPage : public QtListWidget
 {
     Q_OBJECT
 public:
@@ -31,6 +32,17 @@ private slots:
 
 private:
     void InitWidget();
+
+private slots:
+    void SltCurrentIndexClicked(int index);
+
+private:
+    QtSwitchButton          *m_btnSwitch;
+
+protected:
+    void resizeEvent(QResizeEvent *e);
+
+    void drawItemInfo(QPainter *painter, QtListWidgetItem *item);
 };
 
 #endif // SETTINGMAINPAGE_H

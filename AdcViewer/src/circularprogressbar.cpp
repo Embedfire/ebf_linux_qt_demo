@@ -14,11 +14,14 @@
 #include <QDebug>
 #include <QTimer>
 
-CircularProgressBar::CircularProgressBar(QWidget *parent) : QWidget(parent)
+CircularProgressBar::CircularProgressBar(QWidget *parent) : QtWidgetBase(parent)
 {
     m_nMaxValue = 330;
     m_MinValue = 0;
     m_nCurrentValue = 99;
+
+    m_nBaseWidth = 320;
+    m_nBaseHeight = 320;
 
     m_animation = new QPropertyAnimation(this, "value");
     m_animation->setDuration(100);
@@ -57,12 +60,13 @@ void CircularProgressBar::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+
+    // 绘制背景
     drawBackground(&painter);
 
-    int width = this->width();
-    int height = this->height();
-    int side = qMin(width, height);
-    painter.translate(width / 2, height / 2);
+    int side = qMin(m_nBaseWidth, m_nBaseHeight);
+    painter.translate(m_nBaseWidth / 2, m_nBaseHeight / 2);
     painter.scale(side / 200.0, side / 200.0);
 
     // 用图片效果好一点
@@ -73,17 +77,15 @@ void CircularProgressBar::paintEvent(QPaintEvent *)
 
 void CircularProgressBar::drawBackground(QPainter *painter)
 {
-    painter->save();
     QPixmap pixmap(":/images/adc/ring_background.png");
-    int nX = (this->width() - pixmap.width()) / 2;
-    int nY = (this->height() - pixmap.height()) / 2;
+    int nX = (m_nBaseWidth - pixmap.width()) / 2;
+    int nY = (m_nBaseHeight - pixmap.height()) / 2;
     painter->drawPixmap(nX, nY, pixmap);
-    painter->restore();
 }
 
 void CircularProgressBar::drawRing(QPainter *painter)
 {
-    int radius = 96;
+    int radius = 88;
     painter->save();
     painter->setBrush(Qt::NoBrush);
     //计算总范围角度,当前值范围角度,剩余值范围角度
@@ -104,7 +106,7 @@ void CircularProgressBar::drawRing(QPainter *painter)
 
 void CircularProgressBar::drawPointerTriangle(QPainter *painter)
 {
-    int radius = 48;
+    int radius = 40;
     painter->save();
     painter->rotate(45);
     double degRotate = (270.0 * (m_nCurrentValue - m_MinValue)) / (m_nMaxValue - m_MinValue);

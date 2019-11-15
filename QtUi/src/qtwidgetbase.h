@@ -14,6 +14,9 @@
 
 #include <QWidget>
 #include <QPropertyAnimation>
+#include <QMap>
+
+#include "qtpixmapbutton.h"
 
 #ifdef QtUi
 #include <QtUi>
@@ -26,22 +29,37 @@ public:
     explicit QtWidgetBase(QWidget *parent = 0);
     ~QtWidgetBase();
 
+    void addBtn(int index, QtPixmapButton *btn);
 signals:
     void signalBackHome();
-
+    void signalBtnClicked(int index);
 public slots:
 
 protected:
-    void paintEvent(QPaintEvent *);
+    bool m_bZoom;
+    qreal m_scaleX;
+    qreal m_scaleY;
 
+    int   m_nBaseWidth;
+    int   m_nBaseHeight;
+
+    QMap<int,QtPixmapButton*> m_btns;
+protected:
+    void ScaleRect(QRect &rectRet, const QRect &rect);
+    void SetScaleValue();
+
+    void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *);
 };
 
 ////////////////////////////////////////////////////////////////////
 // 专用标题栏
 #ifdef QtUi
-class QTUISHARED_EXPORT QtWidgetTitleBar : public QWidget {
+class QTUISHARED_EXPORT QtWidgetTitleBar : public QtWidgetBase {
 #else
-class QtWidgetTitleBar : public QWidget {
+class QtWidgetTitleBar : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -57,9 +75,15 @@ public:
     void SetTitle(const QString &title);
     void SetTitle(const QString &title, const QColor &textClr, const int &fontSize = 18);
 
+    void SetScalSize(int w, int h);
+    void SetBtnHomePixmap(const QPixmap &normal, const QPixmap &pressed);
+    void SetBtnVisible(bool bOk, int index = 0);
+
+    void SetToolButtons(QMap<int, QtPixmapButton*> btns);
 signals:
-    void signalBack();
-    void signalHome();
+
+protected slots:
+    virtual void SltBtnClicked(int index);
 
 private:
     QPixmap     m_pixmapBackground;
@@ -68,6 +92,9 @@ private:
 
     QString     m_strTitle;
     int         m_nFontSize;
+
+    QtPixmapButton  *m_btnHome;
+
 protected:
     void paintEvent(QPaintEvent *);
 };

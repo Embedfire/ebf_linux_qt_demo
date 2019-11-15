@@ -16,13 +16,15 @@
 #include <QtMath>
 #include <QTimer>
 
-QtKnobSwitch::QtKnobSwitch(QWidget *parent) : QWidget(parent)
+QtKnobSwitch::QtKnobSwitch(QWidget *parent) : QtWidgetBase(parent)
 {
     m_nMinValue = 0;
     m_nMaxValue = 100;
     m_value = 84;
 
     m_bPressed = false;
+    m_nBaseWidth = 316;
+    m_nBaseHeight = 316;
 }
 
 QtKnobSwitch::~QtKnobSwitch()
@@ -44,15 +46,15 @@ void QtKnobSwitch::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
+
     QPixmap pixmap(":/images/backlight/ic_ring.png");
-    int nX = (this->width() - pixmap.width()) / 2 + 1;
-    int nY = (this->height() - pixmap.height()) / 2 + 1;
+    int nX = (m_nBaseWidth - pixmap.width()) / 2 + 1;
+    int nY = (m_nBaseHeight - pixmap.height()) / 2 + 1;
     painter.drawPixmap(nX, nY, pixmap);
 
-    int width = this->width();
-    int height = this->height();
-    int side = qMin(width, height);
-    painter.translate(width / 2, height / 2);
+    int side = qMin(m_nBaseWidth, m_nBaseHeight);
+    painter.translate(m_nBaseWidth / 2, m_nBaseHeight / 2);
     painter.scale(side / 200.0, side / 200.0);
     drawHandle(&painter);
     drawValue(&painter);
@@ -60,15 +62,15 @@ void QtKnobSwitch::paintEvent(QPaintEvent *)
 
 void QtKnobSwitch::drawHandle(QPainter *painter)
 {
-    qreal radius = 81;
-
+    qreal radius = 90;
     double degRotate = (m_value - m_nMinValue) * 360.0/ (m_nMaxValue - m_nMinValue);
     painter->save();
     painter->rotate(degRotate);
     QPixmap pixmap(":/images/backlight/ic_hand_30.png");
-    painter->drawPixmap(-pixmap.width() / 2, -70, pixmap);
+    painter->drawPixmap(-pixmap.width() / 2, -80, pixmap);
     painter->restore();
 
+    // 绘制外边框
     painter->save();
     painter->rotate(-90);
     painter->setPen(QPen(QColor("#ffffff"), 6, Qt::SolidLine, Qt::RoundCap));

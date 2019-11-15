@@ -15,7 +15,7 @@
 #include <QWidget>
 #include "qtdatetimeconfig.h"
 
-class DateTimeSettingPage : public QWidget
+class DateTimeSettingPage : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -30,8 +30,16 @@ public slots:
 
 private:
     QtDateTimeConfig *m_timeConfig;
+    QtPixmapButton   *m_btnOk;
+
 private slots:
     void SetSystemDatetime();
+
+protected:
+    void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // DATETIMESETTINGPAGE_H

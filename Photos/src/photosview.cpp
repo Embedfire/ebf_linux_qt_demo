@@ -35,23 +35,13 @@ PhotosView::~PhotosView()
 
 void PhotosView::InitWidget()
 {
-    QtWidgetTitleBar *widgetTitle= new QtWidgetTitleBar(this);
-    widgetTitle->setMinimumHeight(60);
+    QtWidgetTitleBar *widgetTitle = new QtWidgetTitleBar(this);
+    widgetTitle->SetScalSize(Skin::m_nScreenWidth, 60);
     widgetTitle->SetBackground(QColor("#f0f0f0"));
-    widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
-    widgetTitle->SetTitle("相册", "#333333", 25);
+    widgetTitle->SetTitle(tr("相册"), "#333333", 25);
+    widgetTitle->SetBtnHomePixmap(QPixmap(":/images/photos/menu_icon.png"), QPixmap(":/images/photos/menu_icon_pressed.png"));
 
-    QPushButton *btnHome = new QPushButton(widgetTitle);
-    btnHome->setFixedSize(54, 54);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/photos/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/photos/menu_icon_pressed.png);}"));
-
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(widgetTitle);
-    horLayoutTitle->setContentsMargins(9, 0, 10, 0);
-    horLayoutTitle->setSpacing(18);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
+    connect(widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
     m_photoListView = new PhotoListView(this);
     m_photoListView->SetBackground(QColor("#ffffff"));

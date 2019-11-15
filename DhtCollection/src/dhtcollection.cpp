@@ -55,35 +55,28 @@ DhtCollection::~DhtCollection()
 void DhtCollection::InitWidget()
 {
     m_widgetTitle= new QtWidgetTitleBar(this);
-    m_widgetTitle->setMinimumHeight(80);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 80);
     m_widgetTitle->SetBackground(Qt::transparent);
-    m_widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
-    m_widgetTitle->SetTitle("温湿度采集", "#ffffff", 32);
-
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(54, 54);
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(0, 0, 10, 0);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
+    m_widgetTitle->SetBtnHomePixmap(QPixmap(":/images/backlight/menu_icon.png"), QPixmap(":/images/backlight/menu_icon_pressed.png"));
+    m_widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
+    m_widgetTitle->SetTitle(tr("温湿度采集"), "#ffffff", 32);
+    connect(m_widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
     m_stackedWidget = new QtStackedWidget(this);
+    m_stackedWidget->setPressMove(true);
     connect(m_stackedWidget, SIGNAL(currentChanged(int)), this, SLOT(SltCurrentChanged(int)));
     m_stackedWidget->SetBackground(Qt::transparent);
-    m_stackedWidget->setMinimumHeight(336);
 
     m_realData = new DisplayRealData(m_stackedWidget);
     m_recordData = new DisplayRecordData(m_stackedWidget);
     m_stackedWidget->addWidget(0, m_realData);
     m_stackedWidget->addWidget(1, m_recordData);
 
-    m_verLayoutAll = new QVBoxLayout(this);
+    QVBoxLayout *m_verLayoutAll = new QVBoxLayout(this);
+    m_verLayoutAll->setContentsMargins(0, 0, 0, 0);
     m_verLayoutAll->setSpacing(0);
     m_verLayoutAll->addWidget(m_widgetTitle, 1);
-    m_verLayoutAll->addWidget(m_stackedWidget, 4);
+    m_verLayoutAll->addStretch(5);
 }
 
 void DhtCollection::SltCurrentChanged(int index)
@@ -122,10 +115,8 @@ void DhtCollection::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
     painter.scale(m_scaleX, m_scaleY);
-#endif
 
     painter.drawPixmap(0, 0, QPixmap(":/images/dht/background.png"));
     QPixmap pixmap2Dots(":/images/dht/controls_2dots.png");
@@ -148,24 +139,9 @@ void DhtCollection::hideEvent(QHideEvent *e)
     QWidget::hideEvent(e);
 }
 
-void DhtCollection::mousePressEvent(QMouseEvent *e)
-{
-    QWidget::mousePressEvent(e);
-}
-
 void DhtCollection::resizeEvent(QResizeEvent *e)
 {
-#ifdef BUILD_WITH_HDMI
-    if (this->height() < 500) {
-        m_verLayoutAll->setContentsMargins(0, 0, 0, 55);
-    } else {
-        m_verLayoutAll->setContentsMargins(0, 0, 0, this->height() * 55 / Skin::m_nScreenHeight + 2);
-    }
-#else
-    m_verLayoutAll->setContentsMargins(0, 0, 0, 55);
-#endif
-    m_scaleX = (this->width() * 1.0 / Skin::m_nScreenWidth);
-    m_scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-
+    SetScaleValue();
+    m_stackedWidget->setGeometry(0, 83 * m_scaleY, this->width(), 343 * m_scaleY);
     QWidget::resizeEvent(e);
 }

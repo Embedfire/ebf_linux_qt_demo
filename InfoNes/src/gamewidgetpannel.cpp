@@ -17,7 +17,7 @@
 #include <QFile>
 #include <QDebug>
 
-GameWidgetPannel::GameWidgetPannel(QWidget *parent) : QWidget(parent)
+GameWidgetPannel::GameWidgetPannel(QWidget *parent) : QtWidgetBase(parent)
 {
     m_bEngineError = false;
     m_bQuit = false;
@@ -56,6 +56,7 @@ void GameWidgetPannel::startGame(const QString &fileName)
 #endif
     }
     else {
+        m_bQuit = false;
         m_bEngineError = true;
     }
 
@@ -70,17 +71,19 @@ bool GameWidgetPannel::isRunning()
 void GameWidgetPannel::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
+    painter.scale(m_scaleX, m_scaleY);
     QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(24);
     painter.setFont(font);
 
-    painter.fillRect(this->rect(), Qt::black);
+    QRect rect(0, 0, m_nBaseWidth, m_nBaseHeight);
+    painter.fillRect(rect, Qt::black);
     painter.setPen(QColor("#aaaaaa"));
     if (m_bQuit) {
-        painter.drawText(this->rect(), Qt::AlignCenter, tr("正在退出游戏...."));
+        painter.drawText(rect, Qt::AlignCenter, tr("正在退出游戏...."));
     }
     else {
-        painter.drawText(this->rect(), Qt::AlignCenter, m_bEngineError ? tr("游戏引擎错误，请联系管理员！") : tr("正在启动...."));
+        painter.drawText(rect, Qt::AlignCenter, m_bEngineError ? tr("游戏引擎错误，请联系管理员！") : tr("正在启动...."));
     }
 }
 

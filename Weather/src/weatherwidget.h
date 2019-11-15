@@ -19,12 +19,12 @@
 
 #include "qtwidgetbase.h"
 #include "qtpagelistwidget.h"
-#include "qtrefreshbutton.h"
+#include "qtwaitwidget.h"
 #include "weatherapi.h"
 #include "citymanagerwidget.h"
 #include "qtpixmapbutton.h"
 
-class WeatherView : public QWidget
+class WeatherView : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -45,10 +45,7 @@ private:
     int     m_nYOffset;
     QRect   m_rectCenter;
 
-    QMap<int, QtPixmapButton*> m_btns;
-
-    QWidget         *m_widgetRefresh;
-    QtRefreshButton *m_btnRefesh;
+    QtWaitWidget    *m_widgetRefresh;
     bool            m_bRefresh;
 
     QPixmap         m_pixmapWeatherType;
@@ -127,6 +124,9 @@ private slots:
     void InitWeather();
     void SltToolBtnClicked(int index);
     void SltWeatherReply(const QByteArray &jsonData);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // WEATHERWIDGET_H

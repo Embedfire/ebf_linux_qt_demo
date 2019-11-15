@@ -78,7 +78,6 @@ private:
     CCalculator *ccalculator;
 private:
     void InitData();
-    void CalcButtonResize();
     void onButtonClicked(CalcButton *btn);
 
 protected:

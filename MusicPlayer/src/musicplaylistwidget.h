@@ -58,7 +58,7 @@ private:
     void ScanDirMedias(const QString &path);
 
 private:
-    QLabel *m_labelTitle;
+    QString         m_strTitle;
     PlayListWidget *m_listWidget;
     QMediaPlaylist *m_playList;
     QMap<int,QtListWidgetItem*> m_mapItems;

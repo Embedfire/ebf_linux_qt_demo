@@ -879,8 +879,11 @@ QDate LunarCalendarInfo::getPrevMonth(const QDate &date)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-QtCalendarWidget::QtCalendarWidget(QWidget *parent) : QWidget(parent)
+QtCalendarWidget::QtCalendarWidget(QWidget *parent) : QtWidgetBase(parent)
 {
+    m_nBaseWidth = 800;
+    m_nBaseHeight = 400;
+
     m_colorBackground = QColor("#014b96");
     m_colorText       = QColor("#ffffff");
     m_font            = QFont("Mircosoft YaHei");
@@ -903,6 +906,8 @@ QtCalendarWidget::QtCalendarWidget(QWidget *parent) : QWidget(parent)
     m_lunarCalendarInfo = new LunarCalendarInfo(this);
     m_animationMove = new QPropertyAnimation(this, "xPos");
     m_animationMove->setDuration(200);
+
+    CalcRectSize();
 }
 
 QtCalendarWidget::~QtCalendarWidget()
@@ -957,36 +962,23 @@ void QtCalendarWidget::setXPos(int nValue)
 
 void QtCalendarWidget::CalcRectSize()
 {
-    int nX = (this->width() - MARGIN * 2 - m_cellWidth * 7) / 2 + MARGIN;
-    int nY = (this->height() - MARGIN * 2 - m_cellHeight * 6 - TITLE_HEIGHT) / 2 + MARGIN;
+    int nX = (m_nBaseWidth - MARGIN * 2 - m_cellWidth * 7) / 2 + MARGIN;
+    int nY = (m_nBaseHeight - MARGIN * 2 - m_cellHeight * 6 - TITLE_HEIGHT) / 2 + MARGIN;
     m_calendarRect = QRect(nX, nY + TITLE_HEIGHT, m_cellWidth * 7, m_cellHeight * 6);
-}
-
-void QtCalendarWidget::resizeEvent(QResizeEvent *e)
-{
-    CalcRectSize();
-    QWidget::resizeEvent(e);
-}
-
-QSize QtCalendarWidget::sizeHint() const
-{
-    return QSize(m_cellWidth * 7 + MARGIN * 2, m_cellHeight * 6 + MARGIN * 2 + TITLE_HEIGHT);
-}
-
-QSize QtCalendarWidget::minimumSize() const
-{
-    return QSize(m_cellWidth * 7 + MARGIN * 2, m_cellHeight * 6 + MARGIN * 2 + TITLE_HEIGHT);
 }
 
 void QtCalendarWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
+
     painter.setPen(Qt::NoPen);
     painter.setBrush(m_colorBackground);
-    painter.drawRect(this->rect());
+    painter.drawRect(0, 0, m_nBaseWidth, m_nBaseHeight);
     painter.setFont(m_font);
     drawTitle(&painter);
+
     if (None == m_nDirection) {
         drawDays(&painter, m_currentDate, 0);
     }
@@ -1043,7 +1035,6 @@ void QtCalendarWidget::drawDays(QPainter *painter, const QDate &date, int nStart
     int countDay = m_lunarCalendarInfo->getMonthDays(date.year(), date.month());
 
     int nIndex = 0;
-//    week = (0 == week) ? 7 : week;
     int nEllipseW = qMin(m_cellWidth, m_cellHeight) - 5;
 
     for (int i = 0; i < 42; i++) {
@@ -1104,8 +1095,8 @@ void QtCalendarWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     m_bPressed = false;
     m_animationMove->setStartValue(m_nStartPos);
-    if (qAbs(m_nStartPos) > m_cellWidth * 2) {
-        m_nMoveEndValue = (m_nStartPos < 0) ? -m_calendarRect.width() : m_calendarRect.width();
+    if (qAbs(m_nStartPos) > m_cellWidth * 2 * m_scaleX) {
+        m_nMoveEndValue = (m_nStartPos < 0) ? -m_calendarRect.width() * m_scaleX : m_calendarRect.width() * m_scaleX;
         m_nDirection = (m_nStartPos < 0) ? LeftDirection : RightDirection;
     }
     else {
@@ -1121,7 +1112,9 @@ void QtCalendarWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void QtCalendarWidget::mouseMoveEvent(QMouseEvent *e)
 {
-    if (m_bPressed && m_calendarRect.contains(e->pos())) {
+    QRect rect;
+    ScaleRect(rect, m_calendarRect);
+    if (m_bPressed && rect.contains(e->pos())) {
         int nXoffset = e->pos().x() - m_startPos.x();
         m_startPos = e->pos();
 

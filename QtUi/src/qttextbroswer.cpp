@@ -48,6 +48,11 @@ void QtTextBroswer::setText(const QString &text)
     this->update();
 }
 
+QString QtTextBroswer::text() const
+{
+    return m_strText;
+}
+
 void QtTextBroswer::append(const QString &text)
 {
     m_strText.append("\n");

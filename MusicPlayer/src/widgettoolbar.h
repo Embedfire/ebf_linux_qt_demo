@@ -12,30 +12,13 @@
 #ifndef WIDGETTOOLBAR_H
 #define WIDGETTOOLBAR_H
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
+#include "qtwidgetbase.h"
 #include "qtsliderbar.h"
-
-class QtVolumeSlider : public QtSliderBar {
-    Q_OBJECT
-public:
-    explicit QtVolumeSlider(QWidget *parent = 0);
-    ~QtVolumeSlider();
-
-signals:
-
-private:
-
-protected:
-    void showEvent(QShowEvent *e);
-    void focusOutEvent(QFocusEvent *e);
-};
 
 ///////////////////////////////////////////////////////////////////
 /// \brief The WidgetToolBar class
 ///
-class WidgetToolBar : public QWidget
+class WidgetToolBar : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -56,6 +39,7 @@ signals:
     void currentMuteChanged(int value);
     void toolBarClicked(int index);
     void currentPostionChanged(int postiion);
+
 private:
     void InitWidget();
 
@@ -64,18 +48,19 @@ private:
 
     bool    m_bPlaying;
 
-    QPushButton     *m_btnPlay;
-    QtSliderBar     *m_progressBar;
-    QLabel          *m_labelCurrTime;
-    QLabel          *m_labelDuraTime;
+    QtSliderBar              *m_progressBar;
+    QString             m_strCurrTime;
+    QString             m_strDuration;
 private:
     void InitProperty();
 
     QTime GetTimeByPostion(int postion);
 private slots:
     void SltBtnPlayClicked();
+    void SltBtnClicket(int index);
 
 protected:
+    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
 };
 #endif // WIDGETTOOLBAR_H

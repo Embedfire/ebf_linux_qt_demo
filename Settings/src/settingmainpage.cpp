@@ -26,9 +26,16 @@
 #include <QPainter>
 
 /////////////////////////////////////////////////////////////////////////////
-SettingMainPage::SettingMainPage(QWidget *parent) : QWidget(parent)
+SettingMainPage::SettingMainPage(QWidget *parent) : QtListWidget(parent)
 {
+    m_backgroundColor = Qt::transparent;
+    m_nItemSize = 45;
+    m_bHorizontal = false;
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 400;
+
     InitWidget();
+    connect(this, SIGNAL(currentIndexClicked(int)), this, SLOT(SltCurrentIndexClicked(int)));
 }
 
 SettingMainPage::~SettingMainPage()
@@ -45,62 +52,68 @@ void SettingMainPage::SltSwitchClicked(bool on)
 
 void SettingMainPage::InitWidget()
 {
-    QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
-    verLayoutAll->setContentsMargins(20, 20, 0, 20);
-    verLayoutAll->setSpacing(10);
+    m_btnSwitch = new QtSwitchButton(this);
+    m_btnSwitch->setBackgroundColor(QColor("#0199ff"));
+    m_btnSwitch->setHandleColor(QColor("#ffffff"));
+    m_btnSwitch->setChecked(AppConfig::ReadSetting("System", "mouse", true).toBool());
+    connect(m_btnSwitch, SIGNAL(buttonChecked(bool)), this, SLOT(SltSwitchClicked(bool)));
 
-    ClickedWidget *widgetBoard = new ClickedWidget(this);
-    widgetBoard->setIndex(1, tr("关于开发板"));
-    connect(widgetBoard, SIGNAL(signalClicked(int)), this, SIGNAL(signalChangePage(int)));
-    verLayoutAll->addWidget(widgetBoard);
+    int index = 1;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("关于开发板"),  tr(""), QPixmap(":/images/setting/ic_next.png"))); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("显示/隐藏鼠标"),  tr(""), QPixmap())); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("背光调节"),  tr(""), QPixmap(":/images/setting/ic_next.png"))); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("时间设置"),  tr(""), QPixmap(":/images/setting/ic_next.png"))); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("日期设置"),  tr(""), QPixmap(":/images/setting/ic_next.png"))); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("语言设置(重启生效)"),  tr(""), QPixmap(":/images/setting/ic_next.png")));
+}
 
-    {
-        QWidget *widget = new QWidget(this);
-        widget->setMinimumHeight(44);
-        widget->setObjectName("widgetItem");
+void SettingMainPage::SltCurrentIndexClicked(int index)
+{
+    if (2 == index) {
+        m_btnSwitch->setChecked(!m_btnSwitch->isChecked());
+    } else {
+        emit signalChangePage(index < 2 ? 1 : (index - 1));
+    }
+}
 
-        QHBoxLayout *horLayout = new QHBoxLayout(widget);
-        horLayout->setContentsMargins(0, 0, 20, 0);
+void SettingMainPage::resizeEvent(QResizeEvent *e)
+{
+    m_nItemShowCnt = m_bHorizontal ? ((m_nBaseWidth - m_nMargin * 2) / m_nItemSize) :
+                                     ((m_nBaseHeight - m_nMargin * 2) / m_nItemSize);
+    SetScaleValue();
+    m_btnSwitch->setFixedSize(60 * m_scaleX, 30 * m_scaleY);
+    QWidget::resizeEvent(e);
+}
 
-        horLayout->addWidget(new QLabel(tr("显示/隐藏鼠标"), widget));
-        horLayout->addStretch();
+void SettingMainPage::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
+{
+    painter->save();
+    painter->setPen(QColor("#797979"));
+    painter->drawLine(QPoint(item->m_rect.left() - m_nMargin, item->m_rect.bottom()),
+                      QPoint(item->m_rect.right() + m_nMargin, item->m_rect.bottom()));
 
-        QtSwitchButton *btnSwitch = new QtSwitchButton(widget);
-        btnSwitch->setBackgroundColor(QColor("#0199ff"));
-        btnSwitch->setFixedSize(65, 30);
-        btnSwitch->setHandleColor(QColor("#ffffff"));
-        btnSwitch->setChecked(AppConfig::ReadSetting("System", "mouse", true).toBool());
-        connect(btnSwitch, SIGNAL(buttonChecked(bool)), this, SLOT(SltSwitchClicked(bool)));
+    QRect rect(item->m_rect.left() + 20, item->m_rect.top(), item->m_rect.width() - 40, item->m_rect.height());
+    QFont font(Skin::m_strAppFontNormal);
+    font.setPixelSize(24);
+    painter->setFont(font);
+    painter->setPen(QColor("#ffffff"));
+    painter->drawText(rect, Qt::AlignVCenter, item->m_strText);
 
-        horLayout->addWidget(btnSwitch);
-        verLayoutAll->addWidget(widget);
+    QPixmap pixmap = item->m_pixmapIcon;
+    if (pixmap.isNull()) {
+        int nW = painter->fontMetrics().width(item->m_strBaseName);
+        painter->drawText(QRect(m_nBaseWidth - nW - 20, rect.top(), nW, rect.height()), Qt::AlignCenter, item->m_strBaseName);
+    } else {
+        painter->drawPixmap(m_nBaseWidth - pixmap.width() - 20, rect.top() + (rect.height() - pixmap.height()) / 2, pixmap);
     }
 
-    ClickedWidget *widgetBacklight = new ClickedWidget(this);
-    widgetBacklight->setIndex(2, tr("背光调节"));
-    connect(widgetBacklight, SIGNAL(signalClicked(int)), this, SIGNAL(signalChangePage(int)));
-    verLayoutAll->addWidget(widgetBacklight);
+    if (2 == item->m_nId) {
+        int nX = (item->m_rect.right() - 60 - m_nMargin) * m_scaleX;
+        int nY = (item->m_rect.height() - 30) / 2 + item->m_rect.top();
+        m_btnSwitch->move(nX, nY * m_scaleY);
+    }
 
-    ClickedWidget *widgetTime = new ClickedWidget(this);
-    widgetTime->setIndex(3, tr("时间设置"));
-    connect(widgetTime, SIGNAL(signalClicked(int)), this, SIGNAL(signalChangePage(int)));
-    verLayoutAll->addWidget(widgetTime);
-
-    ClickedWidget *widgetDate = new ClickedWidget(this);
-    widgetDate->setIndex(4, tr("日期设置"));
-    connect(widgetDate, SIGNAL(signalClicked(int)), this, SIGNAL(signalChangePage(int)));
-    verLayoutAll->addWidget(widgetDate);
-
-//    ClickedWidget *widgetEth = new ClickedWidget(this);
-//    widgetEth->setIndex(5, tr("网络设置"));
-//    connect(widgetEth, SIGNAL(signalClicked(int)), this, SIGNAL(signalChangePage(int)));
-//    verLayoutAll->addWidget(widgetEth);
-
-    this->setStyleSheet(QString("QWidget#widgetItem{border: none; border-bottom: 1px solid #797979; background: none;}"
-                        "QPushButton#btnNext{border-image: url(:/images/setting/ic_next.png);}"
-                        "QLabel{font-family: '%1'; font: 24px; color: #ffffff;}")
-                        .arg(Skin::m_strAppFontNormal));
-    verLayoutAll->addStretch();
+    painter->restore();
 }
 
 

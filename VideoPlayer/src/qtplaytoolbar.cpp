@@ -19,7 +19,9 @@
 PlayTitleBarWidget::PlayTitleBarWidget(QWidget *parent) : QtToolBar(parent)
 {
     m_strText = "";
-    this->setFixedHeight(50);
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 50;
+
     m_rectBack = QRect(20, 10, 40, 40);
 }
 
@@ -37,18 +39,22 @@ void PlayTitleBarWidget::SetText(const QString &text)
 void PlayTitleBarWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.fillRect(this->rect(), QColor("#7f182E3A"));
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.fillRect(0, 0, m_nBaseWidth, m_nBaseHeight, QColor("#7f182E3A"));
 
     painter.drawPixmap(m_rectBack.topLeft(), QPixmap(":/images/photos/toolbar/ic_back.png"));
 
     painter.setPen("#ffffff");
     painter.setFont(QFont(Skin::m_strAppFontNormal, 18));
-    painter.drawText(this->rect(), Qt::AlignCenter, m_strText);
+    painter.drawText(0, 0, m_nBaseWidth, m_nBaseHeight, Qt::AlignCenter, m_strText);
 }
 
 void PlayTitleBarWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (m_rectBack.contains(e->pos())) {
+    QRect rect;
+    ScaleRect(rect, m_rectBack);
+    if (rect.contains(e->pos())) {
         emit signalBack();
     }
     QWidget::mousePressEvent(e);
@@ -58,9 +64,14 @@ void PlayTitleBarWidget::mousePressEvent(QMouseEvent *e)
 //////////////////////////////////////////////////////////////////////////////////////
 PlayerBarWidget::PlayerBarWidget(QWidget *parent) : QtToolBar(parent)
 {
-    this->setFixedHeight(102);
-    this->setAttribute(Qt::WA_TranslucentBackground);
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 102;
+
+    m_strCurrTime = "00:00";
+    m_strDuration = "00:00";
+
     InitWidget();
+    connect(this, SIGNAL(signalBtnClicked(int)), this, SLOT(SltBtnClicked(int)));
 }
 
 PlayerBarWidget::~PlayerBarWidget()
@@ -70,97 +81,88 @@ PlayerBarWidget::~PlayerBarWidget()
 
 void PlayerBarWidget::setPlayState(bool bOk)
 {
-    m_btnPlay->setChecked(bOk);
+    m_btns.value(1)->setChecked(bOk);
 }
 
 void PlayerBarWidget::setPostion(int postion)
 {
-    m_sliderBar->SetValue(postion);
-    m_labelPostion->setText(QString("%1:%2").arg(postion / 60, 2, 10, QChar('0')).arg(postion % 60, 2, 10, QChar('0')));
+    m_progressBar->SetValue(postion);
+    m_strCurrTime = QString("%1:%2").arg(postion / 60, 2, 10, QChar('0')).arg(postion % 60, 2, 10, QChar('0'));
+    this->update();
 }
 
 void PlayerBarWidget::setDuration(int duration)
 {
-    m_sliderBar->SetMaxValue(duration);
-    m_labelDuration->setText(QString("%1:%2").arg(duration / 60, 2, 10, QChar('0')).arg(duration % 60, 2, 10, QChar('0')));
+    m_progressBar->SetMaxValue(duration);
+    m_strDuration = QString("%1:%2").arg(duration / 60, 2, 10, QChar('0')).arg(duration % 60, 2, 10, QChar('0'));
+    this->update();
 }
 
 void PlayerBarWidget::InitWidget()
 {
-    m_labelPostion = new QLabel(this);
-    m_labelPostion->setText("00:00");
-    m_labelDuration = new QLabel(this);
-    m_labelDuration->setText("00:00");
+    m_btns.insert(0, new QtPixmapButton(0, QRect(295, 40, 60, 60), QPixmap(":/images/video/ic_prev.png"), QPixmap(":/images/video/ic_prev_pre.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(375, 40, 60, 60), QPixmap(":/images/video/ic_play.png"), QPixmap(":/images/video/ic_pause.png")));
+    m_btns.insert(2, new QtPixmapButton(2, QRect(465, 40, 60, 60), QPixmap(":/images/video/ic_next.png"), QPixmap(":/images/video/ic_next_pre.png")));
+    m_btns.insert(3, new QtPixmapButton(3, QRect(655, 40, 60, 60), QPixmap(":/images/video/ic_volume.png"), QPixmap(":/images/video/ic_volume_pre.png")));
+    m_btns.insert(4, new QtPixmapButton(4, QRect(728, 40, 60, 60), QPixmap(":/images/video/ic_menu_list.png"), QPixmap(":/images/video/ic_menu_list_pre.png")));
+    m_btns.value(1)->setCheckAble(true);
 
-    m_sliderBar = new QtSliderBar(this);
-    m_sliderBar->SetHorizontal(true);
-    m_sliderBar->setMinimumHeight(40);
-    m_sliderBar->SetSliderSize(2, 40);
-    connect(m_sliderBar, SIGNAL(currentValueChanged(int)), this, SIGNAL(currentPostionChanged(int)));
+    // 进度条
+    m_progressBar = new QtSliderBar(this);
+    m_progressBar->SetHorizontal(true);
+    m_progressBar->SetSliderSize(2, 40);
+    connect(m_progressBar, SIGNAL(currentValueChanged(int)), this, SIGNAL(currentPostionChanged(int)));
+}
 
-    QHBoxLayout *horLayoutDuration = new QHBoxLayout();
-    horLayoutDuration->setContentsMargins(0, 0, 0, 0);
-    horLayoutDuration->setSpacing(0);
-    horLayoutDuration->addWidget(m_labelPostion);
-    horLayoutDuration->addWidget(m_sliderBar, 1);
-    horLayoutDuration->addWidget(m_labelDuration);
+void PlayerBarWidget::SltBtnClicked(int index)
+{
+    if (0 == index) {
+        emit signalPrev();
+    } else if (1 == index) {
+        QtPixmapButton *btn = m_btns.value(1);
+        emit signalPlay(btn->isChecked());
+    } else if (2 == index) {
+        emit signalNext();
+    } else if (3 == index) {
+        emit signalVolume();
+    } else if (4 == index) {
+        emit signalMuenList();
+    }
+}
 
-    QHBoxLayout *horLayoutBtns = new QHBoxLayout();
-    horLayoutBtns->setContentsMargins(10, 10, 10, 10);
-    horLayoutBtns->setSpacing(28);
-    horLayoutBtns->addStretch(1);
-
-    m_btnPrev = new QPushButton(this);
-    m_btnPrev->setStyleSheet(QString("QPushButton {border-image: url(:/images/video/ic_prev.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/video/ic_prev_pre.png);}"));
-    horLayoutBtns->addWidget(m_btnPrev);
-    connect(m_btnPrev, SIGNAL(clicked(bool)), this, SIGNAL(signalPrev()));
-
-    m_btnPlay = new QPushButton(this);
-    connect(m_btnPlay, SIGNAL(clicked(bool)), this, SIGNAL(signalPlay(bool)));
-    m_btnPlay->setCheckable(true);
-    m_btnPlay->setChecked(true);
-    m_btnPlay->setStyleSheet(QString("QPushButton {border-image: url(:/images/video/ic_play.png);}"
-                                     "QPushButton:checked {border-image: url(:/images/video/ic_pause.png);}"));
-    horLayoutBtns->addWidget(m_btnPlay);
-
-    m_btnNext = new QPushButton(this);
-    m_btnNext->setStyleSheet(QString("QPushButton {border-image: url(:/images/video/ic_next.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/video/ic_next_pre.png);}"));
-    horLayoutBtns->addWidget(m_btnNext);
-    connect(m_btnNext, SIGNAL(clicked(bool)), this, SIGNAL(signalNext()));
-
-    horLayoutBtns->addStretch(1);
-    m_btnVolume = new QPushButton(this);
-    m_btnVolume->setStyleSheet(QString("QPushButton {border-image: url(:/images/video/ic_volume.png);}"
-                                       "QPushButton:pressed {border-image: url(:/images/video/ic_volume_pre.png);}"));
-    horLayoutBtns->addWidget(m_btnVolume);
-    connect(m_btnVolume, SIGNAL(clicked(bool)), this, SIGNAL(signalVolume()));
-
-    m_btnMenuList = new QPushButton(this);
-    m_btnMenuList->setStyleSheet(QString("QPushButton {border-image: url(:/images/video/ic_menu_list.png);}"
-                                         "QPushButton:pressed {border-image: url(:/images/video/ic_menu_list_pre.png);}"));
-    horLayoutBtns->addWidget(m_btnMenuList);
-    connect(m_btnMenuList, SIGNAL(clicked(bool)), this, SIGNAL(signalMuenList()));
-
-    QVBoxLayout *verLayoutAll =  new QVBoxLayout(this);
-    verLayoutAll->setContentsMargins(5, 5, 5, 5);
-    verLayoutAll->setSpacing(0);
-    verLayoutAll->addLayout(horLayoutDuration);
-    verLayoutAll->addLayout(horLayoutBtns);
-
-    this->setStyleSheet(QString("QPushButton {min-width: 40px; min-height: 40px;} "
-                                "QLabel {font-family:'%1';font: 18px; color: #ffffff;"
-                                "min-width: 60px;}").arg(Skin::m_strAppFontBold));
+void PlayerBarWidget::resizeEvent(QResizeEvent *e)
+{
+    SetScaleValue();
+    m_progressBar->SetSliderSize(2, 40 * m_scaleY);
+    m_progressBar->resize(675 * m_scaleX, 40 * m_scaleY);
+    m_progressBar->move(60 * m_scaleX, 1);
+    m_progressBar->SetValue(m_progressBar->value());
+    QWidget::resizeEvent(e);
 }
 
 void PlayerBarWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
     QLinearGradient linearGradient(QPoint(0, 0), QPoint(0, this->height()));
     linearGradient.setColorAt(0, QColor("#00aaaaaa"));
     linearGradient.setColorAt(1, QColor("#d0aaaaaa"));
     painter.setPen(Qt::NoPen);
     painter.setBrush(linearGradient);
-    painter.drawRect(this->rect());
+    painter.drawRect(0, 0, m_nBaseWidth, m_nBaseHeight);
+
+    painter.setPen(QColor("#ffffff"));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(18);
+    painter.setFont(font);
+    painter.drawText(QRect(4, 0, 60, 40), Qt::AlignCenter, m_strCurrTime);
+    painter.drawText(QRect(740, 0, 60, 40), Qt::AlignCenter, m_strDuration);
+
+    foreach (QtPixmapButton *btn, m_btns) {
+        int nX = btn->rect().left() + (btn->rect().width() - btn->pixmap().width()) / 2;
+        int nY = btn->rect().top() + (btn->rect().height() - btn->pixmap().height()) / 2;
+        painter.drawPixmap(nX, nY, btn->pixmap());
+    }
 }
+

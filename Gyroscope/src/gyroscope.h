@@ -14,14 +14,16 @@
 #include "qtwidgetbase.h"
 #include "mpu6050thread.h"
 #include "gyroscopewidget.h"
+#include "qtwidgetbase.h"
+#include "qtpixmapbutton.h"
 
 #ifndef USE_TEXT_BOARD
 #define USE_TEXT_BOARD
 #endif
 
-class TextBoardWidget : public QWidget {
+class TextBoardWidget : public QtWidgetBase
+{
     Q_OBJECT
-
 public:
     TextBoardWidget(QWidget *parent = 0);
     ~TextBoardWidget();
@@ -67,6 +69,8 @@ private:
 #endif
 
     Mpu6050Thread       *m_threadTest;
+    QtPixmapButton      *m_btnHome;
+
 private:
     void InitWidget();
 
@@ -74,7 +78,10 @@ private slots:
     void SltStartTest();
     void SltUpdateValues(int type, int index, qint16 value);
 protected:
+    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // GYROSCOPE_H

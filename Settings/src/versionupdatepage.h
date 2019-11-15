@@ -40,7 +40,7 @@ private:
     // 解压文件
     QString     m_strExtractFile;
 
-    QtTextBroswer *m_labelVersionInfo;
+    QtTextBroswer *m_textBrowserInfo;
 
     QPushButton   *m_btnCheckVersion;
     QPushButton   *m_btnDownload;
@@ -62,6 +62,7 @@ private slots:
     void SltDownloadNewApp();
 
 protected:
+    void resizeEvent(QResizeEvent *e);
     void showEvent(QShowEvent *e);
 };
 

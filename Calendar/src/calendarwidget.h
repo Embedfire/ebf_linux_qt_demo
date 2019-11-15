@@ -17,10 +17,9 @@
 #include <QVBoxLayout>
 
 #include "qtwidgetbase.h"
-#include "qtclockwidget.h"
 #include "qtstackedwidget.h"
-#include "qtlcdclockwidget.h"
-#include "minicalendarwidget.h"
+#include "calendarmainpage.h"
+#include "qtclockwidget.h"
 
 class CalendarWidget : public QtAnimationWidget
 {
@@ -31,21 +30,24 @@ public:
     ~CalendarWidget();
 
 signals:
-
+    void changeClockStyle(QtClockWidget::ClockStyle style);
 private:
     QtWidgetTitleBar    *m_widgetTitle;
-    QPushButton         *m_btnBack;
-    QPushButton         *m_btnHome;
     QLabel              *m_labelDate;
 
     QtStackedWidget     *m_stackedWidget;
-    QtClockWidget       *m_imageClock;
-    QtLcdClockWidget    *m_lcdClock;
-
-    MiniCalendarWidget  *m_miniCalendar;
+    CalendarMainPage    *m_mainPage;
 
     QStringList         m_strListTitle;
     QVBoxLayout        *m_verLayoutMain;
+    QString             m_strTitle;
+    int                 m_nCurrentPage;
+    QString             m_strCurrDate;
+
+
+    QtPixmapButton      *m_btnBack;
+    QtPixmapButton      *m_btnHome;
+
 private:
     void InitWidget();
     void CreateMainPage();
@@ -59,9 +61,10 @@ private slots:
     void SltCurrentDateChanged(const QDate &date);
 
     void SltChangeClockStyle(int index);
+    void SltBtnClicked(int index);
 
 protected:
-    void resizeEvent(QResizeEvent *e);
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // CALENDARWIDGET_H

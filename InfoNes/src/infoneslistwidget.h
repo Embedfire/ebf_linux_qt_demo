@@ -29,7 +29,6 @@ public slots:
 
 protected:
     void drawItemInfo(QPainter *painter, QtListWidgetItem *item);
-    void mousePressEvent(QMouseEvent *e);
 };
 
 #endif // INFONESLISTWIDGET_H

@@ -117,7 +117,6 @@ void ConfigWidget::mousePressEvent(QMouseEvent *e)
 //////////////////////////////////////////////////////////////////
 CameraConfig::CameraConfig(QWidget *parent) : QtAnimationWidget(parent)
 {
-    this->setFixedSize(434, 360);
     this->SetBackground(Qt::transparent);
     m_photoSize = QSize(800, 480);
     m_strListResolv = QStringList() << "320x240" << "480x272" << tr("800x480(默认)");
@@ -142,7 +141,7 @@ void CameraConfig::InitWidget()
 {
     m_widgetTitle = new QtWidgetTitleBar(this);
     m_widgetTitle->SetBackground(QColor("#000000"));
-    m_widgetTitle->setFixedHeight(45);
+    m_widgetTitle->SetScalSize(400, 45);
     m_widgetTitle->setFont(Skin::m_strAppFontBold);
     m_widgetTitle->SetTitle(tr("参数设置"), "#ffffff", 24);
 
@@ -360,10 +359,5 @@ void CameraConfig::showEvent(QShowEvent *e)
     m_stackedWidget->setCurrentIndex(0);
     this->resize(this->width(), 360);
     QWidget::showEvent(e);
-}
-
-void CameraConfig::resizeEvent(QResizeEvent *e)
-{
-    QWidget::resizeEvent(e);
 }
 

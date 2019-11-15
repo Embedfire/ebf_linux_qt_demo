@@ -21,6 +21,8 @@
 #include <QFileInfo>
 #include <QApplication>
 
+#define FONT_FAMILY "思源黑体 CN Normal"
+
 QtFileDialog::QtFileDialog(QWidget *parent) : QtAnimationWidget(parent)
 {
     if (NULL != parent) {
@@ -76,13 +78,12 @@ void QtFileDialog::InitWidget()
     //////////////////////////////////////////////////////////////////////////////////////////
     QWidget *widgetRecent = new QWidget(this);
     widgetRecent->setObjectName("widgetRecent");
-    widgetRecent->setFixedWidth(133);
     widgetRecent->setStyleSheet(QString("QWidget#widgetRecent{background-color: #605d53;}"
                                         "QPushButton{border:none; border-bottom: 1px solid #aaaaaa;"
-                                        "background-color: none;font: 18px; color: #ffffff; min-height: 35px; "
-                                        "text-align: left; padding-left: 10px}"
-                                        "QPushButton:pressed{background-color: #f17a49;}"));
-    horLayoutRight->addWidget(widgetRecent);
+                                        "background-color: none; font-family:'%1';"
+                                        "font: 18px; color: #ffffff; min-height: 30px; padding-left: 10px}"
+                                        "QPushButton:pressed{background-color: #f17a49;}").arg(FONT_FAMILY));
+    horLayoutRight->addWidget(widgetRecent, 1);
 
 
     QVBoxLayout *verLayoutRecent = new QVBoxLayout(widgetRecent);
@@ -109,20 +110,20 @@ void QtFileDialog::InitWidget()
     m_listView->setDragDropMode(QListView::NoDragDrop);
 
     QHBoxLayout *horLayoutLineEdit = new QHBoxLayout();
-    horLayoutLineEdit->setContentsMargins(10, 10, 10, 10);
+    horLayoutLineEdit->setContentsMargins(10, 8, 10, 8);
     horLayoutLineEdit->setSpacing(10);
     horLayoutLineEdit->addWidget(new QLabel(tr("文件名："), this));
 
     m_lineEditPath = new LineEdit(this);
     m_lineEditPath->setReadOnly(m_bSaveFile);
-    m_lineEditPath->setStyleSheet(QString("QLineEdit{border: 1px solid #5b5b5b; color:#333333; min-height: 27px;}"
+    m_lineEditPath->setStyleSheet(QString("QLineEdit{border: 1px solid #5b5b5b; color:#333333; min-height: 24px;}"
                                           "QLineEdit::focus{border: 1px solid #0078d7;}"));
     horLayoutLineEdit->addWidget(m_lineEditPath, 1);
     connect(m_lineEditPath, SIGNAL(signalFocus(bool)), this, SLOT(SltTextFocusChanged(bool)));
 
     QPushButton *btnOpen = new QPushButton(this);
-    btnOpen->setStyleSheet(QString("QPushButton {border: 1px solid #c6c6c6; border-radius: 2px; "
-                                   "min-width: 80px; min-height: 27px;color: #333333; }"
+    btnOpen->setStyleSheet(QString("QPushButton {border: 1px solid #5b5b5b; border-radius: 2px; "
+                                   "min-width: 80px; min-height: 24px;color: #333333; }"
                                    "QPushButton:pressed {border: 1px solid #0078d7;}"));
     btnOpen->setText(tr("确  定"));
     connect(btnOpen, SIGNAL(clicked(bool)), this, SLOT(SltBtnOkClicked()));
@@ -131,9 +132,10 @@ void QtFileDialog::InitWidget()
 
     QVBoxLayout *verLayoutFiles =  new QVBoxLayout();
     verLayoutFiles->setContentsMargins(0, 0, 0, 0);
-    verLayoutFiles->setSpacing(10);
-    verLayoutFiles->addWidget(m_listView, 1);
-    verLayoutFiles->addLayout(horLayoutLineEdit);
+    verLayoutFiles->setSpacing(0);
+    verLayoutFiles->addWidget(m_listView, 9);
+    verLayoutFiles->addLayout(horLayoutLineEdit, 1);
+
 #ifdef __arm__
     m_keyboard = new QLabel(this);
     m_keyboard->setFixedHeight(221);
@@ -141,13 +143,13 @@ void QtFileDialog::InitWidget()
     verLayoutFiles->addWidget(m_keyboard);
 #endif
 
-    horLayoutRight->addLayout(verLayoutFiles, 1);
+    horLayoutRight->addLayout(verLayoutFiles, 5);
     //////////////////////////////////////////////////////////////////////////////////////////
     QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
     verLayoutAll->setContentsMargins(0, 0, 0, 0);
     verLayoutAll->setSpacing(0);
-    verLayoutAll->addWidget(m_addressBar);
-    verLayoutAll->addLayout(horLayoutRight, 1);
+    verLayoutAll->addWidget(m_addressBar, 1);
+    verLayoutAll->addLayout(horLayoutRight, 7);
 }
 
 void QtFileDialog::InitModel()
@@ -234,4 +236,12 @@ void QtFileDialog::SltBtnRecentClicked(int index)
     } else {
         m_listView->setRootIndex(m_model->index("/root/"));
     }
+}
+
+void QtFileDialog::resizeEvent(QResizeEvent *e)
+{
+    SetScaleValue();
+    m_listView->setIconSize(QSize(60 * m_scaleX, 60 * m_scaleY));
+    m_listView->setGridSize(QSize(100 * m_scaleX, 100 * m_scaleY));
+    QWidget::resizeEvent(e);
 }

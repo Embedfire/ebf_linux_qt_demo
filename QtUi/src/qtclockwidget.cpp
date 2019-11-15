@@ -13,8 +13,11 @@
 #include <QTime>
 #include <QPainter>
 
-QtClockWidget::QtClockWidget(QWidget *parent) : QWidget(parent)
+QtClockWidget::QtClockWidget(QWidget *parent) : QtWidgetBase(parent)
 {
+    m_nBaseWidth = 233;
+    m_nBaseHeight = 243;
+
     SetClockStyle(QtClockWidget::DefaultStyle);
     m_timer = new QTimer(this);
     m_timer->setInterval(1000);
@@ -51,16 +54,15 @@ QSize QtClockWidget::sizeHint() const
 
 void QtClockWidget::paintEvent(QPaintEvent *)
 {
-    int width = this->width();
-    int height = this->height();
-
     // 绘制准备工作,启用反锯齿,启用图片平滑缩放
     QPainter painter(this);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
     // 绘制背景
-    drawBackground(&painter);
-    painter.translate(width / 2, height / 2);
+    painter.drawPixmap(0, 0, m_nBaseWidth, m_nBaseHeight, m_pixmapBackground);
+
+    // 绘制时分秒指针
+    painter.translate(m_nBaseWidth / 2, m_nBaseHeight / 2);
     drawHourHand(&painter);
     drawMinuteHand(&painter);
     drawSecondHand(&painter);
@@ -83,7 +85,7 @@ void QtClockWidget::drawHourHand(QPainter *painter)
     painter->rotate(30.0 * ((time.hour() + time.minute() / 60.0)));
 
     if (BlackStyle == m_colorStyle) {
-        painter->drawPixmap(0, -this->height() / 2 + 20, m_pixmapHourHand);
+        painter->drawPixmap(0, -m_nBaseHeight / 2 + 20, m_pixmapHourHand);
     }
     else {
         int nOffset = (BlackStyle == m_colorStyle) ? -m_pixmapHourHand.width() / 2 : 10;

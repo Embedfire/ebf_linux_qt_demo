@@ -89,6 +89,9 @@ private slots:
     void SltItemFileClicked(const QModelIndex &index);
     void SltAddressChanged(const QString &addr);
     void SltBtnRecentClicked(int index);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif // FILEDIALOG_H

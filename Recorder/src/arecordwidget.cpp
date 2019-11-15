@@ -19,9 +19,10 @@
 
 #define BUTTON_SIZE     40
 
-ARecordWidget::ARecordWidget(QWidget *parent) : QWidget(parent)
+ARecordWidget::ARecordWidget(QWidget *parent) : QtWidgetBase(parent)
 {
-    this->setMinimumWidth(300);
+    m_nBaseWidth = 300;
+    m_nBaseHeight = Skin::m_nScreenHeight;
 
 #ifdef __arm__
     m_wavObject = new WavObject(this);
@@ -117,29 +118,11 @@ void ARecordWidget::StopTimer()
     this->update();
 }
 
-void ARecordWidget::ScalcRect(QRect &rectRet, const QRect &rect)
-{
-#ifdef BUILD_WITH_HDMI
-    qreal scaleX = (this->width() * 1.0 / 300);
-    qreal scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-
-    rectRet.setX(rect.x() * scaleX);
-    rectRet.setY(rect.y() * scaleY);
-    rectRet.setWidth(rect.width() * scaleX);
-    rectRet.setHeight(rect.height() * scaleY);
-#else
-    rectRet = rect;
-#endif
-}
-
 void ARecordWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-
-#ifdef BUILD_WITH_HDMI
-    painter.scale(this->width() * 1.0 / 300, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter.scale(m_scaleX, m_scaleY);
 
     QFont font(Skin::m_strAppFontBold);
     font.setPixelSize(24);
@@ -198,7 +181,7 @@ void ARecordWidget::mousePressEvent(QMouseEvent *e)
     if (!m_bEnable) return;
 
     QRect rect;
-    ScalcRect(rect, m_rectPause);
+    ScaleRect(rect, m_rectPause);
     if (rect.contains(e->pos())) {
         if (m_bRecording) {
             PauseRecording();
@@ -208,7 +191,7 @@ void ARecordWidget::mousePressEvent(QMouseEvent *e)
         }
     }
 
-    ScalcRect(rect, m_rectStop);
+    ScaleRect(rect, m_rectStop);
     if (m_bRecording && rect.contains(e->pos())) {
         StopRecording();
     }

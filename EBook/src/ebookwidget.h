@@ -48,12 +48,13 @@ public:
     EBookWidget(QWidget *parent = 0);
     ~EBookWidget();
 
+    typedef enum {BtnHome, BtnBack, BtnAdd, BtnSetting} ToolBtn;
 private:
     QtWidgetTitleBar        *m_widgetTitle;
-    QPushButton             *m_btnAdd;
-    QPushButton             *m_btnBack;
-    QPushButton             *m_btnSetting;
-    QPushButton             *m_btnHome;
+    QtPixmapButton          *m_btnAdd;
+    QtPixmapButton          *m_btnBack;
+    QtPixmapButton          *m_btnSetting;
+
     TextBrowser             *m_textBrowser;
     QtEbookList             *m_booksView;
 
@@ -71,7 +72,6 @@ private slots:
     void SltLoadEbooks();
     void SltAddEbool();
     void SltCurrentItemClicked(QtPageListWidgetItem *item);
-    void SltSetColorStyle();
 
     void SltFontSizeChanged(int size);
     void SltColorChanged(const QColor &color);
@@ -79,6 +79,7 @@ private slots:
 
     void SltFileSelected(const QString &fileName);
     void SltFileDialogClose();
+    void SltToolBtnClicked(int index);
 
 protected:
     void resizeEvent(QResizeEvent *e);

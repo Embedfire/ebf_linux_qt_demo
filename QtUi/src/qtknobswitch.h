@@ -12,13 +12,13 @@
 #ifndef QTKNOBSWITCH_H
 #define QTKNOBSWITCH_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 
 #ifdef QtUi
 #include <QtUi>
-class QTUISHARED_EXPORT QtKnobSwitch : public QWidget {
+class QTUISHARED_EXPORT QtKnobSwitch : public QtWidgetBase {
 #else
-class QtKnobSwitch : public QWidget {
+class QtKnobSwitch : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:

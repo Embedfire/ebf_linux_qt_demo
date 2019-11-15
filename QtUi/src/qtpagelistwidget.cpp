@@ -49,7 +49,7 @@ QtPageListWidgetItem::QtPageListWidgetItem(int id, const QString &path, const QS
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief QtListWidget::QtListWidget
 /// \param parent
-QtPageListWidget::QtPageListWidget(QWidget *parent) : QWidget(parent)
+QtPageListWidget::QtPageListWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_pixmapWallpaper = QPixmap();
     m_backgroundColor = Qt::transparent;
@@ -58,8 +58,6 @@ QtPageListWidget::QtPageListWidget(QWidget *parent) : QWidget(parent)
     m_nCurrentPage = 0;
     m_nPrevPage = -1;
     m_nCurrentIndex = -1;
-    m_nLayoutRows = 3;
-    m_nLayoutColumns = 4;
 
     m_nDirection = None;
     m_bLoopbackChange = false;
@@ -70,8 +68,11 @@ QtPageListWidget::QtPageListWidget(QWidget *parent) : QWidget(parent)
     m_nStartPos = 0;
     m_nMoveEndValue = 0;
 
+    m_nLayoutRows = 3;
+    m_nLayoutColumns = 4;
     m_nHorSpace = 18;
     m_nVSpace = 6;
+    resizeRect();
 
     m_animationMove = new QPropertyAnimation(this, "xPos");
     m_animationMove->setDuration(200);
@@ -164,23 +165,19 @@ void QtPageListWidget::setXPos(int nValue)
 
 void QtPageListWidget::resizeRect()
 {
-    m_nItemHeight = (this->height() -  (m_nLayoutRows + 1) * m_nVSpace) / m_nLayoutRows;
-    m_nItemWidth = (this->width() -  (m_nLayoutColumns + 1) * m_nHorSpace) / m_nLayoutColumns;
+    m_nItemHeight = (m_nBaseHeight -  (m_nLayoutRows + 1) * m_nVSpace) / m_nLayoutRows;
+    m_nItemWidth = (m_nBaseWidth -  (m_nLayoutColumns + 1) * m_nHorSpace) / m_nLayoutColumns;
     this->update();
-}
-
-void QtPageListWidget::resizeEvent(QResizeEvent *e)
-{
-    resizeRect();
-    QWidget::resizeEvent(e);
 }
 
 void QtPageListWidget::mousePressEvent(QMouseEvent *e)
 {
     bool bOk = false;
     m_nCurrentIndex = -1;
+    QRect rect;
     foreach (QtPageListWidgetItem *item, m_listItems) {
-        if (item->m_rect.contains(e->pos())) {
+        ScaleRect(rect, item->m_rect);
+        if (rect.contains(e->pos())) {
             m_nCurrentIndex = item->m_nId;
             this->update();
             break;
@@ -204,8 +201,8 @@ void QtPageListWidget::mouseReleaseEvent(QMouseEvent *)
     m_bPressed = false;
     m_animationMove->setStartValue(m_nStartPos);
 
-    if (qAbs(m_nStartPos) > 100) {
-        m_nMoveEndValue = (m_nStartPos < 0) ? -this->width() : this->width();
+    if (qAbs(m_nStartPos) > 100 * m_scaleX) {
+        m_nMoveEndValue = (m_nStartPos < 0) ? -m_nBaseWidth : m_nBaseWidth;
         m_nDirection = (m_nStartPos < 0) ? LeftDirection : RightDirection;
     }
     else {
@@ -226,11 +223,13 @@ void QtPageListWidget::mouseMoveEvent(QMouseEvent *e)
         // 向左滑动--显示下一页
         m_nDirection = (nXoffset < 0) ? LeftDirection : RightDirection;
         m_nStartPos += nXoffset;
-        if (RightDirection == m_nDirection && m_nCurrentPage == 0 && m_nStartPos > 50) {
-            m_nStartPos = 50;
+
+        int ntemp = 50 * m_scaleX;
+        if (RightDirection == m_nDirection && m_nCurrentPage == 0 && m_nStartPos > ntemp) {
+            m_nStartPos = ntemp;
         }
-        else if (LeftDirection == m_nDirection && ((m_nCurrentPage + 1) == m_nPageCnt) && m_nStartPos < -50) {
-            m_nStartPos = -50;
+        else if (LeftDirection == m_nDirection && ((m_nCurrentPage + 1) == m_nPageCnt) && m_nStartPos < -ntemp) {
+            m_nStartPos = -ntemp;
         }
 
         this->update();
@@ -241,13 +240,15 @@ void QtPageListWidget::mouseMoveEvent(QMouseEvent *e)
 void QtPageListWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
+    painter.scale(m_scaleX, m_scaleY);
+
     if (!m_pixmapWallpaper.isNull()) {
-        painter.drawTiledPixmap(this->rect(), m_pixmapWallpaper);
+        painter.drawTiledPixmap(QRect(0, 0, m_nBaseWidth, m_nBaseHeight), m_pixmapWallpaper);
     } else {
         painter.setBrush(m_backgroundColor);
-        painter.drawRect(this->rect());
+        painter.drawRect(0, 0, m_nBaseWidth, m_nBaseHeight);
     }
 
     // 绘制中心区域
@@ -257,10 +258,10 @@ void QtPageListWidget::paintEvent(QPaintEvent *)
     else {
         drawListItem(&painter, m_nCurrentPage, m_nStartPos);
         if (m_nStartPos < 0 && (m_nCurrentPage < (m_nPageCnt - 1))) {
-            drawListItem(&painter, m_nCurrentPage + 1, this->width() + m_nStartPos);
+            drawListItem(&painter, m_nCurrentPage + 1, m_nBaseWidth + m_nStartPos);
         }
         else if (m_nCurrentPage > 0) {
-            drawListItem(&painter, m_nCurrentPage - 1, -this->width() + m_nStartPos);
+            drawListItem(&painter, m_nCurrentPage - 1, -m_nBaseWidth + m_nStartPos);
         }
     }
 }

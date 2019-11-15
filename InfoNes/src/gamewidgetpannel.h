@@ -11,11 +11,11 @@
 #ifndef GAMEWIDGETPANNEL_H
 #define GAMEWIDGETPANNEL_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QProcess>
 #include <QTimer>
 
-class GameWidgetPannel : public QWidget
+class GameWidgetPannel : public QtWidgetBase
 {
     Q_OBJECT
 public:

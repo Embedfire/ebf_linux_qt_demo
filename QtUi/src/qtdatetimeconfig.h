@@ -12,10 +12,10 @@
 #ifndef QTDATETIMECONFIG_H
 #define QTDATETIMECONFIG_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QLabel>
 
-class NumberSelected : public QWidget {
+class NumberSelected : public QtWidgetBase {
 
     Q_OBJECT
 public:
@@ -56,21 +56,21 @@ private:
     void setCurrentValue();
 
 protected:
-    void resizeEvent(QResizeEvent *e);
-
     void paintEvent(QPaintEvent *);
     void drawListItem(QPainter *painter);
 
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *e);
+    void wheelEvent(QWheelEvent *e);
+    void moveStep(int nOffset);
 };
 
 #ifdef QtUi
 #include <QtUi>
-class QTUISHARED_EXPORT QtDateTimeConfig : public QWidget {
+class QTUISHARED_EXPORT QtDateTimeConfig : public QtWidgetBase {
 #else
-class QtDateTimeConfig : public QWidget {
+class QtDateTimeConfig : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -88,7 +88,7 @@ public:
 
 private:
     ConfigFromat m_format;
-    QLabel  *m_labelTitle;
+    QString      m_strText;
     NumberSelected *m_numberSelected[3];
 
 private:

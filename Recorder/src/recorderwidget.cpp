@@ -11,6 +11,7 @@
 #include "recorderwidget.h"
 #include "skin.h"
 
+#include <QPainter>
 #include <QApplication>
 #include <QBoxLayout>
 #include <QApplication>
@@ -18,40 +19,43 @@
 #include <QPushButton>
 #include <QFileInfo>
 #include <QTimer>
+#include <QMouseEvent>
 
 RecorderWidget::RecorderWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
     this->SetBackground(QPixmap(":/images/record/ic_background.png"));
 
+    m_strCurrTime = "00:00";
+    m_strDuration = "00:00";
+
     InitWidget();
+
     QTimer::singleShot(500, this, SLOT(InitPlayList()));
 }
 
 RecorderWidget::~RecorderWidget()
 {
-
 }
 
 void RecorderWidget::InitWidget()
 {
     m_recordWidget = new ARecordWidget(this);
+    m_btns.insert(0, new QtPixmapButton(0, QRect(746, 5, 54, 54), QPixmap(":/images/record/menu_icon.png"), QPixmap(":/images/record/menu_icon_pressed.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(453, 431, 38, 38), QPixmap(":/images/record/ic_prev.png"), QPixmap(":/images/record/ic_prev_pre.png")));
+    m_btns.insert(2, new QtPixmapButton(2, QRect(532, 425, 50, 50), QPixmap(":/images/record/ic_play.png"), QPixmap(":/images/record/ic_pause.png")));
+    m_btns.insert(3, new QtPixmapButton(3, QRect(623, 431, 38, 38), QPixmap(":/images/record/ic_next.png"), QPixmap(":/images/record/ic_next_pre.png")));
+    m_btns.value(2)->setCheckAble(true);
+    connect(this, SIGNAL(signalBtnClicked(int)), this, SLOT(SltBtnClicked(int)));
 
-    QtWidgetTitleBar *widgetTitle= new QtWidgetTitleBar(this);
-    widgetTitle->setMinimumHeight(60);
-    widgetTitle->SetBackground(Qt::transparent);
-    widgetTitle->setFont(QFont(Skin::m_strAppFontRegular));
-    widgetTitle->SetTitle(tr("录音文件"), "#333333", 24);
-
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(51, 51);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/record/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/record/menu_icon_pressed.png);}"));
-
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(widgetTitle);
-    horLayoutTitle->setContentsMargins(0, 0, 10, 0);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
+    // 进度条
+    m_progressBar = new QtSliderBar(this);
+    m_progressBar->SetReadOnly(false);
+    m_progressBar->SetHorizontal(true);
+    m_progressBar->SetHandleBgColor(QColor("#95F204"));
+    m_progressBar->SetHandleColor(QColor("#95F204"));
+    m_progressBar->SetSliderSize(1, 30);
+    m_progressBar->SetMaxValue(0);
+    connect(m_progressBar, SIGNAL(currentValueChanged(int)), this, SLOT(SltChangePostion(int)));
 
     // 播放列表
     m_playlistWidget = new WavPlayListWidget(this);
@@ -63,121 +67,29 @@ void RecorderWidget::InitWidget()
     connect(m_player, SIGNAL(positionChanged(qint64)), this, SLOT(SltPostionChanged(qint64)));
     connect(m_player, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(stateChanged(QMediaPlayer::State)));
 
-    QWidget *widgetPlayBar = new QWidget(this);
-    CreatePlayBar(widgetPlayBar);
-    widgetPlayBar->setMinimumHeight(120);
+    m_sliderVolume = new QtSliderBar(this);
+    m_sliderVolume->SetReadOnly(false);
+    m_sliderVolume->SetHorizontal(true);
+    m_sliderVolume->SetMaxValue(100);
+    m_sliderVolume->SetValue(100);
+    m_sliderVolume->SetHandleBgColor(QColor("#95F204"));
+    m_sliderVolume->SetHandleColor(QColor("#95F204"));
+    m_sliderVolume->SetSliderSize(1, 24);
+    connect(m_sliderVolume, SIGNAL(currentValueChanged(int)), m_player, SLOT(setVolume(int)));
 
     // 中间区域
     QVBoxLayout *verLayoutList = new QVBoxLayout();
     verLayoutList->setContentsMargins(0, 0, 0, 0);
     verLayoutList->setSpacing(0);
-    verLayoutList->addWidget(widgetTitle, 1);
+    verLayoutList->addStretch(1);
     verLayoutList->addWidget(m_playlistWidget, 5);
-    verLayoutList->addWidget(widgetPlayBar, 2);
+    verLayoutList->addStretch(2);
 
     QHBoxLayout *horLayoutAll = new QHBoxLayout(this);
     horLayoutAll->setContentsMargins(0, 0, 0, 0);
     horLayoutAll->setSpacing(0);
-    horLayoutAll->addWidget(m_recordWidget);
-    horLayoutAll->addLayout(verLayoutList);
-}
-
-void RecorderWidget::CreatePlayBar(QWidget *parent)
-{
-    QHBoxLayout *horLayoutProgress = new QHBoxLayout();
-    horLayoutProgress->setContentsMargins(0, 0, 0, 0);
-    horLayoutProgress->setSpacing(0);
-
-    m_labelCurrTime = new QLabel(this);
-    m_labelCurrTime->setText("00:00");
-    horLayoutProgress->addWidget(m_labelCurrTime);
-
-    // 进度条
-    m_progressBar = new QtSliderBar(this);
-    m_progressBar->SetReadOnly(false);
-    m_progressBar->SetHorizontal(true);
-    m_progressBar->SetHandleBgColor(QColor("#95F204"));
-    m_progressBar->SetHandleColor(QColor("#95F204"));
-    m_progressBar->SetSliderSize(1, 30);
-    m_progressBar->SetMaxValue(0);
-    connect(m_progressBar, SIGNAL(currentValueChanged(int)), this, SLOT(SltChangePostion(int)));
-    horLayoutProgress->addWidget(m_progressBar, 1);
-
-    m_labelDuraTime = new QLabel(this);
-    m_labelDuraTime->setText("00:00");
-    horLayoutProgress->addWidget(m_labelDuraTime);
-
-    ////////////////////////////////////////////////////////////////////////
-    // 播放按钮
-    QHBoxLayout *horLayoutPlaybtn = new QHBoxLayout();
-    horLayoutPlaybtn->setContentsMargins(0, 0, 0, 0);
-    horLayoutPlaybtn->setSpacing(30);
-    horLayoutPlaybtn->addStretch();
-
-    QPushButton *btnPrev = new QPushButton(this);
-    btnPrev->setFocusPolicy(Qt::NoFocus);
-    connect(btnPrev, SIGNAL(clicked(bool)), m_playlistWidget->palyList(), SLOT(previous()));
-    horLayoutPlaybtn->addWidget(btnPrev);
-    btnPrev->setFixedSize(38, 38);
-    btnPrev->setStyleSheet(QString("QPushButton{border-image: url(:/images/record/ic_prev.png);}"
-                                   "QPushButton:pressed{border-image: url(:/images/record/ic_prev_pre.png);}"));
-
-    m_btnPlay = new QPushButton(this);
-    m_btnPlay->setFocusPolicy(Qt::NoFocus);
-    m_btnPlay->setCheckable(true);
-    connect(m_btnPlay, SIGNAL(clicked(bool)), this, SLOT(SltBtnPlayClicked()));
-    horLayoutPlaybtn->addWidget(m_btnPlay);
-    m_btnPlay->setFixedSize(50, 50);
-    m_btnPlay->setStyleSheet(QString("QPushButton{border-image: url(:/images/record/ic_play.png);}"
-                                     "QPushButton::checked{border-image: url(:/images/record/ic_pause.png);}"));
-
-    QPushButton *btnNext = new QPushButton(this);
-    btnNext->setFocusPolicy(Qt::NoFocus);
-    connect(btnNext, SIGNAL(clicked(bool)), m_playlistWidget->palyList(), SLOT(next()));
-    horLayoutPlaybtn->addWidget(btnNext);
-    btnNext->setFixedSize(38, 38);
-    btnNext->setStyleSheet(QString("QPushButton{border-image: url(:/images/record/ic_next.png);}"
-                                   "QPushButton:pressed{border-image: url(:/images/record/ic_next_pre.png);}"));
-
-
-    horLayoutPlaybtn->addStretch();
-    //////////////////////////////////////////////////////////////////
-    QLabel *labelVolume = new QLabel(this);
-    labelVolume->setFixedSize(42, 42);
-    labelVolume->setStyleSheet(QString("QLabel{min-width: 42px;}"));
-    labelVolume->setPixmap(QPixmap(":/images/record/ic_volume.png"));
-
-    QtSliderBar *sliderVolume = new QtSliderBar(this);
-    sliderVolume->SetReadOnly(false);
-    sliderVolume->SetHorizontal(true);
-    sliderVolume->SetMaxValue(100);
-    sliderVolume->SetValue(100);
-    sliderVolume->SetHandleBgColor(QColor("#95F204"));
-    sliderVolume->SetHandleColor(QColor("#95F204"));
-    sliderVolume->SetSliderSize(1, 24);
-    connect(sliderVolume, SIGNAL(currentValueChanged(int)), m_player, SLOT(setVolume(int)));
-
-    QHBoxLayout *horLayoutVolume = new QHBoxLayout();
-    horLayoutVolume->setContentsMargins(0, 0, 0, 0);
-    horLayoutVolume->setSpacing(0);
-    horLayoutVolume->addWidget(labelVolume);
-    horLayoutVolume->addWidget(sliderVolume, 1);
-
-    QHBoxLayout *horLayoutBtns = new QHBoxLayout();
-    horLayoutBtns->setContentsMargins(0, 0, 0, 0);
-    horLayoutBtns->setSpacing(10);
-    horLayoutBtns->addLayout(horLayoutVolume, 1);
-    horLayoutBtns->addLayout(horLayoutPlaybtn);
-    horLayoutBtns->addStretch(1);
-    //////////////////////////////////////////////////////////////////
-    QVBoxLayout *verLayout = new QVBoxLayout(parent);
-    verLayout->setContentsMargins(10, 10, 10, 10);
-    verLayout->setSpacing(10);
-    verLayout->addLayout(horLayoutProgress);
-    verLayout->addLayout(horLayoutBtns);
-
-    parent->setStyleSheet(QString("QLabel{font-family: '%1'; font: 24px; color: #333333; min-width: 60px;}")
-                          .arg(Skin::m_strAppFontRegular));
+    horLayoutAll->addWidget(m_recordWidget, 3);
+    horLayoutAll->addLayout(verLayoutList, 5);
 }
 
 void RecorderWidget::InitPlayList()
@@ -187,12 +99,13 @@ void RecorderWidget::InitPlayList()
 
 void RecorderWidget::SltBtnPlayClicked()
 {
+    QtPixmapButton *btnPlay = m_btns.value(2);
     if (m_recordWidget->isRecording()) {
-        m_btnPlay->setChecked(false);
+        btnPlay->setChecked(false);
         return;
     }
 
-    if (m_btnPlay->isChecked()) {
+    if (btnPlay->isChecked()) {
         m_player->play();
     } else {
         m_player->pause();
@@ -204,8 +117,9 @@ void RecorderWidget::SltDurationChanged(qint64 duration)
     if (0 == duration) return;
     QTime totalTime = GetTimeByPostion(duration / 1000);
     QString format = "mm:ss";
-    m_labelDuraTime->setText(totalTime.toString(format));
+    m_strDuration = totalTime.toString(format);
     m_progressBar->SetMaxValue(duration / 1000);
+    this->update();
 }
 
 void RecorderWidget::SltPostionChanged(qint64 postion)
@@ -213,8 +127,9 @@ void RecorderWidget::SltPostionChanged(qint64 postion)
     if (0 == postion) return;
     QTime currentTime = GetTimeByPostion(postion / 1000);
     QString format = "mm:ss";
-    m_labelCurrTime->setText(currentTime.toString(format));
+    m_strCurrTime = currentTime.toString(format);
     m_progressBar->SetValue(postion/ 1000);
+    this->update();
 }
 
 void RecorderWidget::stateChanged(QMediaPlayer::State newState)
@@ -227,12 +142,56 @@ void RecorderWidget::SltChangePostion(int postion)
     m_player->setPosition(postion * 1000);
 }
 
+void RecorderWidget::SltBtnClicked(int index)
+{
+    if (0 ==index) {
+        emit signalBackHome();
+    } else if (1 == index) {
+        m_playlistWidget->palyList()->previous();
+    }  else if (2 == index) {
+        SltBtnPlayClicked();
+    }
+    else if (3 == index) {
+        m_playlistWidget->palyList()->next();
+    }
+}
+
 void RecorderWidget::resizeEvent(QResizeEvent *e)
 {
-#ifdef BUILD_WITH_HDMI
-    m_recordWidget->setMinimumWidth(this->width() * 0.375);
-#endif
+    SetScaleValue();
+    m_progressBar->SetSliderSize(1, 30 * m_scaleY);
+    m_progressBar->resize(340 * m_scaleX, 30 * m_scaleY);
+    m_progressBar->move(380 * m_scaleX, 375 * m_scaleY);
+    m_progressBar->SetValue(m_progressBar->value());
+
+    m_sliderVolume->SetSliderSize(1, 24 * m_scaleY);
+    m_sliderVolume->resize(90 * m_scaleX, 24 * m_scaleY);
+    m_sliderVolume->move(360 * m_scaleX, 440 * m_scaleY);
+    m_sliderVolume->SetValue(m_sliderVolume->value());
+
     QWidget::resizeEvent(e);
+}
+
+void RecorderWidget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.drawPixmap(0, 0, m_nBaseWidth, m_nBaseHeight, m_pixmapBackground);
+    painter.setPen(QColor("#333333"));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(24);
+    painter.setFont(font);
+    painter.drawText(300, 0, m_nBaseWidth - 300, 60, Qt::AlignCenter, tr("录音文件"));
+
+    painter.drawText(QRect(302, 375, 70, 30), Qt::AlignCenter, m_strCurrTime);
+    painter.drawText(QRect(728, 375, 70, 30), Qt::AlignCenter, m_strDuration);
+
+    foreach (QtPixmapButton *btn, m_btns) {
+        painter.drawPixmap(btn->rect(), btn->pixmap());
+    }
+
+    painter.drawPixmap(314, 431, QPixmap(":/images/record/ic_volume.png"));
 }
 
 QTime RecorderWidget::GetTimeByPostion(int postion)

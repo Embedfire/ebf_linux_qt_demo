@@ -26,7 +26,7 @@
 /////////////////////////////////////////////////////////////////////
 /// \brief The VideoWidget class
 ///
-class QtVideoWidget : public QWidget
+class QtVideoWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -51,7 +51,6 @@ private:
     qint64      m_nDuration;
     qint64      m_nPostion;
     QUrl        m_urlMedia;
-
 
     // 停留自动关闭
     QTimer     *m_timerShow;

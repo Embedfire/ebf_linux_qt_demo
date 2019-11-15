@@ -188,6 +188,7 @@ QtCustomPlot::~QtCustomPlot()
 
 void QtCustomPlot::addData(double data)
 {
+    if (data > m_nMaxValue) data = m_nMaxValue;
     m_listData.push_back(data);
     updateData();
 }
@@ -385,13 +386,17 @@ void QtCustomPlot::drawDataBox(QPainter *painter)
     offset = m_dataRect.width() * 1.0 / 24;
     rect = QRect(m_dataRect.left(), m_dataRect.bottom(), offset, nH);
     painter->drawText(rect, Qt::AlignLeft, QString("%1").arg(m_nStartTime));
+    QString strValue = "";
     for (int i = 1; i < 24; i++) {
         int nX = m_dataRect.left() + i * offset;
         painter->drawLine(QPoint(nX, m_dataRect.top()), QPoint(nX, m_dataRect.bottom()));
-        if (m_nStartTime >= 100 && ((0 == ((i + 1) % 4)) || 0 == i) ) {
-            rect = QRect(nX, m_dataRect.bottom(), offset, nH);
+        strValue = QString("%1").arg(m_nStartTime + i);
+        int nW = painter->fontMetrics().width(strValue);
+        if (nW > offset) {
+            if ((0 != (i % 5))) continue;
+            rect = QRect(nX, m_dataRect.bottom(), nW, nH);
             painter->drawText(rect, Qt::AlignLeft, QString("%1").arg(m_nStartTime + i));
-        } else if (m_nStartTime < 100) {
+        } else {
             rect = QRect(nX, m_dataRect.bottom(), offset, nH);
             painter->drawText(rect, Qt::AlignLeft, QString("%1").arg(m_nStartTime + i));
         }

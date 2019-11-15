@@ -18,6 +18,7 @@
 #include "backlightpage.h"
 #include "datetimesettingpage.h"
 #include "versionupdatepage.h"
+#include "languagepage.h"
 
 #include <QBoxLayout>
 #include <QDebug>
@@ -26,7 +27,7 @@ SettingWidget::SettingWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
     this->SetBackground(QPixmap(":/images/setting/ic_background.png"));
     m_strListTitle = QStringList() << tr("系统设置") << tr("关于开发板") << tr("亮度调节")
-                                   << tr("设置时间") << tr("设置日期") << tr("检查更新");
+                                   << tr("设置时间") << tr("设置日期") << tr("语言设置") << tr("检查更新");
     InitWidget();
     InitSettingPage();
 }
@@ -39,32 +40,19 @@ SettingWidget::~SettingWidget()
 void SettingWidget::InitWidget()
 {
     m_widgetTitle = new QtWidgetTitleBar(this);
-    m_widgetTitle->setObjectName("widgetTitle");
-    m_widgetTitle->setMinimumHeight(82);
+    m_widgetTitle->SetScalSize(Skin::m_nScreenWidth, 80);
     m_widgetTitle->SetBackground(Qt::transparent);
     m_widgetTitle->setFont(QFont(Skin::m_strAppFontBold));
     m_widgetTitle->SetTitle(m_strListTitle.at(0), QColor("#ffffff"), 32);
+    m_widgetTitle->SetBtnHomePixmap(QPixmap(":/images/setting/menu_icon.png"), QPixmap(":/images/setting/menu_icon_pressed.png"));
+    connect(m_widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
-    m_btnBack = new QPushButton(this);
+    m_btnBack = new QtPixmapButton(1, QRect(20, 20, 40, 40), QPixmap(":/images/calendar/ic_back.png"), QPixmap(":/images/calendar/ic_back_pressed.pn"));
+    QMap<int,QtPixmapButton*> btns;
+    btns.insert(1, m_btnBack);
+    m_widgetTitle->SetToolButtons(btns);
+    connect(m_widgetTitle,SIGNAL(signalBtnClicked(int)), this, SLOT(SltToolBtnClicked(int)));
     m_btnBack->setVisible(false);
-    m_btnBack->setStyleSheet(QString("QPushButton {border-image: url(:/images/calendar/ic_back.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/calendar/ic_back_pressed.png);}"));
-
-    m_btnBack->setFixedSize(32, 32);
-    connect(m_btnBack, SIGNAL(clicked(bool)), this, SLOT(SltBtnBackClicked()));
-
-    m_btnHome = new QPushButton(this);
-    m_btnHome->setFixedSize(54, 54);
-
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(10, 0, 10, 0);
-    horLayoutTitle->setSpacing(18);
-    horLayoutTitle->addWidget(m_btnBack);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(m_btnHome);
-    connect(m_btnHome, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-    m_btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
-                                     "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
 
     m_stackedWidget = new QtStackedWidget(this);
     m_stackedWidget->setPressMove(false);
@@ -106,9 +94,18 @@ void SettingWidget::InitSettingPage()
     connect(dateSetting, SIGNAL(signalFinished()), this, SLOT(SltBtnBackClicked()));
     m_stackedWidget->addWidget(4, dateSetting);
 
+    // 语言管理
+    LanguagePage *languageWidget = new LanguagePage(m_stackedWidget);
+    m_stackedWidget->addWidget(5, languageWidget);
+
     // 检查更新
     VersionUpdatePage *checkVersion = new VersionUpdatePage(m_stackedWidget);
-    m_stackedWidget->addWidget(5, checkVersion);
+    m_stackedWidget->addWidget(6, checkVersion);
+}
+
+void SettingWidget::SltToolBtnClicked(int /*index*/)
+{
+    SltBtnBackClicked();
 }
 
 // 返回
@@ -133,7 +130,7 @@ void SettingWidget::SltCurrentPageChanged(int index)
         m_widgetTitle->SetTitle(tr("系统设置"));
     }
 
-    m_btnHome->setVisible(index == 0);
+    m_widgetTitle->SetBtnVisible(index == 0);
 }
 
 void SettingWidget::SltChangePage(int index)

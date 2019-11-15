@@ -42,9 +42,10 @@ private:
 private slots:
     void SltSearcCitys();
     void SltCitySelected(QtListWidgetItem *item);
-
+    void SltToolBtnClicked(int index);
 protected:
-    QSize sizeHint() const;
+    void resizeEvent(QResizeEvent *);
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // CITYMANAGERWIDGET_H

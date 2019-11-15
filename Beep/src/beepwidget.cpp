@@ -67,25 +67,10 @@ void BeepWidget::setSwitchRect(const QRect &value)
 
 void BeepWidget::InitDataRect()
 {
-    m_btnHome.setRect(QRect(736, 0, 54, 54));
+    m_btnHome.setRect(QRect(736, 3, 54, 54));
     m_rectHorn = QRect(228, 82, 344, 344);
     m_rectLeftSwitch = QRect(80, m_bLeftSwitch ? 263 : 181, 65, 65);
     m_rectRightSwitch = QRect(657, m_bRightSwitch ? 263 : 181, 65, 65);
-}
-
-void BeepWidget::ScalcRect(QRect &rectRet, const QRect &rect)
-{
-#ifdef BUILD_WITH_HDMI
-    qreal scaleX = (this->width() * 1.0 / Skin::m_nScreenWidth);
-    qreal scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-
-    rectRet.setX(rect.x() * scaleX);
-    rectRet.setY(rect.y() * scaleY);
-    rectRet.setWidth(rect.width() * scaleX);
-    rectRet.setHeight(rect.height() * scaleY);
-#else
-    rectRet = rect;
-#endif
 }
 
 void BeepWidget::CheckDevice()
@@ -139,21 +124,16 @@ void BeepWidget::SltLongPressed()
     this->update();
 }
 
-void BeepWidget::resizeEvent(QResizeEvent *e)
-{
-    QWidget::resizeEvent(e);
-}
-
 void BeepWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    painter.drawPixmap(this->rect(), QPixmap(":/images/beep/ic_background.png"));
 
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
-    painter.scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter.scale(m_scaleX, m_scaleY);
+
+    // 绘制背景
+    painter.drawPixmap(0, 0, QPixmap(":/images/beep/ic_background.png"));
 
     // 绘制标题栏
     drawTitle(&painter);
@@ -177,7 +157,7 @@ void BeepWidget::drawTitle(QPainter *painter)
     font.setPixelSize(32);
     painter->setFont(font);
     painter->setPen(QColor("#333333"));
-    painter->drawText(0, 0, Skin::m_nScreenWidth, 54, Qt::AlignCenter, tr("蜂鸣器控制"));
+    painter->drawText(0, 0, Skin::m_nScreenWidth, 60, Qt::AlignCenter, tr("蜂鸣器控制"));
     painter->restore();
 }
 
@@ -227,15 +207,14 @@ void BeepWidget::drawHorn(QPainter *painter)
 
 void BeepWidget::mousePressEvent(QMouseEvent *e)
 {
-    m_bPwmBeep = false;
     QRect rect;
-    ScalcRect(rect, m_btnHome.rect());
+    ScaleRect(rect, m_btnHome.rect());
     if (rect.contains(e->pos())) {
         m_btnHome.setPressed(true);
         this->update();
     }
 
-    ScalcRect(rect, m_rectLeftSwitch);
+    ScaleRect(rect, m_rectLeftSwitch);
     if (rect.contains(e->pos())) {
         m_bLeftSwitch = !m_bLeftSwitch;
         m_nSwitchIndex = 0;
@@ -251,9 +230,10 @@ void BeepWidget::mousePressEvent(QMouseEvent *e)
         } else {
             setBeepState(0);
         }
+        return;
     }
 
-    ScalcRect(rect, m_rectRightSwitch);
+    ScaleRect(rect, m_rectRightSwitch);
     if (rect.contains(e->pos())) {
         m_bRightSwitch = !m_bRightSwitch;
         m_nSwitchIndex = 1;
@@ -271,9 +251,10 @@ void BeepWidget::mousePressEvent(QMouseEvent *e)
         }
         // 控制蜂鸣器
         setBeepState(m_bRightSwitch ? 1 : 0);
+        return;
     }
 
-    ScalcRect(rect, m_rectHorn);
+    ScaleRect(rect, m_rectHorn);
     if (rect.contains(e->pos())) {
         if (m_bLeftSwitch) {
             m_bLeftSwitch = false;
@@ -293,7 +274,7 @@ void BeepWidget::mousePressEvent(QMouseEvent *e)
 void BeepWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     QRect rect;
-    ScalcRect(rect, m_btnHome.rect());
+    ScaleRect(rect, m_btnHome.rect());
     if (m_btnHome.isPressed()) {
         m_btnHome.setPressed(false);
         if (rect.contains(e->pos())) {

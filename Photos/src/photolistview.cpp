@@ -32,7 +32,7 @@ void PhotoListView::drawItemInfo(QPainter *painter, QtPageListWidgetItem *item)
         font.setPixelSize(32);
         painter->setFont(font);
         painter->setPen("#ff0000");
-        painter->drawText(item->m_rect, Qt::AlignCenter, QString("图片已损坏"));
+        painter->drawText(item->m_rect, Qt::AlignCenter, tr("图片已损坏"));
     }
     else {
         painter->drawPixmap(item->m_rect, item->m_pixmapIcon);

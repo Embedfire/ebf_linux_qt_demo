@@ -12,11 +12,11 @@
 #ifndef TIMECONFIGWIDGET_H
 #define TIMECONFIGWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include "qtpixmapbutton.h"
 #include "qtdatetimeconfig.h"
 
-class TimeConfigWidget : public QWidget
+class TimeConfigWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -26,26 +26,19 @@ public:
 signals:
     void signalChangePage(int index, int direction);
 
-public slots:
+private slots:
+    void SltBtnClicked(int index);
 
 private:
-    QtPixmapButton  m_btnPrev;
-    QtPixmapButton  m_btnSure;
-    QtPixmapButton  m_btnNext;
-
     QtDateTimeConfig    *m_timeConfig;
 
 private:
     void setSystemTime(bool bOk);
 
 protected:
-    QSize sizeHint() const;
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawButton(QPainter *painter);
-
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
 };
 
 #endif // TIMECONFIGWIDGET_H

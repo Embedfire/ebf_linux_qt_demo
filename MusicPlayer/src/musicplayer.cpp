@@ -56,25 +56,16 @@ void MusicPlayer::StopMusic()
 
 void MusicPlayer::InitWidget()
 {
-    m_widgetTitle= new QtWidgetTitleBar(this);
-    m_widgetTitle->setMinimumWidth(60);
-    m_widgetTitle->SetBackground(Qt::transparent);
-    m_widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
-    m_widgetTitle->SetTitle("音乐播放器", "#ffffff", 24);
-
-    QPushButton *btnHome = new QPushButton(this);
-    btnHome->setFixedSize(51, 51);
-    QHBoxLayout *horLayoutTitle = new QHBoxLayout(m_widgetTitle);
-    horLayoutTitle->setContentsMargins(0, 0, 10, 0);
-    horLayoutTitle->addStretch();
-    horLayoutTitle->addWidget(btnHome);
-    connect(btnHome, SIGNAL(clicked(bool)), this, SLOT(SltBackHome()));
-    btnHome->setStyleSheet(QString("QPushButton {border-image: url(:/images/music/menu_icon.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/music/menu_icon_pressed.png);}"));
+    QtWidgetTitleBar *widgetTitle = new QtWidgetTitleBar(this);
+    widgetTitle->SetScalSize(Skin::m_nScreenWidth, 60);
+    widgetTitle->SetBackground(Qt::transparent);
+    widgetTitle->setFont(QFont(Skin::m_strAppFontNormal));
+    widgetTitle->SetTitle(tr("音乐播放器"), "#ffffff", 24);
+    connect(widgetTitle, SIGNAL(signalBackHome()), this, SIGNAL(signalBackHome()));
 
     QHBoxLayout *horLayoutCentor = new QHBoxLayout();
-    horLayoutCentor->setContentsMargins(10, 10, 10, 10);
-    horLayoutCentor->setSpacing(10);
+    horLayoutCentor->setContentsMargins(0, 0, 0, 0);
+    horLayoutCentor->setSpacing(0);
 
     m_recorder = new WidgetRecord(this);
     horLayoutCentor->addWidget(m_recorder, 1);
@@ -84,16 +75,16 @@ void MusicPlayer::InitWidget()
 
     m_playerToolBar = new WidgetToolBar(this);
 
-    QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
-    verLayoutAll->setContentsMargins(0, 0, 0, 0);
-    verLayoutAll->setSpacing(0);
-    verLayoutAll->addWidget(m_widgetTitle, 1);
-    verLayoutAll->addLayout(horLayoutCentor, 6);
-    verLayoutAll->addWidget(m_playerToolBar, 1);
-
     connect(m_playerToolBar, SIGNAL(play()), this, SLOT(SltMusicPlay()));
     connect(m_playerToolBar, SIGNAL(pause()), this, SLOT(SltMusicPause()));
     connect(m_playerToolBar, SIGNAL(toolBarClicked(int)), this, SLOT(SltToolbarClicked(int)));
+
+    QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
+    verLayoutAll->setContentsMargins(0, 0, 0, 0);
+    verLayoutAll->setSpacing(0);
+    verLayoutAll->addWidget(widgetTitle, 1);
+    verLayoutAll->addLayout(horLayoutCentor, 6);
+    verLayoutAll->addWidget(m_playerToolBar);
 
     // 均衡器
     m_eaualizeWidget = new EqualizeWidget(this);
@@ -119,8 +110,6 @@ void MusicPlayer::InitPlayer()
 
     m_volumeSlider = new QtSliderBar(this);
     m_volumeSlider->SetHorizontal(false);
-    m_volumeSlider->SetSliderSize(4, 36);
-    m_volumeSlider->setFixedSize(36, 136);
     m_volumeSlider->SetValue(100);
     m_volumeSlider->hide();
     connect(m_volumeSlider, SIGNAL(currentValueChanged(int)), m_player, SLOT(setVolume(int)));
@@ -144,6 +133,11 @@ void MusicPlayer::SltBackHome()
 
 void MusicPlayer::SltMusicPlay()
 {
+    if (m_widgetMusicList->playList()->isEmpty()) {
+        m_playerToolBar->SetPlayState(false);
+        return;
+    }
+
     if (QMediaPlayer::StoppedState == m_player->state()) {
         m_player->play();
         m_recorder->Start();
@@ -189,8 +183,6 @@ void MusicPlayer::SltToolbarClicked(int index)
         if (m_widgetMusicList->isVisible()) m_widgetMusicList->setVisible(false);
         m_eaualizeWidget->StartAutoMove(!m_eaualizeWidget->isVisible(), this->width());
     } else if (2 == index) {
-        QPoint pos = m_lyricWidget->geometry().bottomRight();
-        m_volumeSlider->move(pos.x() - 115, pos.y() - m_volumeSlider->height() + 20);
         m_volumeSlider->setVisible(!m_volumeSlider->isVisible());
     } else if (3 == index) {
         m_volumeSlider->setVisible(false);
@@ -213,6 +205,7 @@ void MusicPlayer::SltCurrentSongChanged(const QString &name, const QString &path
     // 设置新歌曲
     m_lyricWidget->LoadLyricFile(name, path);
     m_playerToolBar->SetPlayState(true);
+
     QImage image = m_ffmpeg->getAritstPic(path);
     m_recorder->SetImage(image);
     m_recorder->Start();
@@ -228,13 +221,18 @@ void MusicPlayer::SltChangePostion(int postion)
 
 void MusicPlayer::resizeEvent(QResizeEvent *e)
 {
-    QPoint pos = m_lyricWidget->geometry().topRight();
+    SetScaleValue();
+    m_playerToolBar->setMinimumHeight(69 * m_scaleY);
 
-    m_eaualizeWidget->setFixedHeight(m_lyricWidget->height());
-    m_eaualizeWidget->m_nYPos = pos.y();
+    m_widgetMusicList->resize(405 * m_scaleX, 350 * m_scaleY);
+    m_widgetMusicList->move(this->width() - m_widgetMusicList->width() + 5, 55 * m_scaleY);
+    m_widgetMusicList->m_nYPos = 55 * m_scaleY;
 
-    m_widgetMusicList->setFixedHeight(m_lyricWidget->height());
-    m_widgetMusicList->m_nYPos = pos.y();
+    int nW = 4 * m_scaleX;
+    m_volumeSlider->resize(36 * m_scaleX, 100 * m_scaleY);
+    m_volumeSlider->SetSliderSize(nW < 1 ? 1 : nW, 36 * m_scaleX);
+    m_volumeSlider->move(690 * m_scaleX, 320 * m_scaleY);
+    m_volumeSlider->SetValue(m_volumeSlider->value());
     QWidget::resizeEvent(e);
 }
 

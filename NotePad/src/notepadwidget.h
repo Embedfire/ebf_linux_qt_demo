@@ -54,12 +54,9 @@ private:
     QtWidgetTitleBar    *m_widgetTitle;
     QtPaletteWidget     *m_paletteWidget;
     QtFileDialog        *m_fileDialog;
-
+    QMenu               *m_menuFile;
 private:
     void InitWidget();
-    void actionOpen();
-    void NewDocument();
-    void SaveDocument();
 
 private slots:
     void SltBackHome();
@@ -71,6 +68,11 @@ private slots:
 
     void SltFileSelected(const QString &fileName);
     void SltFileDialogClose();
+    void SltToolBtnClicked(int index);
+
+    void ActionOpen();
+    void NewDocument();
+    void SaveDocument();
 
 protected:
     void resizeEvent(QResizeEvent *e);

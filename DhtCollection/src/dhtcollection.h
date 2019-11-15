@@ -43,9 +43,6 @@ private:
     QProcess            *m_cmd;
     QTimer              *m_timer;
 
-    QVBoxLayout         *m_verLayoutAll;
-    qreal m_scaleX;
-    qreal m_scaleY;
 private slots:
     void SltCurrentChanged(int index);
     void SltProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -58,7 +55,6 @@ protected:
     void showEvent(QShowEvent *e);
     void hideEvent(QHideEvent *e);
 
-    void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 };
 

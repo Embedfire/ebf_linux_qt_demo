@@ -34,19 +34,14 @@
 #include "videoplayer.h"
 #include "weatherwidget.h"
 #include "keypresswidget.h"
-
-#ifdef Q_OS_UNIX
 #include "infoneswidget.h"
-#else
 #include "nessimulator.h"
-#endif
 
 #ifdef BUILD_WITH_WEBVIEW
 #include "browserwindow.h"
 #endif
 
 #include <QPainter>
-#include <QPushButton>
 #include <QBoxLayout>
 #include <QFile>
 #include <QDir>
@@ -54,14 +49,17 @@
 #include <QTimerEvent>
 #include <QRegExp>
 
-#define MOUSE_DEV_PATH       "/dev/input/by-path/"
+#define MOUSE_DEV_PATH       "/dev/input/by-path"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
 #ifdef __arm__
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
+
+    // 启动检测鼠标是否接入系统
+    AppConfig::m_bMouseInsert = CheckMouseInsert();
     bool bOn = AppConfig::ReadSetting("System", "mouse", true).toBool();
-    this->setCursor(bOn ? Qt::ArrowCursor : Qt::BlankCursor);
+    this->setCursor((bOn || AppConfig::m_bMouseInsert) ? Qt::ArrowCursor : Qt::BlankCursor);
 #endif
 
     m_widgetWorkSpace = NULL;
@@ -98,43 +96,15 @@ void MainWindow::InitWidget() {
     verLayout->setContentsMargins(0, 0, 0, 0);
     verLayout->setSpacing(0);
 
-    // 中间主界面
-    QHBoxLayout *horLayout = new QHBoxLayout();
-    horLayout->setContentsMargins(10, 0, 10, 0);
-    horLayout->setSpacing(10);
-    verLayout->addLayout(horLayout, 1);
-
-    m_btnPrevPage = new QPushButton(this);
-    m_btnPrevPage->setEnabled(false);
-    m_btnPrevPage->setFixedSize(40, 40);
-    m_btnPrevPage->setStyleSheet(QString("QPushButton{border-image: url(:/images/mainwindow/ic_prev.png);}"
-                                         "QPushButton:pressed{border-image: url(:/images/mainwindow/ic_prev_pre.png);}"
-                                         "QPushButton:!enabled{border-image: url(:/images/mainwindow/ic_prev_pre.png);}"));
-    horLayout->addWidget(m_btnPrevPage, 0, Qt::AlignCenter);
-
     m_launcherWidget = new LauncherWidget(this);
-    m_launcherWidget->SetWallpaper(QColor(Qt::transparent));
+    m_launcherWidget->SetWallpaper(QPixmap(":/images/mainwindow/background.png"));
     connect(m_launcherWidget, SIGNAL(currentItemClicked(int)), this, SLOT(SltCurrentAppChanged(int)));
-    connect(m_launcherWidget, SIGNAL(currentPageChanged(int)), this, SLOT(SltCurrentPageChanged(int)));
-    horLayout->addWidget(m_launcherWidget, 1);
-
-    m_btnNextPage = new QPushButton(this);
-    m_btnNextPage->setFixedSize(40, 40);
-    m_btnNextPage->setStyleSheet(QString("QPushButton{border-image: url(:/images/mainwindow/ic_next.png);}"
-                                         "QPushButton:pressed{border-image: url(:/images/mainwindow/ic_next_pre.png);}"
-                                         "QPushButton:!enabled{border-image: url(:/images/mainwindow/ic_next_pre.png);}"));
-
-    horLayout->addWidget(m_btnNextPage, 0, Qt::AlignVCenter);
-    connect(m_btnPrevPage, SIGNAL(clicked(bool)), m_launcherWidget, SLOT(SltShowPrevPage()));
-    connect(m_btnNextPage, SIGNAL(clicked(bool)), m_launcherWidget, SLOT(SltShowNextPage()));
-
-    StatusBarWidget *widgetStatusbar = new StatusBarWidget(this);
-    verLayout->addWidget(widgetStatusbar);
+    verLayout->addWidget(m_launcherWidget, 1);
 
     // 广告
     m_aboutUs = new AboutUs(this);
     m_aboutUs->hide();
-    connect(widgetStatusbar, SIGNAL(signalAboutClicked()), m_aboutUs, SLOT(SltStartMove()));
+    connect(m_launcherWidget, SIGNAL(signalAboutClicked()), m_aboutUs, SLOT(SltStartMove()));
 
 #if 0
     if (NULL == m_musicWidget) {
@@ -151,44 +121,44 @@ void MainWindow::InitDesktop()
 #if 1
     // 第一页
     int nPage = 0;
-    m_launchItems.insert(0, new LauncherItem(0, nPage, QStringLiteral("文件管理"), QPixmap(":/images/mainwindow/ic_file.png")));
-    m_launchItems.insert(3, new LauncherItem(3, nPage, QStringLiteral("相册"), QPixmap(":/images/mainwindow/ic_photos.png")));
-    m_launchItems.insert(5, new LauncherItem(5, nPage, QStringLiteral("天气"), QPixmap(":/images/mainwindow/ic_weather.png")));
-    m_launchItems.insert(6, new LauncherItem(6, nPage, QStringLiteral("记事本"), QPixmap(":/images/mainwindow/ic_notepad.png")));
-    m_launchItems.insert(7, new LauncherItem(7, nPage, QStringLiteral("时钟"), QPixmap(":/images/mainwindow/ic_clock.png")));
-    m_launchItems.insert(8, new LauncherItem(8, nPage, QStringLiteral("电子书"), QPixmap(":/images/mainwindow/ic_ebook.png")));
-    m_launchItems.insert(10, new LauncherItem(10, nPage, QStringLiteral("计算器"), QPixmap(":/images/mainwindow/ic_calc.png")));
+    m_launchItems.insert(0, new LauncherItem(0, nPage, tr("文件管理"), QPixmap(":/images/mainwindow/ic_file.png")));
+    m_launchItems.insert(3, new LauncherItem(3, nPage, tr("相册"), QPixmap(":/images/mainwindow/ic_photos.png")));
+    m_launchItems.insert(5, new LauncherItem(5, nPage, tr("天气"), QPixmap(":/images/mainwindow/ic_weather.png")));
+    m_launchItems.insert(6, new LauncherItem(6, nPage, tr("记事本"), QPixmap(":/images/mainwindow/ic_notepad.png")));
+    m_launchItems.insert(7, new LauncherItem(7, nPage, tr("时钟"), QPixmap(":/images/mainwindow/ic_clock.png")));
+    m_launchItems.insert(8, new LauncherItem(8, nPage, tr("电子书"), QPixmap(":/images/mainwindow/ic_ebook.png")));
+    m_launchItems.insert(10, new LauncherItem(10, nPage, tr("计算器"), QPixmap(":/images/mainwindow/ic_calc.png")));
 
     // mini板卡取消功能
     if (!bMiniBoard) {
-        m_launchItems.insert(1, new LauncherItem(1, nPage, QStringLiteral("视频播放"), QPixmap(":/images/mainwindow/ic_video.png")));
-        m_launchItems.insert(2, new LauncherItem(2, nPage, QStringLiteral("ADC"), QPixmap(":/images/mainwindow/ic_adc.png")));
-        m_launchItems.insert(4, new LauncherItem(4, nPage, QStringLiteral("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
-        m_launchItems.insert(9, new LauncherItem(9, nPage, QStringLiteral("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
-        m_launchItems.insert(11, new LauncherItem(11, nPage, QStringLiteral("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
+        m_launchItems.insert(1, new LauncherItem(1, nPage, tr("视频播放"), QPixmap(":/images/mainwindow/ic_video.png")));
+        m_launchItems.insert(2, new LauncherItem(2, nPage, tr("ADC"), QPixmap(":/images/mainwindow/ic_adc.png")));
+        m_launchItems.insert(4, new LauncherItem(4, nPage, tr("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
+        m_launchItems.insert(9, new LauncherItem(9, nPage, tr("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
+        m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
     }
 
     // 第二页
     nPage++;
-    m_launchItems.insert(12, new LauncherItem(12, nPage, QStringLiteral("RGB彩灯"), QPixmap(":/images/mainwindow/ic_light.png")));
+    m_launchItems.insert(12, new LauncherItem(12, nPage, tr("RGB彩灯"), QPixmap(":/images/mainwindow/ic_light.png")));
 #ifdef BUILD_WITH_WEBVIEW
-    m_launchItems.insert(14, new LauncherItem(14, nPage, QStringLiteral("网络浏览器"), QPixmap(":/images/mainwindow/ic_webview.png")));
+    m_launchItems.insert(14, new LauncherItem(14, nPage, tr("网络浏览器"), QPixmap(":/images/mainwindow/ic_webview.png")));
 #endif
-    m_launchItems.insert(15, new LauncherItem(15, nPage, QStringLiteral("汽车仪表"), QPixmap(":/images/mainwindow/ic_car.png")));
-    m_launchItems.insert(16, new LauncherItem(16, nPage, QStringLiteral("背光调节"), QPixmap(":/images/mainwindow/ic_backlight.png")));
-    m_launchItems.insert(19, new LauncherItem(19, nPage, QStringLiteral("按键测试"), QPixmap(":/images/mainwindow/ic_key.png")));
-    m_launchItems.insert(23, new LauncherItem(23, nPage, QStringLiteral("系统设置"), QPixmap(":/images/mainwindow/ic_setting.png")));
+    m_launchItems.insert(15, new LauncherItem(15, nPage, tr("汽车仪表"), QPixmap(":/images/mainwindow/ic_car.png")));
+    m_launchItems.insert(16, new LauncherItem(16, nPage, tr("背光调节"), QPixmap(":/images/mainwindow/ic_backlight.png")));
+    m_launchItems.insert(19, new LauncherItem(19, nPage, tr("按键测试"), QPixmap(":/images/mainwindow/ic_key.png")));
+    m_launchItems.insert(23, new LauncherItem(23, nPage, tr("系统设置"), QPixmap(":/images/mainwindow/ic_setting.png")));
 
     // mini板卡取消功能
     if (!bMiniBoard) {
-        m_launchItems.insert(13, new LauncherItem(13, nPage, QStringLiteral("陀螺仪"), QPixmap(":/images/mainwindow/ic_gyroscope.png")));
-        m_launchItems.insert(17, new LauncherItem(17, nPage, QStringLiteral("蜂鸣器"), QPixmap(":/images/mainwindow/ic_beep.png")));
-        m_launchItems.insert(18, new LauncherItem(18, nPage, QStringLiteral("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
+        m_launchItems.insert(13, new LauncherItem(13, nPage, tr("陀螺仪"), QPixmap(":/images/mainwindow/ic_gyroscope.png")));
+        m_launchItems.insert(17, new LauncherItem(17, nPage, tr("蜂鸣器"), QPixmap(":/images/mainwindow/ic_beep.png")));
+        m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
     }
 
     // 第三页
     nPage++;
-    m_launchItems.insert(24, new LauncherItem(24, nPage, QStringLiteral("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
+    m_launchItems.insert(24, new LauncherItem(24, nPage, tr("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
 
     m_launcherWidget->SetItems(m_launchItems);
 #endif
@@ -207,12 +177,6 @@ void MainWindow::InitThreads()
 
     m_threadPowerKey->start();
     m_threadKey->start();
-}
-
-void MainWindow::SltCurrentPageChanged(int index)
-{
-    m_btnPrevPage->setEnabled(0 != index);
-    m_btnNextPage->setEnabled(2 != index);
 }
 
 void MainWindow::SltCurrentAppChanged(int index)
@@ -345,7 +309,7 @@ void MainWindow::SltCurrentAppChanged(int index)
             m_musicWidget->StopMusic();
         }
 
-#ifdef Q_OS_UNIX
+#if 1
         m_widgetWorkSpace = new InfoNesWidget(this);
 #else
         m_widgetWorkSpace = new NesSimulator(this);
@@ -432,11 +396,6 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
-void MainWindow::paintEvent(QPaintEvent *) {
-    QPainter painter(this);
-    painter.drawPixmap(0, 0, this->width(), this->height(), QPixmap(":/images/mainwindow/background.png"));
-}
-
 #ifdef Q_OS_WIN32
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -455,13 +414,13 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 }
 #endif
 
-#if CHECK_MOUSE_BY_TIMER
+
 bool MainWindow::CheckMouseInsert()
 {
     QDir dir(MOUSE_DEV_PATH);
     if (!dir.exists()) return false;
 
-    dir.setFilter(QDir::NoSymLinks | QDir::Files | QDir::NoDotAndDotDot);
+    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
@@ -473,6 +432,7 @@ bool MainWindow::CheckMouseInsert()
     return false;
 }
 
+#if CHECK_MOUSE_BY_TIMER
 void MainWindow::timerEvent(QTimerEvent *e)
 {
     if (m_nMouseCheckId == e->timerId()) {

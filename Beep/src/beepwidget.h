@@ -50,7 +50,6 @@ protected:
     bool                m_bPwmBeep;
 private:
     void InitDataRect();
-    void ScalcRect(QRect &rectRet, const QRect &rect);
 
     void CheckDevice();
     void setBeepState(int on);
@@ -60,7 +59,6 @@ private slots:
     void SltLongPressed();
 
 protected:
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
 
     void drawTitle(QPainter *painter);

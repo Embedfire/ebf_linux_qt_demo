@@ -52,7 +52,7 @@ QtListWidgetItem::QtListWidgetItem(int id, const QString &path, const QString &n
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief QtListWidget::QtListWidget
 /// \param parent
-QtListWidget::QtListWidget(QWidget *parent) : QWidget(parent)
+QtListWidget::QtListWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_pixmapWallpaper = QPixmap();
     m_backgroundColor = QColor("#fafafa");
@@ -144,6 +144,15 @@ void QtListWidget::setAlignment(Qt::Alignment aligns)
 {
     m_alignment = aligns;
     this->update();
+}
+
+void QtListWidget::setScaleSize(int w, int h)
+{
+    m_nBaseHeight = h;
+    m_nBaseWidth = w;
+    m_nItemShowCnt = m_bHorizontal ? ((m_nBaseWidth - m_nMargin * 2) / m_nItemSize) :
+                                     ((m_nBaseHeight - m_nMargin * 2) / m_nItemSize);
+    SetScaleValue();
 }
 
 void QtListWidget::setPrevIndex()
@@ -240,16 +249,22 @@ QSize QtListWidget::sizeHint() const
 
 void QtListWidget::resizeEvent(QResizeEvent *e)
 {
-    m_nItemShowCnt = m_bHorizontal ? ((this->width() - m_nMargin * 2) / m_nItemSize) :
-                                     ((this->height() - m_nMargin * 2) / m_nItemSize);
+    m_nItemShowCnt = m_bHorizontal ? ((m_nBaseWidth - m_nMargin * 2) / m_nItemSize) :
+                                     ((m_nBaseHeight - m_nMargin * 2) / m_nItemSize);
+    SetScaleValue();
     QWidget::resizeEvent(e);
 }
 
 void QtListWidget::mousePressEvent(QMouseEvent *e)
 {
     m_nDirection = None;
+    QRect rect;
     foreach (QtListWidgetItem *item, m_listItems) {
-        item->m_bPressed = item->m_rect.contains(e->pos());
+        ScaleRect(rect, item->m_rect);
+        if (rect.contains(e->pos())) {
+            item->m_bPressed = true;
+            break;
+        }
     }
 
     m_bPressed = true;
@@ -259,13 +274,14 @@ void QtListWidget::mousePressEvent(QMouseEvent *e)
 void QtListWidget::mouseReleaseEvent(QMouseEvent *)
 {
     foreach (QtListWidgetItem *item, m_listItems) {
-        if (item->m_bPressed && m_nStartPos < 2) {
-            m_nCurrentIndex = item->m_nId;
+        if (item->m_bPressed) {
+            item->m_bPressed = false;
             if (None == m_nDirection) {
+                m_nCurrentIndex = item->m_nId;
+                this->update();
                 emit currentItemClicked(item);
                 emit currentIndexClicked(m_nCurrentIndex);
             }
-            this->update();
             break;
         }
     }
@@ -298,11 +314,12 @@ void QtListWidget::mouseMoveEvent(QMouseEvent *e)
         m_nDirection = (nXoffset < 0) ? (m_bHorizontal ? LeftDirection : UpDirection) :
                                         (m_bHorizontal ? RightDirection : DownDirection);
         m_nStartPos += nXoffset;
-        int nOffset = m_nItemSize + m_nSpace;
+        qreal scale = (m_bHorizontal ? m_scaleX : m_scaleY);
+        int nOffset = (m_nItemSize + m_nSpace) * scale;
         if (RightDirection == m_nDirection || DownDirection == m_nDirection)
         {
             if (m_nStartIndex == 0 && m_nStartPos > (m_nItemSize / 2)) {
-                m_nStartPos = m_nItemSize / 2;
+                m_nStartPos = m_nItemSize * scale / 2;
             }
             else if (m_nStartPos >= nOffset && m_nStartIndex > 0) {
                 m_nStartPos = 0;
@@ -312,7 +329,7 @@ void QtListWidget::mouseMoveEvent(QMouseEvent *e)
         else if (LeftDirection == m_nDirection || UpDirection == m_nDirection)
         {
             if (m_nStartIndex == (m_listItems.size() - m_nItemShowCnt) && m_nStartPos < -(m_nItemSize / 2)) {
-                m_nStartPos = -m_nItemSize / 2;
+                m_nStartPos = -m_nItemSize * scale / 2;
             }
             else if (m_nStartPos <= -nOffset && m_nStartIndex < (m_listItems.size() - m_nItemShowCnt))
             {
@@ -329,13 +346,15 @@ void QtListWidget::mouseMoveEvent(QMouseEvent *e)
 void QtListWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
+    painter.scale(m_scaleX, m_scaleY);
+
     if (!m_pixmapWallpaper.isNull()) {
-        painter.drawTiledPixmap(this->rect(), m_pixmapWallpaper);
+        painter.drawPixmap(0, 0, m_pixmapWallpaper);
     } else {
         painter.setBrush(m_backgroundColor);
-        painter.drawRect(this->rect());
+        painter.drawRect(0, 0, m_nBaseWidth, m_nBaseHeight);
     }
 
     if (m_bHorizontal) {
@@ -343,18 +362,18 @@ void QtListWidget::paintEvent(QPaintEvent *)
     } else {
         drawVerticalItem(&painter);
     }
-
 }
 
 void QtListWidget::drawHorizontalItem(QPainter *painter)
 {
     painter->save();
-    QRect rect = QRect(m_nStartPos + m_nMargin - m_nSpace - m_nItemSize, m_nMargin, m_nItemSize, this->height()  - m_nMargin * 2);
+    QRect rect = QRect(m_nStartPos + m_nMargin - m_nSpace - m_nItemSize, m_nMargin, m_nItemSize, m_nBaseHeight - m_nMargin * 2);
     if (m_nStartIndex > 0 && RightDirection == m_nDirection) {
         QtListWidgetItem *item = m_listItems.value(m_nStartIndex - 1);
         item->m_rect = rect;
         drawItemInfo(painter, item);
     }
+
     int id = (m_nStartIndex + m_nItemShowCnt);
     foreach (QtListWidgetItem *item, m_listItems) {
         item->m_rect = QRect(0, 0, 0, 0);
@@ -377,7 +396,7 @@ void QtListWidget::drawHorizontalItem(QPainter *painter)
 void QtListWidget::drawVerticalItem(QPainter *painter)
 {
     painter->save();
-    QRect rect = QRect(m_nMargin, m_nMargin - m_nSpace + m_nStartPos - m_nItemSize, this->width()  - m_nMargin * 2, m_nItemSize);
+    QRect rect = QRect(m_nMargin, m_nMargin - m_nSpace + m_nStartPos - m_nItemSize, m_nBaseWidth  - m_nMargin * 2, m_nItemSize);
     if (m_nStartIndex > 0 && DownDirection == m_nDirection) {
         QtListWidgetItem *item = m_listItems.value(m_nStartIndex - 1);
         item->m_rect = rect;

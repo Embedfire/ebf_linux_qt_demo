@@ -11,7 +11,7 @@
 #ifndef QTPAGELISTWIDGET_H
 #define QTPAGELISTWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include <QMap>
 #include <QTimer>
 #include <QPropertyAnimation>
@@ -46,9 +46,9 @@ public:
 ////////////////////////////////////////////////////////
 /// \brief The QtListWidget class
 #ifdef QtUi
-class QTUISHARED_EXPORT QtPageListWidget : public QWidget {
+class QTUISHARED_EXPORT QtPageListWidget : public QtWidgetBase {
 #else
-class QtPageListWidget : public QWidget {
+class QtPageListWidget : public QtWidgetBase {
 #endif
     Q_OBJECT
 public:
@@ -107,16 +107,13 @@ private:
     void setXPos(int nValue);
     int Xpos(){return m_nStartPos;}
     void resizeRect();
-
 private slots:
 
 protected:
     int         m_nCurrentIndex;
     int         m_nHorSpace;
     int         m_nVSpace;
-
 protected:
-    void resizeEvent(QResizeEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *e);

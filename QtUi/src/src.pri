@@ -10,13 +10,11 @@ HEADERS += \
     $$PWD/gyroscopewidget.h \
     $$PWD/qtcalendarwidget.h \
     $$PWD/qtclockwidget.h \
-    $$PWD/imageanimation.h \
     $$PWD/qtpalettewidget.h \
     $$PWD/qtpagelistwidget.h \
     $$PWD/qtswitchbutton.h \
     $$PWD/qtlistwidget.h \
     $$PWD/qtpressmovelistview.h \
-    $$PWD/qtaddressbar.h \
     $$PWD/qtfiledialog.h \
     $$PWD/qtvideowidgetsurface.h \
     $$PWD/qtpixmapbutton.h \
@@ -24,7 +22,8 @@ HEADERS += \
     $$PWD/qtknobswitch.h \
     $$PWD/qttextbroswer.h \
     $$PWD/qtlcdclockwidget.h \
-    $$PWD/qttoolbar.h
+    $$PWD/qttoolbar.h \
+    $$PWD/qtaddressbar.h
 
 SOURCES += \
     $$PWD/splashscreen.cpp \
@@ -36,13 +35,11 @@ SOURCES += \
     $$PWD/gyroscopewidget.cpp \
     $$PWD/qtcalendarwidget.cpp \
     $$PWD/qtclockwidget.cpp \
-    $$PWD/imageanimation.cpp \
     $$PWD/qtpalettewidget.cpp \
     $$PWD/qtpagelistwidget.cpp \
     $$PWD/qtswitchbutton.cpp \
     $$PWD/qtlistwidget.cpp \
     $$PWD/qtpressmovelistview.cpp \
-    $$PWD/qtaddressbar.cpp \
     $$PWD/qtfiledialog.cpp \
     $$PWD/qtvideowidgetsurface.cpp \
     $$PWD/qtpixmapbutton.cpp \
@@ -50,5 +47,6 @@ SOURCES += \
     $$PWD/qtknobswitch.cpp \
     $$PWD/qttextbroswer.cpp \
     $$PWD/qtlcdclockwidget.cpp \
-    $$PWD/qttoolbar.cpp
+    $$PWD/qttoolbar.cpp \
+    $$PWD/qtaddressbar.cpp
 

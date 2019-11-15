@@ -13,6 +13,7 @@
 #include "skin.h"
 #include "citybook.h"
 
+#include <QPainter>
 #include <QPushButton>
 #include <QDebug>
 #include <QBoxLayout>
@@ -33,76 +34,29 @@ CityManagerWidget::~CityManagerWidget()
 
 void CityManagerWidget::InitWidget()
 {
-    QtWidgetTitleBar *widgetTitle = new QtWidgetTitleBar(this);
-    widgetTitle->SetBackground(Qt::transparent);
-    widgetTitle->setFixedHeight(80);
-    widgetTitle->SetTitle(tr("城市选择"), "#ffffff", 32);
+    m_btns.insert(0, new QtPixmapButton(0, QRect(10, 20, 40, 40), QPixmap(":/images/weather/ic_back.png"), QPixmap(":/images/weather/ic_back_pre.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(723, 95, 67, 35), tr("搜索"), QColor("#169bd5"), QColor("#11bbdd")));
 
-    QHBoxLayout *horLayout = new QHBoxLayout(widgetTitle);
-    horLayout->setContentsMargins(10, 0, 0, 0);
-    horLayout->setSpacing(10);
-
-    QPushButton *btnBack = new QPushButton(this);
-    connect(btnBack, SIGNAL(clicked(bool)), this, SIGNAL(signalBackHome()));
-
-    horLayout->addWidget(btnBack);
-    btnBack->setFixedSize(30, 30);
-    btnBack->setStyleSheet(QString("QPushButton {border-image: url(:/images/weather/ic_back.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/weather/ic_back_pre.png);}"));
-    horLayout->addStretch();
-
-    QWidget *widgetInput = new QWidget(this);
-    widgetInput->setObjectName("widgetInput");
-    widgetInput->setStyleSheet(QString("QWidget#widgetInput{border-radius:1px solid #333333;"
-                                       "border-radius: 10px;"
-                                       "background-color: #ffffff;}"));
-    QHBoxLayout *horLayoutInput = new QHBoxLayout(widgetInput);
-    horLayoutInput->setContentsMargins(10, 5, 5, 10);
-    horLayoutInput->setSpacing(10);
-
-
-    m_lineEdit = new QLineEdit(widgetInput);
+    m_lineEdit = new QLineEdit(this);
+    m_lineEdit->setText(tr(""));
     m_lineEdit->setContextMenuPolicy(Qt::NoContextMenu);
     connect(m_lineEdit, SIGNAL(returnPressed()), this, SLOT(SltSearcCitys()));
-    m_lineEdit->setMinimumHeight(30);
     m_lineEdit->setStyleSheet(QString("QLineEdit{border-radius:none; border-radius: 10px;"
                                       "background-color: #ffffff; font-family: '%1'; "
                                       "color: #333333; font: 16px;}").arg(Skin::m_strAppFontNormal));
 
-    QPushButton *btnSearch = new QPushButton(this);
-    btnSearch->setFixedSize(67, 35);
-    btnSearch->setText(tr("搜索"));
-    connect(btnSearch, SIGNAL(clicked(bool)), this, SLOT(SltSearcCitys()));
-    btnSearch->setStyleSheet(QString("QPushButton { border: none; border-radius: 10px; color: #ffffff;"
-                                     "background-color: #169bd5;"
-                                     "padding-top: 0px; font-family: '%1'; font: 18px;}"
-                                     "QPushButton::pressed{padding-top: 2px;}").arg(Skin::m_strAppFontNormal));
-
-    horLayoutInput->addWidget(m_lineEdit);
-    horLayoutInput->addWidget(btnSearch);
-
     m_listCitys = new QtListWidget(this);
     m_listCitys->SetBackground(QColor("#fafafa"));
     m_listCitys->setVisible(false);
-    m_listCitys->setMinimumHeight(140);
     m_listCitys->setFont(QFont(Skin::m_strAppFontNormal));
     m_listCitys->setHoriazontal(false);
     m_listCitys->setAlignment(Qt::AlignVCenter);
-    m_listCitys->setItemSize(40);
+    m_listCitys->setItemSize(45);
+    m_listCitys->setScaleSize(Skin::m_nScreenWidth, 155);
+
     connect(m_listCitys, SIGNAL(currentItemClicked(QtListWidgetItem*)), this, SLOT(SltCitySelected(QtListWidgetItem*)));
+    connect(this, SIGNAL(signalBtnClicked(int)), this, SLOT(SltToolBtnClicked(int)));
 
-    QVBoxLayout *verLayoutList = new QVBoxLayout();
-    verLayoutList->setContentsMargins(0, 0, 0, 0);
-    verLayoutList->setSpacing(5);
-    verLayoutList->addWidget(widgetInput);
-    verLayoutList->addWidget(m_listCitys);
-
-    QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
-    verLayoutAll->setContentsMargins(0, 0, 0, 0);
-    verLayoutAll->setSpacing(20);
-    verLayoutAll->addWidget(widgetTitle);
-    verLayoutAll->addLayout(verLayoutList);
-    verLayoutAll->addStretch();
 }
 
 void CityManagerWidget::SltSearcCitys()
@@ -116,14 +70,6 @@ void CityManagerWidget::SltSearcCitys()
         mapCitys.insert(i, new QtListWidgetItem(i, strCitys.at(i)));
     }
     m_listCitys->SetItems(mapCitys);
-
-    int nSize = mapCitys.size();
-    if (nSize > 9) {
-        m_listCitys->setFixedHeight(9 * 40);
-    }
-    else if (nSize > 3 && nSize < 10) {
-        m_listCitys->setFixedHeight(nSize * 40 + 20);
-    }
 }
 
 void CityManagerWidget::SltCitySelected(QtListWidgetItem *item)
@@ -131,8 +77,61 @@ void CityManagerWidget::SltCitySelected(QtListWidgetItem *item)
     emit signalCityChanged(item->m_strText);
 }
 
-QSize CityManagerWidget::sizeHint() const
+void CityManagerWidget::SltToolBtnClicked(int index)
 {
-    return QSize(800, 480);
+    m_lineEdit->clearFocus();
+
+    if (0 == index) {
+        emit signalBackHome();
+    } if (1 == index) {
+#ifdef Q_OS_WIN32
+        m_lineEdit->clearFocus();
+#endif
+        SltSearcCitys();
+    }
+}
+
+void CityManagerWidget::resizeEvent(QResizeEvent *e)
+{
+    SetScaleValue();
+    m_lineEdit->resize(700 * m_scaleX, 35 * m_scaleY);
+    m_lineEdit->move(10, 95 * m_scaleY);
+
+    m_listCitys->resize(this->width(), 155 * m_scaleY);
+    m_listCitys->move(0, 140 * m_scaleY);
+
+    QWidget::resizeEvent(e);
+}
+
+void CityManagerWidget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.drawPixmap(0, 0, m_pixmapBackground);
+
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(32);
+    painter.setFont(font);
+    painter.setPen(QColor("#ffffff"));
+    QRect rect(1, 0, m_nBaseWidth - 2, 80);
+    painter.drawText(rect, Qt::AlignCenter, tr("城市选择"));
+
+    QtPixmapButton *btnBack = m_btns.value(0);
+    painter.drawPixmap(btnBack->rect(), btnBack->pixmap());
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor("#ffffff"));
+    rect = QRect(rect.left(), rect.bottom() + 10, rect.width(), 45);
+    painter.drawRoundedRect(rect, 5, 5);
+
+    QtPixmapButton *btnSearch = m_btns.value(1);
+    painter.setBrush(btnSearch->color());
+    painter.drawRoundedRect(btnSearch->rect(), 5, 5);
+
+    font.setPixelSize(20);
+    painter.setFont(font);
+    painter.setPen(QColor("#ffffff"));
+    painter.drawText(btnSearch->rect(), Qt::AlignCenter, btnSearch->text());
 }
 

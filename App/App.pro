@@ -59,10 +59,10 @@ include($$PWD/../RgbLight/rgblight.pri)
 include($$PWD/../Settings/settings.pri)
 include($$PWD/../VideoPlayer/videoplayer.pri)
 include($$PWD/../Weather/weather.pri)
+#
+include($$PWD/../InfoNes/infones.pri)
+include($$PWD/../NesSimulator/simulator.pri)
 
-# nes
-win32{ include($$PWD/../NesSimulator/simulator.pri)}
-unix {include($$PWD/../InfoNes/infones.pri)}
 #unix {include($$PWD/../WebBrowser/webbrowser.pri)}
 
 #add libs
@@ -95,3 +95,6 @@ win32 {
 
 #编译HDMI版本，方便适配大屏显示
 DEFINES      += BUILD_WITH_HDMI
+
+
+TRANSLATIONS    = qt_zh.ts qt_en.ts

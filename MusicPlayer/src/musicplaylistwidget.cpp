@@ -30,6 +30,9 @@ PlayListWidget::PlayListWidget(QWidget *parent) : QtListWidget(parent)
     m_nMargin = 0;
     m_backgroundColor = Qt::transparent;
     m_nCurrentIndex = 0;
+
+    m_nBaseWidth = 405;
+    m_nBaseHeight = 360;
 }
 
 PlayListWidget::~PlayListWidget()
@@ -42,7 +45,6 @@ void PlayListWidget::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
 {
     painter->save();
     QRect rect = item->m_rect;
-    painter->setRenderHint(QPainter::Antialiasing, false);
     painter->setPen(QPen(QColor("#797979"), 1));
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
 
@@ -60,29 +62,22 @@ MusicPlayListWidget::MusicPlayListWidget(QWidget *parent) : QtAnimationWidget(pa
 {
     this->setAttribute(Qt::WA_TranslucentBackground);
     m_colorBackground = QColor("#5362b5");
-    this->setFixedWidth(405);
+    m_nBaseWidth  = 405;
+    m_nBaseHeight = 350;
     m_nYPos = 60;
-
-    m_labelTitle = new QLabel(this);
-    m_labelTitle->setAlignment(Qt::AlignCenter);
-    m_labelTitle->setText(tr("播放列表"));
-    m_labelTitle->setMinimumHeight(40);
 
     m_listWidget = new PlayListWidget(this);
     QVBoxLayout *verLayout = new QVBoxLayout(this);
     verLayout->setContentsMargins(0, 10, 0, 10);
     verLayout->setSpacing(0);
-    verLayout->addWidget(m_labelTitle);
-    verLayout->addWidget(m_listWidget, 1);
+    verLayout->addStretch(1);
+    verLayout->addWidget(m_listWidget, 9);
 
     // 播放列表
     m_playList = new QMediaPlaylist(this);
     m_playList->setPlaybackMode(QMediaPlaylist::Loop);
     connect(m_playList, SIGNAL(currentIndexChanged(int)), this, SLOT(SltCurrMediaChanged(int)));
     connect(m_listWidget, SIGNAL(currentIndexClicked(int)), m_playList, SLOT(setCurrentIndex(int)));
-
-    this->setStyleSheet(QString("QLabel{color: #ffffff; font: 18px; font-family: '%1';"
-                                "border: none; border-bottom: 1px solid #797979;}").arg(Skin::m_strAppFontBold));
 }
 
 MusicPlayListWidget::~MusicPlayListWidget()
@@ -92,7 +87,7 @@ MusicPlayListWidget::~MusicPlayListWidget()
 
 void MusicPlayListWidget::setTitle(const QString &title)
 {
-    m_labelTitle->setText(title);
+    m_strTitle = title;
 }
 
 QMediaPlaylist *MusicPlayListWidget::playList()
@@ -167,8 +162,17 @@ void MusicPlayListWidget::SltCurrMediaChanged(int index)
 void MusicPlayListWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
     painter.setPen(Qt::NoPen);
     painter.setBrush(m_colorBackground);
-    painter.drawRoundedRect(0, 0, this->width() + 5, this->height(), 10, 10);
+    painter.drawRoundedRect(0, 0, m_nBaseWidth + 5,m_nBaseHeight, 10, 10);
+
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(24);
+    painter.setPen(Qt::white);
+    painter.drawText(0, 0, m_nBaseWidth, 40, Qt::AlignCenter, tr("播放列表"));
+
+    painter.setPen(QColor("#797979"));
+    painter.drawLine(QPoint(0, 40), QPoint(m_nBaseWidth, 40));
 }

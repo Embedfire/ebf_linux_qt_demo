@@ -12,13 +12,13 @@
 #ifndef LYRICWIDGET_H
 #define LYRICWIDGET_H
 
-#include <QWidget>
+#include "qtwidgetbase.h"
 #include "lyricfactory.h"
 #include "netdownlyric.h"
 
 //#define AUTO_DOWNLOAD_LYRIC
 
-class LyricWidget : public QWidget
+class LyricWidget : public QtWidgetBase
 {
     Q_OBJECT
 public:
@@ -56,7 +56,6 @@ private slots:
     void SltLoadNetLyric(const QString &file);
 
 protected:
-    void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);
     void drawLyricLines(QPainter *painter);
 };

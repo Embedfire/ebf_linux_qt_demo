@@ -41,6 +41,7 @@ void QtSwitchButton::setChecked(bool bOk)
 {
     if (m_bChecked != bOk) {
         m_bChecked = bOk;
+        emit buttonChecked(m_bChecked);
         this->update();
     }
 }

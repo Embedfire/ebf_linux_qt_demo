@@ -99,20 +99,6 @@ void CarMeterWidget::InitData()
     m_markSgin.insert(11, new MarkIcon(11, QRect(643, 431, 56, 40), QStringList() << ":/images/car/mark/enginoil_on.png" << ":/images/car/mark/enginoil_off.png"));
 }
 
-void CarMeterWidget::ScalcRect(QRect &rectRet, const QRect &rect)
-{
-#ifdef BUILD_WITH_HDMI
-    qreal scaleX = (this->width() * 1.0 / Skin::m_nScreenWidth);
-    qreal scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-
-    rectRet.setX(rect.x() * scaleX);
-    rectRet.setY(rect.y() * scaleY);
-    rectRet.setWidth(rect.width() * scaleX);
-    rectRet.setHeight(rect.height() * scaleY);
-#else
-    rectRet = rect;
-#endif
-}
 
 void CarMeterWidget::paintEvent(QPaintEvent *)
 {
@@ -128,10 +114,8 @@ void CarMeterWidget::paintEvent(QPaintEvent *)
 void CarMeterWidget::drawRects(QPainter *painter)
 {
     painter->save();
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
-    painter->scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter->scale(m_scaleX, m_scaleY);
 
     if (m_bHomePressed) painter->drawPixmap(m_rectHome, QPixmap(":/images/car/menu_icon_pressed.png"));
     for (int i = 0; i < m_nLeftPower; i++) {
@@ -146,10 +130,8 @@ void CarMeterWidget::drawRects(QPainter *painter)
 void CarMeterWidget::drawMarIcons(QPainter *painter)
 {
     painter->save();
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
-    painter->scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter->scale(m_scaleX, m_scaleY);
 
     foreach (MarkIcon *icon, m_markSgin) {
         painter->drawPixmap(icon->m_rect.topLeft(), icon->pixmap());
@@ -160,12 +142,12 @@ void CarMeterWidget::drawMarIcons(QPainter *painter)
 void CarMeterWidget::drawValue(QPainter *painter)
 {
     painter->save();
-    QPixmap pixmap(":/images/car/point_hand.png");
-    painter->translate(this->rect().center().x(), this->rect().center().y());
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
-    painter->scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter->scale(m_scaleX, m_scaleY);
+
+    QPixmap pixmap(":/images/car/point_hand.png");
+    painter->translate(m_nBaseWidth / 2, m_nBaseHeight / 2);
+
     int nWidth = 306;
     QRectF rectangle(-nWidth / 2 + 1.2, -nWidth / 2 - 5.6, nWidth, nWidth);
     qreal rotate = (m_nSpeed * 1.0) / 180 * 270;
@@ -176,17 +158,16 @@ void CarMeterWidget::drawValue(QPainter *painter)
     linear.setColorAt(1, QColor(0, 255, 255, 255));
     painter->setPen(Qt::NoPen);
     painter->setBrush(linear);
-    painter->drawPie(rectangle, 225 *16, -(rotate + (m_nSpeed * 1.0) / 180 * 1) * 16);
+    painter->drawPie(rectangle, 225 * 16, -(rotate + (m_nSpeed * 1.0) / 180 * 1) * 16);
     painter->rotate(-135);
     painter->rotate(rotate);
     painter->drawPixmap(-pixmap.width() / 2, -pixmap.height() + 17, pixmap);
     painter->restore();
 
     painter->save();
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
-    painter->scale(this->width() * 1.0 / Skin::m_nScreenWidth, this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
+    painter->scale(m_scaleX, m_scaleY);
+
     painter->setPen(QColor("#ffffff"));
     //  绘制速度
     QFont font(Skin::m_strAppFontBold);
@@ -197,7 +178,7 @@ void CarMeterWidget::drawValue(QPainter *painter)
 
     font.setPixelSize(29);
     painter->setFont(font);
-    painter->drawText(251, 422, 285, 49, Qt::AlignCenter, QString("总里程：546546 km"));
+    painter->drawText(251, 422, 285, 49, Qt::AlignCenter, tr("总里程：546546 km"));
     painter->restore();
 }
 
@@ -205,7 +186,7 @@ void CarMeterWidget::mousePressEvent(QMouseEvent *e)
 {
     foreach (MarkIcon *icon, m_markSgin) {
         QRect rect;
-        ScalcRect(rect, icon->m_rect);
+        ScaleRect(rect, icon->m_rect);
 
         if (rect.contains(e->pos())) {
             if (icon->m_bFickerAble) {
@@ -221,7 +202,7 @@ void CarMeterWidget::mousePressEvent(QMouseEvent *e)
     }
 
     QRect rect;
-    ScalcRect(rect, m_rectHome);
+    ScaleRect(rect, m_rectHome);
     if (rect.contains(e->pos())) {
         m_bHomePressed = true;
         this->update();
@@ -248,27 +229,19 @@ void CarMeterWidget::mouseReleaseEvent(QMouseEvent *e)
 void CarMeterWidget::mouseMoveEvent(QMouseEvent *e)
 {
     QRect rect;
-    ScalcRect(rect, m_rectLeftValue);
+    ScaleRect(rect, m_rectLeftValue);
     if (m_bPressed && rect.contains(e->pos())) {
         int nValue = rect.bottom() - e->y();
         m_nLeftPower = (nValue * 1.0) / rect.height() * 11;
-#ifdef BUILD_WITH_HDMI
-        if (e->y() < 120 * (this->height() * 1.0 / Skin::m_nScreenHeight)) m_nLeftPower = 11;
-#else
-        if (e->y() < 120) m_nLeftPower = 11;
-#endif
+        if (e->y() < 120 * m_scaleY) m_nLeftPower = 11;
         this->update();
     }
 
-    ScalcRect(rect, m_rectRightValue);
+    ScaleRect(rect, m_rectRightValue);
     if (rect.contains(e->pos())) {
         int nValue = rect.bottom() - e->y();
         m_nRightPower = (nValue * 1.0) / rect.height() * 11;
-#ifdef BUILD_WITH_HDMI
-        if (e->y() < 120 * (this->height() * 1.0 / Skin::m_nScreenHeight)) m_nRightPower = 11;
-#else
-         if (e->y() < 120) m_nRightPower = 11;
-#endif
+        if (e->y() < 120 * m_scaleY) m_nRightPower = 11;
         this->update();
     }
 }

@@ -51,11 +51,11 @@ void BoardLogoWidget::drawPointLine(QPainter *painter)
     font.setBold(true);
     painter->setFont(font);
     int nH = painter->fontMetrics().height();
-    painter->drawText(230, 300, QString("调节电压"));
+    painter->drawText(230, 300, tr("调节电压"));
 
     font.setPixelSize(22);
     painter->setFont(font);
-    painter->drawText(230, 290 - nH, QString("旋转电位器"));
+    painter->drawText(230, 290 - nH, tr("旋转电位器"));
     painter->restore();
 }
 

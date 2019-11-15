@@ -23,13 +23,11 @@ RgbLightMonitor::RgbLightMonitor(QWidget *parent) : QtAnimationWidget(parent)
     m_nValue = 78;
     m_nCurrentLight = 1;
     m_bPressed = false;
-    m_scaleX = 1.0;
-    m_scaleX = 1.0;
 
     m_btnHome = new QtPixmapButton(0, QRect(736, 13, 54, 54), QPixmap(":/images/music/menu_icon.png"), QPixmap(":/images/music/menu_icon_pressed.png"));
-    m_lightObjs.insert(0, new LightObect(0, QRect(105, 383, 66, 66), 75, QStringLiteral("红灯")));
-    m_lightObjs.insert(1, new LightObect(1, QRect(368, 383, 66, 66), 200, QStringLiteral("绿灯")));
-    m_lightObjs.insert(2, new LightObect(2, QRect(633, 383, 66, 66), 185, QStringLiteral("蓝灯")));
+    m_lightObjs.insert(0, new LightObect(0, QRect(105, 383, 66, 66), 75, tr("红灯")));
+    m_lightObjs.insert(1, new LightObect(1, QRect(368, 383, 66, 66), 200, tr("绿灯")));
+    m_lightObjs.insert(2, new LightObect(2, QRect(633, 383, 66, 66), 185, tr("蓝灯")));
 
     // 读取值
     ReadRgbLightValues();
@@ -37,7 +35,14 @@ RgbLightMonitor::RgbLightMonitor(QWidget *parent) : QtAnimationWidget(parent)
 
 RgbLightMonitor::~RgbLightMonitor()
 {
+    delete m_btnHome;
+    m_btnHome = NULL;
 
+    foreach (LightObect *obj, m_lightObjs) {
+        m_lightObjs.remove(obj->m_nId);
+        delete obj;
+        obj = NULL;
+    }
 }
 
 void RgbLightMonitor::ChangeRgbLightValue()
@@ -80,36 +85,14 @@ void RgbLightMonitor::ReadRgbLightValues()
 #endif
 }
 
-void RgbLightMonitor::ScalcRect(QRect &rectRet, const QRect &rect)
-{
-#ifdef BUILD_WITH_HDMI
-    rectRet.setX(rect.x() * m_scaleX);
-    rectRet.setY(rect.y() * m_scaleY);
-    rectRet.setWidth(rect.width() * m_scaleX);
-    rectRet.setHeight(rect.height() * m_scaleY);
-#else
-    rectRet = rect;
-#endif
-}
-
-void RgbLightMonitor::resizeEvent(QResizeEvent *e)
-{  
-#ifdef BUILD_WITH_HDMI
-    m_scaleX = (this->width() * 1.0 / Skin::m_nScreenWidth);
-    m_scaleY = (this->height() * 1.0 / Skin::m_nScreenHeight);
-#endif
-    QWidget::resizeEvent(e);
-}
-
 void RgbLightMonitor::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
-#ifdef BUILD_WITH_HDMI
     // 设置放大倍数
     painter.scale(m_scaleX, m_scaleY);
-#endif
+
     // 绘制背景
     drawBackground(&painter);
 
@@ -139,7 +122,7 @@ void RgbLightMonitor::drawValue(QPainter *painter)
     painter->setFont(font);
     painter->setPen(QColor("#ffffff"));
     QRect rectTitle(0, 0, Skin::m_nScreenWidth, 80);
-    painter->drawText(rectTitle, Qt::AlignCenter, QStringLiteral("RGB灯亮度调节"));
+    painter->drawText(rectTitle, Qt::AlignCenter, tr("RGB灯亮度调节"));
 
     // 绘制亮度灯
     QRect rect(100, 126, 60, 60);
@@ -268,20 +251,20 @@ void RgbLightMonitor::drawBottomLight(QPainter *painter)
 void RgbLightMonitor::mousePressEvent(QMouseEvent *e)
 {
     QRect rect;
-    ScalcRect(rect, m_nRectHandle);
+    ScaleRect(rect, m_nRectHandle);
     if (rect.contains(e->pos())) {
         m_bPressed = true;
         return;
     }
 
-    ScalcRect(rect, m_btnHome->rect());
+    ScaleRect(rect, m_btnHome->rect());
     if (rect.contains(e->pos())) {
         m_btnHome->setPressed(true);
         this->update();
     }
     else {
         foreach (LightObect *obj, m_lightObjs) {
-            ScalcRect(rect, obj->m_rect);
+            ScaleRect(rect, obj->m_rect);
             if (rect.contains(e->pos())) {
                 if (m_nCurrentLight != obj->m_nId) {
                     m_nCurrentLight = obj->m_nId;

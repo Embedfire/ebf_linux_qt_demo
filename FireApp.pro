@@ -28,4 +28,4 @@ SUBDIRS += App
 #SUBDIRS += Weather
 #SUBDIRS += WebBrowser
 
-win {SUBDIRS += $$PWD/thirdpart/quazip}
+#win {SUBDIRS += $$PWD/thirdpart/quazip}

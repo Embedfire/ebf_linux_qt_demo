@@ -11,51 +11,27 @@
 *******************************************************************/
 #include "widgettoolbar.h"
 #include "unit.h"
+#include "skin.h"
 
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
 #include <QTime>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QButtonGroup>
-
-QtVolumeSlider::QtVolumeSlider(QWidget *parent) :
-    QtSliderBar(parent)
-{
-    this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::SubWindow);
-    this->SetHorizontal(false);
-    this->SetSliderSize(4, 36);
-    this->setFixedSize(36, 120);
-}
-
-QtVolumeSlider::~QtVolumeSlider()
-{
-
-}
-
-void QtVolumeSlider::showEvent(QShowEvent *e)
-{
-    this->setFocus();
-    QWidget::showEvent(e);
-}
-
-void QtVolumeSlider::focusOutEvent(QFocusEvent *e)
-{
-    this->hide();
-    QWidget::focusOutEvent(e);
-}
 
 ///////////////////////////////////////////////////////////////////
-WidgetToolBar::WidgetToolBar(QWidget *parent) : QWidget(parent)
+WidgetToolBar::WidgetToolBar(QWidget *parent) : QtWidgetBase(parent)
 {
-    this->setAttribute(Qt::WA_TranslucentBackground);
+    m_nBaseWidth = Skin::m_nScreenWidth;
+    m_nBaseHeight = 69;
 
-    InitWidget();
+    m_strCurrTime = "00:00";
+    m_strDuration = "00:00";
+
     m_bPlaying = false;
     m_nMaxValue = 0;
     m_nCurrentValue = 0;
+
+    InitWidget();
 }
 
 WidgetToolBar::~WidgetToolBar()
@@ -70,121 +46,48 @@ void WidgetToolBar::UpdateDurationInfo(int postion)
     QTime totalTime = GetTimeByPostion(m_nMaxValue);
     QString format = "mm:ss";
     if (m_nMaxValue > 3600) format = "hh:mm:ss";
-    m_labelCurrTime->setText(currentTime.toString(format));
-    m_labelDuraTime->setText(totalTime.toString(format));
+    m_strCurrTime = currentTime.toString(format);
+    m_strDuration = totalTime.toString(format);
     m_progressBar->SetValue(postion);
+    this->update();
 }
 
 void WidgetToolBar::SetDuration(int duration)
 {
     this->m_nMaxValue = duration;
     m_progressBar->SetMaxValue(duration);
+    m_progressBar->SetValue(0);
     m_nCurrentValue = 0;
+
+    QTime totalTime = GetTimeByPostion(m_nMaxValue);
+    QString format = "mm:ss";
+    if (m_nMaxValue > 3600) format = "hh:mm:ss";
+    m_strCurrTime = "00:00";
+    m_strDuration = totalTime.toString(format);
+    this->update();
 }
 
 void WidgetToolBar::SetPlayState(bool state)
 {
     m_bPlaying = state;
-    m_btnPlay->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_%1.png);}")
-                             .arg(m_bPlaying ? "pause" : "play"));
+    m_btns.value(1)->setChecked(state);
 }
 
 void WidgetToolBar::InitWidget()
 {
-    // 播放按钮
-    QHBoxLayout *horLayoutPlaybtn = new QHBoxLayout();
-    horLayoutPlaybtn->setContentsMargins(0, 0, 0, 0);
-    horLayoutPlaybtn->setSpacing(14);
-
-    QPushButton *btnPrev = new QPushButton(this);
-    btnPrev->setFocusPolicy(Qt::NoFocus);
-    connect(btnPrev, SIGNAL(clicked(bool)), this, SIGNAL(previous()));
-    horLayoutPlaybtn->addWidget(btnPrev);
-    btnPrev->setFixedSize(38, 38);
-    btnPrev->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_prev.png);}"
-                                   "QPushButton:pressed{border-image: url(:/images/music/ic_prev_pre.png);}"));
-
-    m_btnPlay = new QPushButton(this);
-    m_btnPlay->setFocusPolicy(Qt::NoFocus);
-    connect(m_btnPlay, SIGNAL(clicked(bool)), this, SLOT(SltBtnPlayClicked()));
-    horLayoutPlaybtn->addWidget(m_btnPlay);
-    m_btnPlay->setFixedSize(50, 50);
-    m_btnPlay->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_play.png);}"));
-
-    QPushButton *btnNext = new QPushButton(this);
-    btnNext->setFocusPolicy(Qt::NoFocus);
-    connect(btnNext, SIGNAL(clicked(bool)), this, SIGNAL(next()));
-    horLayoutPlaybtn->addWidget(btnNext);
-    btnNext->setFixedSize(38, 38);
-    btnNext->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_next.png);}"
-                                   "QPushButton:pressed{border-image: url(:/images/music/ic_next_pre.png);}"));
-
-
-    //--------- 进度 -------------//
-    QHBoxLayout *horLayoutProgress = new QHBoxLayout();
-    horLayoutProgress->setContentsMargins(0, 0, 0, 0);
-    horLayoutProgress->setSpacing(5);
-
-    m_labelCurrTime = new QLabel(this);
-    horLayoutProgress->addWidget(m_labelCurrTime);
-    m_labelCurrTime->setText("00:00");
-
-    // 进度条
     m_progressBar = new QtSliderBar(this);
-    m_progressBar->SetReadOnly(false);
-    horLayoutProgress->addWidget(m_progressBar, 1);
     m_progressBar->SetHorizontal(true);
-    m_progressBar->SetSliderSize(2, 36);
     m_progressBar->SetMaxValue(0);
     m_progressBar->SetValue(0);
     connect(m_progressBar, SIGNAL(currentValueChanged(int)), this, SIGNAL(currentPostionChanged(int)));
 
-    m_labelDuraTime = new QLabel(this);
-    horLayoutProgress->addWidget(m_labelDuraTime);
-    m_labelDuraTime->setText("00:00");
-
-    //--------- 播放列表 -------------//
-    QHBoxLayout *horLayoutList = new QHBoxLayout();
-    horLayoutList->setContentsMargins(0, 0, 0, 0);
-    horLayoutList->setSpacing(0);
-
-    QButtonGroup *btnGroup = new QButtonGroup(this);
-    connect(btnGroup, SIGNAL(buttonClicked(int)), this, SIGNAL(toolBarClicked(int)));
-
-    QPushButton *btnEqualize = new QPushButton(this);
-    btnEqualize->setVisible(false);
-    btnEqualize->setFocusPolicy(Qt::NoFocus);
-    btnGroup->addButton(btnEqualize, 1);
-    horLayoutList->addWidget(btnEqualize);
-    btnEqualize->setFixedSize(27, 27);
-    btnEqualize->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_equalizer.png);}"
-                                       "QPushButton:pressed{border-image: url(:/images/music/ic_equalizer_pre.png);}"));
-
-    QPushButton *btnVolume = new QPushButton(this);
-    btnGroup->addButton(btnVolume, 2);
-    horLayoutList->addWidget(btnVolume);
-    btnVolume->setFocusPolicy(Qt::NoFocus);
-    btnVolume->setMinimumSize(69, 69);
-    btnVolume->setIconSize(QSize(27, 27));
-    btnVolume->setIcon(QIcon(":/images/music/ic_volume.png"));
-    btnVolume->setStyleSheet(QString("border: none; background: none;"));
-
-    QPushButton *btnMusicList = new QPushButton(this);
-    btnMusicList->setFocusPolicy(Qt::NoFocus);
-    btnGroup->addButton(btnMusicList, 3);
-    horLayoutList->addWidget(btnMusicList);
-    btnMusicList->setMinimumSize(69, 69);
-    btnMusicList->setIconSize(QSize(27, 27));
-    btnMusicList->setIcon(QIcon(":/images/music/ic_list.png"));
-    btnMusicList->setStyleSheet(QString("border: none; background: none;"));
-
-    QHBoxLayout *horLayoutAll = new QHBoxLayout(this);
-    horLayoutAll->setContentsMargins(10, 10, 10, 10);
-    horLayoutAll->setSpacing(20);
-    horLayoutAll->addLayout(horLayoutPlaybtn);
-    horLayoutAll->addLayout(horLayoutProgress, 1);
-    horLayoutAll->addLayout(horLayoutList);
-    this->setStyleSheet(QString("QLabel{font-family: '%1'; font: bold 18px; color: #333333; min-width: 50px;}").arg(APP_FONT_FAMILY));
+    m_btns.insert(0, new QtPixmapButton(0, QRect(12, 4, 60, 60), QPixmap(":/images/music/ic_prev.png"), QPixmap(":/images/music/ic_prev_pre.png")));
+    m_btns.insert(1, new QtPixmapButton(1, QRect(64, 4, 60, 60), QPixmap(":/images/music/ic_play.png"), QPixmap(":/images/music/ic_pause.png")));
+    m_btns.insert(2, new QtPixmapButton(2, QRect(128, 4, 60, 60), QPixmap(":/images/music/ic_next.png"), QPixmap(":/images/music/ic_next_pre.png")));
+    m_btns.insert(3, new QtPixmapButton(3, QRect(680, 4, 60, 60), QPixmap(":/images/video/ic_volume.png"), QPixmap(":/images/video/ic_volume_pre.png")));
+    m_btns.insert(4, new QtPixmapButton(4, QRect(740, 4, 60, 60), QPixmap(":/images/video/ic_menu_list.png"), QPixmap(":/images/video/ic_menu_list_pre.png")));
+    m_btns.value(1)->setCheckAble(true);
+    connect(this, SIGNAL(signalBtnClicked(int)), this, SLOT(SltBtnClicket(int)));
 }
 
 void WidgetToolBar::InitProperty()
@@ -204,17 +107,58 @@ QTime WidgetToolBar::GetTimeByPostion(int postion)
 void WidgetToolBar::SltBtnPlayClicked()
 {
     m_bPlaying = !m_bPlaying;
-    m_btnPlay->setStyleSheet(QString("QPushButton{border-image: url(:/images/music/ic_%1.png);}")
-                             .arg(m_bPlaying ? "pause" : "play"));
+    m_btns.value(1)->setChecked(m_bPlaying);
     if (m_bPlaying) {emit play();}
     else {emit pause();}
+}
+
+void WidgetToolBar::SltBtnClicket(int index)
+{
+    if (0 == index) {
+        emit previous();
+    } else if (1 == index) {
+        SltBtnPlayClicked();
+    } else if (2 == index) {
+        emit next();
+    } else if (3 == index) {
+        emit toolBarClicked(2);
+    } else if (4 == index) {
+        emit toolBarClicked(3);
+    }
+}
+
+void WidgetToolBar::resizeEvent(QResizeEvent *e)
+{
+    SetScaleValue();
+
+    m_progressBar->resize(350 * m_scaleX, 30 * m_scaleX);
+    m_progressBar->SetSliderSize(1, 30 * m_scaleX);
+    m_progressBar->move(245 * m_scaleX, 20 * m_scaleX);
+    m_progressBar->SetValue(m_progressBar->value());
+
+    QWidget::resizeEvent(e);
 }
 
 void WidgetToolBar::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(this->rect(), QColor("#72ffffff"));
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.scale(m_scaleX, m_scaleY);
+    painter.setBrush(QColor("#72ffffff"));
+    painter.drawRect(0, 0, m_nBaseWidth, m_nBaseHeight);
 
+    painter.setPen(QColor("#ffffff"));
+    QFont font(Skin::m_strAppFontBold);
+    font.setPixelSize(18);
+    painter.setFont(font);
+
+    painter.drawText(QRect(188, 15, 60, 40), Qt::AlignCenter, m_strCurrTime);
+    painter.drawText(QRect(610, 15, 60, 40), Qt::AlignCenter, m_strDuration);
+
+    foreach (QtPixmapButton *btn, m_btns) {
+        int nX = btn->rect().left() + (btn->rect().width() - btn->pixmap().width()) / 2;
+        int nY = btn->rect().top() + (btn->rect().height() - btn->pixmap().height()) / 2;
+        painter.drawPixmap(nX, nY, btn->pixmap());
+    }
 }
 
