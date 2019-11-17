@@ -79,7 +79,9 @@ int main(int argc, char *argv[])
 
 #ifdef __arm__
     QSize size = a.primaryScreen()->availableGeometry().size();
-    w.resize(size.width(), size.height() + 48);
+    // w.resize(size.width(), size.height());
+    // 分辨率读取不对，暂时先指定HDMI分辨率为1280*720
+    w.resize(1280, 720);    
     qDebug() << "primaryScreen availableGeometry" << size;
     w.showFullScreen();
 #else

@@ -20,7 +20,8 @@
 #include <QDebug>
 #include <QFile>
 
-#define FLASH_FILE_INFO     "/sys/class/mtd/mtd0/size"
+#define FLASH_FILE_PART     4
+#define FLASH_FILE_INFO     "/sys/class/mtd/mtd%1/size"
 #ifndef FLASH_FILE_EMMC
 #define FLASH_FILE_EMMC     "/sys/class/mmc_host/mmc1/mmc1:0001/block/mmcblk1/size"
 #endif
@@ -55,18 +56,26 @@ void AboutBoard::InitBoardInfo()
     }
 
     // nand容量读取
-    QFile file(FLASH_FILE_INFO);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Read flash size failed";
-        return;
+    quint32 usize, i;
+    QString flash_file;
+    for (i = 0; i < FLASH_FILE_PART; i++) {
+        flash_file = QString(FLASH_FILE_INFO).arg(i);
+
+        QFile file(flash_file);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qDebug() << "Read flash size failed";
+            return;
+        }
+
+        QString strTemp = file.readAll();
+        strTemp.remove("\\n");
+        usize += strTemp.toULong();
+        file.close();
     }
 
-    QString strTemp = file.readAll();
-    strTemp.remove("\\n");
-    quint32 usize = strTemp.toULong();
     usize /= (1024 * 1024);
     m_strNandSize = QString("%1MB NAND").arg(usize);
-    file.close();
+
 #endif
 }
 
