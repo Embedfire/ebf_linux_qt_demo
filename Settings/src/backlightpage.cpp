@@ -19,8 +19,9 @@
 #include <QApplication>
 
 BackLightPage::BackLightPage(QWidget *parent) : QtWidgetBase(parent),
-    m_nLevel(0),m_nBaseHeight(400)
+    m_nLevel(0)
 {
+    m_nBaseHeight = 400;
     InitWidget();
 }
 
