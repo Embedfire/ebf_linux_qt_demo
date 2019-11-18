@@ -23,6 +23,9 @@ cp ../app_bin/App -arf .
 cp ../thirdpart/libskin/lib/* -arf ./libskin
 cp ../thirdpart/libqui/lib/* -arf ./libqui
 
+#cp ../app_bin/App -arf ~/FireRtfs/opt
+#cp ../thirdpart/libskin -arf ~/FireRtfs/opt/
+#cp ../thirdpart/libqui -arf ~/FireRtfs/opt/
 
 #tar 
 tar -jcf ../fire-app-$(date +%Y%m%d).tar.bz2 *
