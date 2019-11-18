@@ -32,6 +32,7 @@ private:
 private:
     void InitWidget();
 
+    void ReadBacklight();
 private slots:
     void SltValueChanged(int value);
 

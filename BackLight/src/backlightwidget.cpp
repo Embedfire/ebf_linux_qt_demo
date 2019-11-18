@@ -19,10 +19,10 @@
 #include <QTextStream>
 #include <QDebug>
 
-BackLightWidget::BackLightWidget(QWidget *parent) : QtAnimationWidget(parent)
+BackLightWidget::BackLightWidget(QWidget *parent) : QtAnimationWidget(parent),m_nLevel(0)
 {
     this->SetBackground(QPixmap(":/images/backlight/ic_background.png"));
-    m_nLevel = 6;
+    ReadBacklight();
     InitWidget();
 }
 
@@ -50,6 +50,24 @@ void BackLightWidget::InitWidget()
     verLayout->setSpacing(0);
     verLayout->addWidget(widgetTitle, 1);
     verLayout->addStretch(5);
+}
+
+// 读取配置
+void BackLightWidget::ReadBacklight()
+{
+#ifdef __arm__
+    QString strFile = "/sys/class/backlight/backlight/brightness";
+    QFile file(strFile);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "open Leds failed!";
+        m_nLevel = 5;
+        return;
+    }
+
+    m_nLevel = file.readAll().toInt();
+    m_knobSwitch->setValue(m_nLevel);
+    file.close();
+#endif
 }
 
 void BackLightWidget::SltValueChanged(int value)
