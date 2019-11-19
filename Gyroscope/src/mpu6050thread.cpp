@@ -61,10 +61,7 @@ Mpu6050Thread::Mpu6050Thread(QObject *parent) : QThread(parent),
 
 Mpu6050Thread::~Mpu6050Thread()
 {
-    m_bRun = false;
-    if (this->isRunning()) {
-        this->quit();
-    }
+    Stop();
 }
 
 void Mpu6050Thread::Stop()
@@ -182,23 +179,24 @@ void Mpu6050Thread::run()
     while (m_bRun)
     {
         // printf("\033[2J");
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(0, ArgX, GetData(ACCEL_XOUT_H));
 
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(0, ArgY, GetData(ACCEL_YOUT_H));
 
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(0, ArgZ, GetData(ACCEL_ZOUT_H));
 
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(1, ArgX, GetData(GYRO_XOUT_H));
 
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(1, ArgY, GetData(GYRO_YOUT_H));
 
-        usleep(1000 * 10);
+        // usleep(1000 * 10);
         emit signalUpdate(1, ArgZ, GetData(GYRO_ZOUT_H));
+        usleep(1000 * 150);
     }
 #ifdef __arm__
     close(m_fd);
