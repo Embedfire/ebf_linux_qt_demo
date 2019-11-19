@@ -22,8 +22,8 @@
 BackLightWidget::BackLightWidget(QWidget *parent) : QtAnimationWidget(parent),m_nLevel(0)
 {
     this->SetBackground(QPixmap(":/images/backlight/ic_background.png"));
-    ReadBacklight();
     InitWidget();
+    ReadBacklight();
 }
 
 BackLightWidget::~BackLightWidget()
@@ -64,8 +64,12 @@ void BackLightWidget::ReadBacklight()
         return;
     }
 
-    m_nLevel = file.readAll().toInt();
-    m_knobSwitch->setValue(m_nLevel);
+    QString strTemp = file.readAll();
+    m_nLevel = strTemp.toInt();
+    if (m_nLevel > 5 && m_nLevel < 100) {
+        m_knobSwitch->setValue(m_nLevel);
+    }
+
     file.close();
 #endif
 }

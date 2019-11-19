@@ -15,6 +15,8 @@
 #include <QApplication>
 #include <QPainter>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QDebug>
 
 GameWidgetPannel::GameWidgetPannel(QWidget *parent) : QtWidgetBase(parent)
@@ -49,6 +51,9 @@ void GameWidgetPannel::startGame(const QString &fileName)
 
         strCmd += " ";
         strCmd += fileName;
+        strCmd += " ";
+        strCmd += CheckKeyboardInsert();
+
 #ifdef __arm__
         // 关闭鼠标显示
         this->setCursor(Qt::BlankCursor);
@@ -85,6 +90,23 @@ void GameWidgetPannel::paintEvent(QPaintEvent *)
     else {
         painter.drawText(rect, Qt::AlignCenter, m_bEngineError ? tr("游戏引擎错误，请联系管理员！") : tr("正在启动...."));
     }
+}
+
+QString GameWidgetPannel::CheckKeyboardInsert()
+{
+    QDir dir("/dev/input/by-path/");
+    if (!dir.exists()) return "";
+
+    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); i++) {
+        QFileInfo fileInfo = list.at(i);
+        if (fileInfo.fileName().contains("kbd")) {
+            return fileInfo.absoluteFilePath();
+        }
+    }
+
+    return "";
 }
 
 void GameWidgetPannel::mousePressEvent(QMouseEvent *)

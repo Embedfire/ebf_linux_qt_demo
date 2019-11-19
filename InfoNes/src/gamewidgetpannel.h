@@ -37,6 +37,8 @@ private:
 
     QTimer   *m_timer;
 protected:
+    QString CheckKeyboardInsert();
+
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
 };
