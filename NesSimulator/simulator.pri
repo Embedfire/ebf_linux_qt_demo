@@ -12,3 +12,5 @@ HEADERS += \
 SOURCES += \
     $$PWD/nessimulator.cpp
 
+
+DEFINES     += BUILD_WIN_NES

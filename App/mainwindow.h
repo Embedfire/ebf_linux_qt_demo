@@ -62,7 +62,7 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *e);
-#ifdef Q_OS_WIN32
+#ifdef BUILD_WIN_NES
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 #endif

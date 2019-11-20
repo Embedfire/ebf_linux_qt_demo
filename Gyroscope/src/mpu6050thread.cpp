@@ -173,31 +173,32 @@ short Mpu6050Thread::GetData(quint8 REG_Address)
 void Mpu6050Thread::run()
 {
     m_fd = MPU6050_Init();
-
-    qDebug() << "m_fd" << m_fd << m_bRun;
-
+    // 启动线程
     while (m_bRun)
     {
         // printf("\033[2J");
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(0, ArgX, GetData(ACCEL_XOUT_H));
 
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(0, ArgY, GetData(ACCEL_YOUT_H));
 
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(0, ArgZ, GetData(ACCEL_ZOUT_H));
 
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(1, ArgX, GetData(GYRO_XOUT_H));
 
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(1, ArgY, GetData(GYRO_YOUT_H));
 
-        // usleep(1000 * 10);
+//        usleep(1000 * 10);
         emit signalUpdate(1, ArgZ, GetData(GYRO_ZOUT_H));
+
         usleep(1000 * 150);
     }
+
+    // 关闭设备
 #ifdef __arm__
     close(m_fd);
 #endif

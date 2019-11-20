@@ -25,6 +25,7 @@ public:
 private:
     void InitWidget();
     void ReadBacklight();
+
 private:
     QtKnobSwitch        *m_knobSwitch;
     int                  m_nLevel;
