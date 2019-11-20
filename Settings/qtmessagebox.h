@@ -75,12 +75,19 @@ protected:
     bool   m_bBtnOkHover;
 
 private:
+    qreal m_scaleX;
+    qreal m_scaleY;
 
+    QSize GetDesktopSize();
+    void ScaleRect(QRect &rectRet, const QRect &rect);
 protected:
+    void showEvent(QShowEvent *e);
     void paintEvent(QPaintEvent *);
+
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
+
     void leaveEvent(QEvent *);
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);

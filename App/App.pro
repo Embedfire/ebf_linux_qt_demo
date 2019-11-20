@@ -61,7 +61,7 @@ include($$PWD/../VideoPlayer/videoplayer.pri)
 include($$PWD/../Weather/weather.pri)
 #
 include($$PWD/../InfoNes/infones.pri)
-include($$PWD/../NesSimulator/simulator.pri)
+#include($$PWD/../NesSimulator/simulator.pri)
 
 #unix {include($$PWD/../WebBrowser/webbrowser.pri)}
 

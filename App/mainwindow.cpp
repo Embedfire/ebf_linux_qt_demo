@@ -35,7 +35,10 @@
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
+
+#ifdef BUILD_WIN_NES
 #include "nessimulator.h"
+#endif
 
 #ifdef BUILD_WITH_WEBVIEW
 #include "browserwindow.h"
@@ -309,10 +312,10 @@ void MainWindow::SltCurrentAppChanged(int index)
             m_musicWidget->StopMusic();
         }
 
-#if 1
-        m_widgetWorkSpace = new InfoNesWidget(this);
-#else
+#ifdef BUILD_WIN_NES
         m_widgetWorkSpace = new NesSimulator(this);
+#else
+        m_widgetWorkSpace = new InfoNesWidget(this);
 #endif
     }
         break;
@@ -396,7 +399,7 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
-#ifdef Q_OS_WIN32
+#ifdef BUILD_WIN_NES
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (24 == m_nCurrentIndex && NULL != m_widgetWorkSpace) {

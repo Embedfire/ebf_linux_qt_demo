@@ -15,19 +15,18 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-static QPointF s_leftPoint[] = {
+static const QPointF s_leftPoint[] = {
     QPointF(56, 351), QPointF(55, 327), QPointF(55, 303), QPointF(56, 280), QPointF(57, 257), QPointF(61, 233),
     QPointF(67, 210), QPointF(75, 187), QPointF(85, 163), QPointF(100, 140), QPointF(115, 116)
 };
 
-static QPointF s_rightPoint[] = {
+static const QPointF s_rightPoint[] = {
     QPointF(658, 351), QPointF(671, 327), QPointF(678, 303), QPointF(683, 280), QPointF(684, 257), QPointF(682, 233),
     QPointF(678, 210), QPointF(671, 187), QPointF(662, 163), QPointF(648, 140), QPointF(630, 116)
 };
 
 CarMeterWidget::CarMeterWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
-//    this->setFixedSize(Skin::m_nScreenWidth, Skin::m_nScreenHeight);
     InitData();
 
     m_timer = new QTimer(this);

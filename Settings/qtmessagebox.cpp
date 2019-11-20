@@ -16,12 +16,31 @@
 #include <QTextDocument>
 #include <QPainter>
 #include <QDebug>
+#include <QApplication>
+#include <QScreen>
+
+#define DIALOG_WIDTH    400
+#define DIALOG_HEIGHT   220
 
 #define TITLE_HEIGHT    40
 #define PADDING_SIZE    20
 #define SHOW_ITEM_CNT   3
 #define BUTTON_WIDTH    150
 #define BUTTON_HEIGHT   40
+
+#ifdef __arm__
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <linux/fb.h>
+#endif
 
 typedef enum
 {
@@ -34,10 +53,9 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////////////////
 /// \brief MessageBox::self
 /// 消息对话框，需要人为处理
-QtMessageBox::QtMessageBox(QWidget *parent) : QDialog(parent)
+QtMessageBox::QtMessageBox(QWidget *parent) : QDialog(parent),m_scaleX(1.0),m_scaleY(1.0)
 {
     this->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool | Qt::FramelessWindowHint);
-    this->setFixedSize(400, 220);
     this->setFocusPolicy(Qt::NoFocus);
     this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -101,6 +119,67 @@ void QtMessageBox::SltTimeOut()
 
 }
 
+QSize QtMessageBox::GetDesktopSize() {
+#ifdef __arm__
+    int fb_fd = open("/dev/fb0", O_RDWR);
+    int lcd_width, lcd_height;
+    static struct fb_var_screeninfo var;
+
+    if(-1 == fb_fd)
+    {
+        printf("cat't open /dev/fb0 \n");
+        return QSize(0, 0);
+    }
+    //获取屏幕参数
+    if(-1 == ioctl(fb_fd, FBIOGET_VSCREENINFO, &var))
+    {
+        close(fb_fd);
+        printf("cat't ioctl /dev/fb0 \n");
+        return QSize(0, 0);
+    }
+
+    // 计算参数
+    lcd_width    = var.xres;
+    lcd_height   = var.yres;
+
+    printf("fb width:%d height:%d \n", lcd_width, lcd_height);
+    close(fb_fd);
+
+    return QSize(lcd_width, lcd_height);
+#else
+
+//    return QSize(480, 272);
+    return QSize(800, 480);
+#endif
+}
+
+
+void QtMessageBox::ScaleRect(QRect &rectRet, const QRect &rect)
+{
+    rectRet.setX(rect.x() * m_scaleX);
+    rectRet.setY(rect.y() * m_scaleY);
+    rectRet.setWidth(rect.width() * m_scaleX);
+    rectRet.setHeight(rect.height() * m_scaleY);
+}
+
+void QtMessageBox::showEvent(QShowEvent *e)
+{
+    QSize screenSize = GetDesktopSize();
+    m_scaleX = screenSize.width() * 1.0 / 800;
+    m_scaleY = screenSize.height() * 1.0 / 480;
+    this->resize(400 * m_scaleX, 220 * m_scaleY);
+#ifdef __arm__
+    this->move((screenSize.width() * m_scaleX - this->width()) / 2,
+               (screenSize.height() * m_scaleY - this->height()) / 2);
+#else
+    QRect rect = qApp->primaryScreen()->availableGeometry();
+    this->move(rect.center().x() - this->width() / 2,
+                  rect.center().y() - this->height() / 2);
+#endif
+    this->update();
+    QDialog::showEvent(e);
+}
+
 /**
  * @brief MessageBox::paintEvent
  * 绘制界面
@@ -109,16 +188,17 @@ void QtMessageBox::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
+    painter.scale(m_scaleX, m_scaleY);
     painter.setPen(m_strHighLightColor);
     painter.setBrush(QColor(m_strBackgroundColor));
-    painter.drawRect(1, 1, this->width() - 2, this->height() - 2);
+    painter.drawRect(1, 1, DIALOG_WIDTH - 2, DIALOG_HEIGHT - 2);
 
     QFont font("Microsoft YaHei");
     font.setPixelSize(18);
     painter.setFont(font);
 
     // 绘制标题栏
-    QRect rect(1, 1, this->width() - 2, TITLE_HEIGHT - 1);
+    QRect rect(1, 1, DIALOG_WIDTH - 2, TITLE_HEIGHT - 1);
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(m_strHighLightColor));
     painter.drawRect(rect);
@@ -130,8 +210,8 @@ void QtMessageBox::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     // 文字显示区域
-    rect = QRect(PADDING_SIZE, TITLE_HEIGHT, this->width() - PADDING_SIZE * 2,
-                 this->height() - TITLE_HEIGHT - BUTTON_HEIGHT - 30);
+    rect = QRect(PADDING_SIZE, TITLE_HEIGHT, DIALOG_WIDTH - PADDING_SIZE * 2,
+                 DIALOG_HEIGHT - TITLE_HEIGHT - BUTTON_HEIGHT - 30);
 
     m_document->setDefaultFont(font);
     if (m_document->size().width() > rect.width()) {
@@ -148,12 +228,12 @@ void QtMessageBox::paintEvent(QPaintEvent *)
 
     // --- 绘制按钮 --- //
     if (Msg_Information == m_nMsgType) {
-        int nOffset = (this->width() - BUTTON_WIDTH) / 2;
+        int nOffset = (DIALOG_WIDTH - BUTTON_WIDTH) / 2;
         m_btnOkRect = QRect(nOffset, rect.bottom() + 15, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
     else {
         m_btnOkRect = QRect(PADDING_SIZE, rect.bottom() + 15, BUTTON_WIDTH, BUTTON_HEIGHT);
-        m_btnCalcelRect = QRect(this->width() - PADDING_SIZE - BUTTON_WIDTH, m_btnOkRect.top(), BUTTON_WIDTH, BUTTON_HEIGHT);
+        m_btnCalcelRect = QRect(DIALOG_WIDTH - PADDING_SIZE - BUTTON_WIDTH, m_btnOkRect.top(), BUTTON_WIDTH, BUTTON_HEIGHT);
 
         painter.setPen(Qt::NoPen);
         painter.setBrush(QColor("#eeeeee"));
@@ -179,15 +259,23 @@ void QtMessageBox::mousePressEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton)
     {
-        if (m_btnCalcelRect.contains(e->pos()))
+        QRect rect;
+        ScaleRect(rect, m_btnCalcelRect);
+        if (rect.contains(e->pos()))
         {
             this->reject();
+            return;
         }
-        else if (m_btnOkRect.contains(e->pos()))
+
+        ScaleRect(rect, m_btnOkRect);
+        if (rect.contains(e->pos()))
         {
             this->accept();
+            return;
         }
-        else if (m_rectWinClose.contains(e->pos())) {
+
+        ScaleRect(rect, m_rectWinClose);
+        if (rect.contains(e->pos())) {
             this->reject();
         }
         else
@@ -207,10 +295,15 @@ void QtMessageBox::mouseMoveEvent(QMouseEvent *e)
     }
     else
     {
-        m_bBtnCalcelHover = m_btnCalcelRect.contains(e->pos());
-        m_bBtnOkHover = m_btnOkRect.contains(e->pos());
+        QRect rect;
+        ScaleRect(rect, m_btnCalcelRect);
+        m_bBtnCalcelHover = rect.contains(e->pos());
+
+        ScaleRect(rect, m_btnOkRect);
+        m_bBtnOkHover = rect.contains(e->pos());
+
         bool bClose = m_rectWinClose.contains(e->pos());
-        this->setCursor((m_bBtnCalcelHover || m_bBtnOkHover | bClose) ? Qt::PointingHandCursor : Qt::ArrowCursor);
+        this->setCursor((m_bBtnCalcelHover || m_bBtnOkHover || bClose) ? Qt::PointingHandCursor : Qt::ArrowCursor);
         this->update();
     }
 }
