@@ -78,7 +78,6 @@ private:
     qreal m_scaleX;
     qreal m_scaleY;
 
-    QSize GetDesktopSize();
     void ScaleRect(QRect &rectRet, const QRect &rect);
 protected:
     void showEvent(QShowEvent *e);
