@@ -9,6 +9,7 @@
   Niyh	   2019    1.0.0.0 1     文件创建
 *******************************************************************/
 #include "qtmessagebox.h"
+#include "appconfig.h"
 
 #include <QCursor>
 #include <QMutex>
@@ -28,20 +29,6 @@
 #define BUTTON_WIDTH    150
 #define BUTTON_HEIGHT   40
 
-#ifdef __arm__
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <linux/fb.h>
-#endif
-
 typedef enum
 {
     Message_Info,
@@ -55,9 +42,8 @@ typedef enum
 /// 消息对话框，需要人为处理
 QtMessageBox::QtMessageBox(QWidget *parent) : QDialog(parent),m_scaleX(1.0),m_scaleY(1.0)
 {
-    this->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Tool | Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Dialog | Qt::FramelessWindowHint);
     this->setFocusPolicy(Qt::NoFocus);
-    this->setAttribute(Qt::WA_DeleteOnClose);
 
     m_bBtnOkHover = false;
     m_bBtnCalcelHover = false;
@@ -81,6 +67,7 @@ QtMessageBox::QtMessageBox(QWidget *parent) : QDialog(parent),m_scaleX(1.0),m_sc
 
 QtMessageBox::~QtMessageBox()
 {
+
 }
 
 /**
@@ -93,13 +80,18 @@ void QtMessageBox::ShowMessage(const QString &text, const QString &title)
     QtMessageBox *msgBox = new QtMessageBox();
     msgBox->SetMessages(text, title, Msg_Information);
     msgBox->exec();
+    delete msgBox;
+    msgBox = NULL;
 }
 
 int QtMessageBox::ShowAskMessage(const QString &text, const QString &title)
 {
     QtMessageBox *msgBox = new QtMessageBox();
     msgBox->SetMessages(text, title, Msg_Question);
-    return msgBox->exec();
+    int nRet = msgBox->exec();
+    delete msgBox;
+    msgBox = NULL;
+    return nRet;
 }
 
 void QtMessageBox::SetMessages(const QString &text, const QString &title, E_MSG_TYPE type)
@@ -119,41 +111,6 @@ void QtMessageBox::SltTimeOut()
 
 }
 
-QSize QtMessageBox::GetDesktopSize() {
-#ifdef __arm__
-    int fb_fd = open("/dev/fb0", O_RDWR);
-    int lcd_width, lcd_height;
-    static struct fb_var_screeninfo var;
-
-    if(-1 == fb_fd)
-    {
-        printf("cat't open /dev/fb0 \n");
-        return QSize(0, 0);
-    }
-    //获取屏幕参数
-    if(-1 == ioctl(fb_fd, FBIOGET_VSCREENINFO, &var))
-    {
-        close(fb_fd);
-        printf("cat't ioctl /dev/fb0 \n");
-        return QSize(0, 0);
-    }
-
-    // 计算参数
-    lcd_width    = var.xres;
-    lcd_height   = var.yres;
-
-    printf("fb width:%d height:%d \n", lcd_width, lcd_height);
-    close(fb_fd);
-
-    return QSize(lcd_width, lcd_height);
-#else
-
-//    return QSize(480, 272);
-    return QSize(800, 480);
-#endif
-}
-
-
 void QtMessageBox::ScaleRect(QRect &rectRet, const QRect &rect)
 {
     rectRet.setX(rect.x() * m_scaleX);
@@ -164,7 +121,7 @@ void QtMessageBox::ScaleRect(QRect &rectRet, const QRect &rect)
 
 void QtMessageBox::showEvent(QShowEvent *e)
 {
-    QSize screenSize = GetDesktopSize();
+    QSize screenSize = AppConfig::GetDesktopSize();
     m_scaleX = screenSize.width() * 1.0 / 800;
     m_scaleY = screenSize.height() * 1.0 / 480;
     this->resize(400 * m_scaleX, 220 * m_scaleY);

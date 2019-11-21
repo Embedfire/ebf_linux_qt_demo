@@ -21,6 +21,7 @@ public:
     static QVariant ReadSetting(const QString &group, const QString &name, const QVariant &value = QVariant());
     static bool m_bMouseInsert;
     static bool m_bPlayVideo;
+    static QSize GetDesktopSize();
 };
 
 #endif // APPCONFIG_H

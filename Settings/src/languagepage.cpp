@@ -59,6 +59,7 @@ void LanguagePage::LoadQmFiles()
 void LanguagePage::SltCurrentIndexClicked(QtListWidgetItem *item)
 {
     AppConfig::SaveSetting("System", "language", item->m_strText);
+#if 0
     int nRet = QtMessageBox::ShowAskMessage(tr("语言设置重启生效，是否立即重启?"), tr("语言设置"));
     if (nRet == QDialog::Accepted)
     {
@@ -68,6 +69,8 @@ void LanguagePage::SltCurrentIndexClicked(QtListWidgetItem *item)
         qApp->quit();
 #endif
     }
+
+#endif
 }
 
 void LanguagePage::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
