@@ -50,7 +50,8 @@ MusicPlayer::~MusicPlayer()
 void MusicPlayer::StopMusic()
 {
     if (m_player->state() == QMediaPlayer::PlayingState) {
-        m_player->pause();
+        m_player->stop();
+        m_player->setMedia(QUrl::fromLocalFile(""));
     }
 }
 
