@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : weatherwidget.cpp --- WeatherWidget
  作 者    : Niyh(lynnhua)
@@ -154,11 +154,11 @@ void WeatherView::drawWeatherInfo(QPainter *painter)
         painter->drawText(m_rectCenter, Qt::AlignCenter, m_strErrorMsg);
     }
     else {
-        int nW = painter->fontMetrics().width(m_strWeatherDatas.at(0));
+        int nW = getTextWidthByFont(painter->font(), m_strWeatherDatas.at(0));
         painter->drawText((m_nBaseWidth - nW) / 2, m_nYOffset + 10, nW, 25, Qt::AlignCenter, m_strWeatherDatas.at(0));
         font.setPixelSize(100);
         painter->setFont(font);
-        nW = painter->fontMetrics().width(m_strWeatherDatas.at(1) + "°");
+        nW = getTextWidthByFont(painter->font(), m_strWeatherDatas.at(1) + "°");
         QRect rectTemp((m_nBaseWidth -  nW - 90) / 2, m_nYOffset + 35, nW, 140);
         painter->drawText(rectTemp, Qt::AlignCenter, m_strWeatherDatas.at(1) + "°");
 
@@ -186,16 +186,16 @@ void WeatherView::drawStatusBar(QPainter *painter)
     painter->setFont(font);
     painter->setPen(QColor("#797979"));
     QString strTemp = tr("预报");
-    int nW = painter->fontMetrics().width(strTemp);
+    int nW = getTextWidthByFont(painter->font(), strTemp);
     painter->drawText(25, this->height() - 25, nW, 25, Qt::AlignCenter, strTemp);
 
     strTemp = tr("今天");
-    nW = painter->fontMetrics().width(strTemp);
+    nW = getTextWidthByFont(painter->font(), strTemp);
     painter->drawText(m_nBaseWidth - nW - 85, m_nBaseHeight - 25, nW, 25, Qt::AlignCenter, strTemp);
     painter->setPen(QColor("#ffffff"));
 
     strTemp = getTodayOfWeek();
-    nW = painter->fontMetrics().width(strTemp);
+    nW = getTextWidthByFont(painter->font(), strTemp);
     painter->drawText(m_nBaseWidth - 85, m_nBaseHeight - 25, 60, 25, Qt::AlignCenter, strTemp);
     painter->restore();
 }

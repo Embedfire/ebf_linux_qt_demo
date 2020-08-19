@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qtcustomplot.cpp --- QtCustomPlot
  作 者    : Niyh(lynnhua)
@@ -269,7 +269,11 @@ void QtCustomPlot::setBackgroundColor(QColor color)
 void QtCustomPlot::calcDataBox()
 {
     QFontMetrics fm(m_font);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nYoffset = QFontMetrics(fm).horizontalAdvance(m_strYLabels);
+#else
     int nYoffset = QFontMetrics(fm).width(m_strYLabels);
+#endif
     int nXoffset = fm.height();
     m_dataRect = QRect(nYoffset + 10, 30, this->width() - nYoffset - 40,
                        this->height() - 40 - nXoffset);
@@ -367,7 +371,11 @@ void QtCustomPlot::drawDataBox(QPainter *painter)
 
 
     qreal offset = (m_dataRect.height() * 1.0 / 20);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nW = painter->fontMetrics().horizontalAdvance("0000");
+#else
     int nW = painter->fontMetrics().width("0000");
+#endif
     int nH = painter->fontMetrics().height();
     QRect rect(m_dataRect.left() - nW, m_dataRect.top(), nW, nH);
     QString strTemp = QString("%1").arg(m_nMaxValue, 0, 'f', 0);
@@ -391,7 +399,11 @@ void QtCustomPlot::drawDataBox(QPainter *painter)
         int nX = m_dataRect.left() + i * offset;
         painter->drawLine(QPoint(nX, m_dataRect.top()), QPoint(nX, m_dataRect.bottom()));
         strValue = QString("%1").arg(m_nStartTime + i);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+        int nW = painter->fontMetrics().horizontalAdvance(strValue);
+#else
         int nW = painter->fontMetrics().width(strValue);
+#endif
         if (nW > offset) {
             if ((0 != (i % 5))) continue;
             rect = QRect(nX, m_dataRect.bottom(), nW, nH);
@@ -410,12 +422,20 @@ void QtCustomPlot::drawBoxText(QPainter *painter)
 {
     painter->save();
     painter->setPen(m_colorGridLine);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nTextW = painter->fontMetrics().horizontalAdvance(m_strYLabels);
+#else
     int nTextW = painter->fontMetrics().width(m_strYLabels);
+#endif
     int nTextH = painter->fontMetrics().height();
     painter->drawText(1, 1, nTextW, nTextH, Qt::AlignCenter, m_strYLabels);
 
-
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    nTextW = painter->fontMetrics().horizontalAdvance(m_strXLabels);
+#else
     nTextW = painter->fontMetrics().width(m_strXLabels);
+#endif
+
     painter->drawText(this->width() - nTextW - 1, this->height() - nTextH,
                       nTextW, nTextH, Qt::AlignCenter, m_strXLabels);
 

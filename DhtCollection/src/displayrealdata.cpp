@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : displayrealdata.cpp --- DisplayRealData
  作 者    : Niyh  (QQ:393320854)
@@ -68,7 +68,7 @@ void DisplayRealData::drawValues(QPainter *painter)
 
     font.setPixelSize(48);
     painter->setFont(font);
-    int nTextWidth = painter->fontMetrics().width("℃");
+    int nTextWidth = getTextWidthByFont(painter->font(), "℃");
     int nTextHeight = painter->fontMetrics().height();
     painter->drawText(rectTemp.right() - nTextWidth, rectTemp.bottom() - nTextHeight, nTextHeight, nTextHeight,
                      Qt::AlignCenter, QString("℃"));

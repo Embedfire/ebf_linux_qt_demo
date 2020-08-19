@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : rgblightmonitor.cpp ---
  作 者    : Niyh  (QQ:393320854)
@@ -134,13 +134,13 @@ void RgbLightMonitor::drawValue(QPainter *painter)
     font.setFamily("Arial");
     font.setPixelSize(80);
     painter->setFont(font);
-    int nTextW = painter->fontMetrics().width("100");
+    int nTextW = getTextWidthByFont(painter->font(), "100");
     rect = QRect((Skin::m_nScreenWidth - nTextW) / 2, 120, nTextW, 92);
     painter->drawText(rect, Qt::AlignCenter, QString::number(m_nValue));
 
     font.setPixelSize(40);
     painter->setFont(font);
-    nTextW = painter->fontMetrics().width("%");
+    nTextW = getTextWidthByFont(painter->font(), "%");
     int nTextH = painter->fontMetrics().height();
     rect = QRect(rect.right() + 10, rect.bottom() - nTextH - 10, nTextW, nTextH);
     painter->drawText(rect, Qt::AlignCenter, QStringLiteral("%"));

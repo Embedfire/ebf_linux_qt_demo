@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : gyroscopewidget.cpp --- GyroscopeWidget
  作 者    : Niyh(lynnhua)
@@ -108,8 +108,11 @@ void GyroscopeWidget::drawYawBoard(QPainter *painter)
     // 逐个绘制方位角
     painter->rotate(135);
     painter->rotate(m_nYawValue);
-
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+   int nTextWidth = painter->fontMetrics().horizontalAdvance("NE");
+#else
     int nTextWidth = painter->fontMetrics().width("NE");
+#endif
     int nTextHeight = painter->fontMetrics().height();
     for (int i = 0; i < 8; i++) {
         painter->rotate(45);
@@ -156,7 +159,11 @@ void GyroscopeWidget::drawRollBoard(QPainter *painter)
     painter->setPen(Qt::white);
     // 线条长度
     int len = 6;
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nTextWidth = painter->fontMetrics().horizontalAdvance("-100");
+#else
     int nTextWidth = painter->fontMetrics().width("-100");
+#endif
     int nTextHeight = painter->fontMetrics().height();
 
     // 逐个绘制方位角
@@ -220,8 +227,11 @@ void GyroscopeWidget::drawPitchScale(QPainter *painter)
     painter->drawLine(-30, 1, 30, 1);
 
     double offset = (m_nPitchValue * radius * 1.0 / 180);
-
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nTextWidth = painter->fontMetrics().horizontalAdvance("-180");
+#else
     int nTextWidth = painter->fontMetrics().width("-180");
+#endif
     int nTextHeight = painter->fontMetrics().height();
     int nX = 10 + nTextWidth;
 

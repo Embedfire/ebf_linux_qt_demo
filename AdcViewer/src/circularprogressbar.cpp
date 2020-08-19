@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : circularprogressbar.cpp --- CircularProgressBar
  作 者    : Niyh  (QQ:393320854)
@@ -125,18 +125,18 @@ void CircularProgressBar::drawValue(QPainter *painter)
     painter->setFont(font);
 
     QString strValue = QString("%1").arg(m_nCurrentValue * 100 / m_nMaxValue);
-    int nValueW = painter->fontMetrics().width(strValue);
+    int nValueW = getTextWidthByFont(painter->font(), strValue);
 
     font.setPixelSize(18);
     QFontMetrics fm(font);
-    nValueW += fm.width("%");
+    nValueW += getTextWidthByFont(painter->font(), "%");
 
     int nFontHeith = painter->fontMetrics().height();
     QRect rect(-nValueW / 2, -nFontHeith / 2, nValueW, nFontHeith);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, strValue);
 
     painter->setFont(font);
-    int nW = painter->fontMetrics().width("%");
+    int nW = getTextWidthByFont(painter->font(), "%");
     nFontHeith = painter->fontMetrics().height();
     rect = QRect(rect.right() - nW, rect.bottom() - nFontHeith - 5, nW, nFontHeith);
     painter->drawText(rect, Qt::AlignCenter, "%");
