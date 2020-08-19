@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qtwidgetbase.cpp --- QtWidgetBase
  作 者    : Niyh(lynnhua)
@@ -35,6 +35,18 @@ void QtWidgetBase::addBtn(int index, QtPixmapButton *btn)
 {
     m_btns.insert(index, btn);
     this->update();
+}
+
+int QtWidgetBase::getTextWidthByFont(QFont font, QString text)
+{
+    int nlen = 0;
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    nlen = QFontMetrics(font).horizontalAdvance(text);
+#else
+    nlen = QFontMetrics(font).width(text);
+#endif
+
+    return nlen;
 }
 
 void QtWidgetBase::ScaleRect(QRect &rectRet, const QRect &rect)

@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : qtvideowidgetsurface.cpp --- QtVideoWidgetSurface
  作 者    : Niyh  (QQ:393320854)
@@ -12,6 +12,7 @@
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <QDebug>
 
 QtVideoWidgetSurface::QtVideoWidgetSurface(QWidget *widget, QObject *parent)
     : QAbstractVideoSurface(parent)
@@ -106,11 +107,11 @@ bool QtVideoWidgetSurface::present(const QVideoFrame &frame)
 //! [5]
 void QtVideoWidgetSurface::updateVideoRect()
 {
-//    QSize size = surfaceFormat().sizeHint();
-//    size.scale(widget->size(), Qt::KeepAspectRatio);
+    //    QSize size = surfaceFormat().sizeHint();
+    //    size.scale(widget->size(), Qt::KeepAspectRatio);
 
     targetRect = QRect(QPoint(0, 0), widget->size());
-//    targetRect.moveCenter(widget->rect().center());
+    //    targetRect.moveCenter(widget->rect().center());
 }
 //! [5]
 
@@ -153,6 +154,14 @@ bool QtVideoWidgetSurface::takePhoto(const QString &fileName, const QSize &size)
                     imageFormat);
         if (image.isNull()) return false;
 
+        // 翻转
+        if (surfaceFormat().scanLineDirection() == QVideoSurfaceFormat::BottomToTop) {
+            QMatrix matrix;
+            matrix.scale(1, -1);
+            image = image.transformed(matrix);
+        }
+
+        // 保存图像
         return image.scaled(size).save(fileName);
         currentFrame.unmap();
     }

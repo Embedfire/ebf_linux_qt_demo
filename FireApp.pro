@@ -1,4 +1,6 @@
 TEMPLATE = subdirs
+CONFIG  += ordered
+CONFIG -= debug_and_release
 
 #unix { SUBDIRS += v4l2Cam }
 SUBDIRS += QtUi Skin
@@ -27,5 +29,3 @@ SUBDIRS += App
 #SUBDIRS += VideoPlayer
 #SUBDIRS += Weather
 #SUBDIRS += WebBrowser
-
-#win {SUBDIRS += $$PWD/thirdpart/quazip}

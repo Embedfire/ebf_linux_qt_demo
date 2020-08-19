@@ -1,4 +1,4 @@
-#include <QWidget>
+﻿#include <QtWidgets>
 
 #ifdef QtUi
 #if defined(QTUI_LIBRARY)
@@ -7,3 +7,4 @@
 #  define QTUISHARED_EXPORT Q_DECL_IMPORT
 #endif
 #endif
+

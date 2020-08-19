@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qtwidgetbase.h --- QtWidgetBase
  作 者    : Niyh(lynnhua)
@@ -45,6 +45,7 @@ protected:
 
     QMap<int,QtPixmapButton*> m_btns;
 protected:
+    int getTextWidthByFont(QFont font, QString text);
     void ScaleRect(QRect &rectRet, const QRect &rect);
     void SetScaleValue();
 

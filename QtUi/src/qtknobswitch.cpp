@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qtknobswitch.cpp --- QtKnobSwitch
  作 者    : Niyh(lynnhua)
@@ -86,7 +86,11 @@ void QtKnobSwitch::drawValue(QPainter *painter)
     font.setPixelSize(24);
     painter->setFont(font);
     QString strValue = QString::number(m_value);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    int nTextWidth = painter->fontMetrics().horizontalAdvance(strValue);
+#else
     int nTextWidth = painter->fontMetrics().width(strValue);
+#endif
     int nTextHeight = painter->fontMetrics().height() / 2 + 10;
     QRect rectText(-nTextWidth / 2 - 6, -nTextHeight / 2, nTextWidth, nTextHeight);
     painter->setPen(Qt::white);

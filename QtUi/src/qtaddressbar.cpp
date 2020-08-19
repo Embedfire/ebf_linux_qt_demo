@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : qtaddressbar.cpp --- QtAddressBar
  作 者    : Niyh  (QQ:393320854)
@@ -29,7 +29,11 @@ AddressLineEdit::AddressLineEdit(QWidget *parent) : QtWidgetBase(parent)
     m_nMargin = 10;
 
     QFontMetrics fm(m_font);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+    fm.horizontalAdvance("/");
+#else
     m_nSplitWidth = fm.width("/") ;
+#endif
     m_nIndex = -1;
 }
 
@@ -51,7 +55,11 @@ void AddressLineEdit::setAddress(const QString &addr)
 
     for (int i = 0; i < strAddress.size(); i++) {
         QString strAddr = strAddress.at(i);
+#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
+        int nWidth = fm.horizontalAdvance(strAddr, strAddr.length());
+#else
         int nWidth = fm.width(strAddr, strAddr.length());
+#endif
         rect = QRect(rect.right()+ 2, rect.top(), nWidth + m_nSplitWidth, rect.height());
         m_addressItems.insert(i, new AddressItem(i, strAddr, rect));
     }

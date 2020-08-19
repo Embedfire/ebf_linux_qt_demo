@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qtwaitwidget.cpp --- QtWaitWidget
  作 者    : Niyh(lynnhua)
@@ -78,7 +78,7 @@ void QtWaitWidget::paintEvent(QPaintEvent *)
     QFont font(Skin::m_strAppFontNormal);
     font.setPixelSize(18);
     painter.setFont(font);
-    int nTW = painter.fontMetrics().width(m_strText);
+    int nTW = getTextWidthByFont(painter.font(), m_strText);
     painter.setPen(QColor("#ffffff"));;
 
     if (m_pixmap.isNull()) {

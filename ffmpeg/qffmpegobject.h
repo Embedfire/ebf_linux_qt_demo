@@ -1,4 +1,4 @@
-/******************************************************************
+﻿/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qffmpegobject.h --- QFFmpegObject
  作 者    : Niyh(lynnhua)
@@ -14,8 +14,10 @@
 
 #include <QObject>
 extern "C" {
+#ifdef __arm__
 #include "include/libavformat/avformat.h"
 #include "include/libavcodec/avcodec.h"
+#endif
 }
 
 class QFFmpegObject : public QObject
@@ -31,7 +33,9 @@ signals:
 public slots:
 
 private:
+#ifdef __arm__
     AVFormatContext *m_AVFormatContext;
+#endif
 };
 
 #endif // QFFMPEGOBJECT_H
