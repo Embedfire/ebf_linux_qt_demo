@@ -1,0 +1,14 @@
+prefix=host
+exec_prefix=${prefix}
+libdir=host/lib
+includedir=host/include
+
+Name: libswresample
+Description: FFmpeg audio resampling library
+Version: 2.9.100
+Requires: 
+Requires.private: libavutil >= 55.78.100
+Conflicts:
+Libs: -L${libdir}  -lswresample 
+Libs.private: -lm
+Cflags: -I${includedir}
