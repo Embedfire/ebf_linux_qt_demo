@@ -14,13 +14,13 @@
 #include "skin.h"
 #include "appconfig.h"
 
-//#include "musicplayer.h"
+#include "musicplayer.h"
 #include "beepwidget.h"
 #include "rgblightmonitor.h"
 #include "backlightwidget.h"
 #include "calendarwidget.h"
 #include "calculator.h"
-//#include "camerawidget.h"
+#include "camerawidget.h"
 #include "carmeterwidget.h"
 #include "adcviewer.h"
 #include "dhtcollection.h"
@@ -31,7 +31,7 @@
 #include "photosview.h"
 //#include "recorderwidget.h"
 #include "settingwidget.h"
-//#include "videoplayer.h"
+#include "videoplayer.h"
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
@@ -134,11 +134,11 @@ void MainWindow::InitDesktop()
 
     // mini板卡取消功能
     if (!bMiniBoard) {
-//        m_launchItems.insert(1, new LauncherItem(1, nPage, tr("视频播放"), QPixmap(":/images/mainwindow/ic_video.png")));
+        m_launchItems.insert(1, new LauncherItem(1, nPage, tr("视频播放"), QPixmap(":/images/mainwindow/ic_video.png")));
         m_launchItems.insert(2, new LauncherItem(2, nPage, tr("ADC"), QPixmap(":/images/mainwindow/ic_adc.png")));
-//        m_launchItems.insert(4, new LauncherItem(4, nPage, tr("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
+        m_launchItems.insert(4, new LauncherItem(4, nPage, tr("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
         m_launchItems.insert(9, new LauncherItem(9, nPage, tr("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
-//        m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
+        m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
     }
 
     // 第二页
@@ -206,11 +206,11 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 1: {
-//        if (NULL != m_musicWidget) {
-//            m_musicWidget->StopMusic();
-//        }
-        //
-//        m_widgetWorkSpace = new VideoPlayer(this);
+        if (NULL != m_musicWidget) {
+            m_musicWidget->StopMusic();
+        }
+
+        m_widgetWorkSpace = new VideoPlayer(this);
     }
         break;
     case 2: {
@@ -222,7 +222,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 4: {
-//        m_widgetWorkSpace = new CameraWidget(this);
+        m_widgetWorkSpace = new CameraWidget(this);
     }
         break;
     case 5: {
@@ -250,18 +250,18 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 11: {
-        //        m_widgetWorkSpace = new MusicPlayer(this);
-//        m_nCurrentIndex = index;
-//        if (NULL == m_musicWidget) {
-//            m_musicWidget = new MusicPlayer(this);
-//            connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
-//            connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
-//        }
+        m_widgetWorkSpace = new MusicPlayer(this);
+        m_nCurrentIndex = index;
+        if (NULL == m_musicWidget) {
+            m_musicWidget = new MusicPlayer(this);
+            connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
+            connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
+        }
 
-//        m_musicWidget->resize(this->size());
-//        m_musicWidget->setVisible(true);
-//        m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
-//        return;
+        m_musicWidget->resize(this->size());
+        m_musicWidget->setVisible(true);
+        m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
+        return;
     }
         break;
     case 12: {
@@ -308,9 +308,9 @@ void MainWindow::SltCurrentAppChanged(int index)
         break;
     case 24: {
         // 关闭音乐
-//        if (NULL != m_musicWidget) {
-//            m_musicWidget->StopMusic();
-//        }
+        if (NULL != m_musicWidget) {
+            m_musicWidget->StopMusic();
+        }
 
 #ifdef BUILD_WIN_NES
         m_widgetWorkSpace = new NesSimulator(this);
@@ -341,9 +341,9 @@ void MainWindow::SltBackHome()
     if (NULL != m_widgetWorkSpace) {
         m_widgetWorkSpace->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
     }
-//    else if (NULL != m_musicWidget) {
-//        m_musicWidget->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
-//    }
+    else if (NULL != m_musicWidget) {
+        m_musicWidget->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
+    }
 }
 
 void MainWindow::SltChangeCursorShap(Qt::CursorShape shape)
@@ -355,11 +355,11 @@ void MainWindow::SltAppStartOk()
 {
     m_bStartApp = false;
     m_launcherWidget->setEnabled(true);
-//    if (11 == m_nCurrentIndex) {
-//        if (NULL != m_musicWidget && m_musicWidget->isVisible()) {
-//            m_musicWidget->InitPlayList();
-//        }
-//    }
+    if (11 == m_nCurrentIndex) {
+        if (NULL != m_musicWidget && m_musicWidget->isVisible()) {
+            m_musicWidget->InitPlayList();
+        }
+    }
 
     if (19 == m_nCurrentIndex && (NULL != m_widgetWorkSpace) && !m_widgetWorkSpace->isVisible()) {
         disconnect(m_widgetWorkSpace, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
@@ -393,9 +393,9 @@ void MainWindow::resizeEvent(QResizeEvent *e)
         m_widgetWorkSpace->resize(this->size());
     }
 
-//    if (NULL != m_musicWidget) {
-//        m_musicWidget->resize(this->size());
-//    }
+    if (NULL != m_musicWidget) {
+        m_musicWidget->resize(this->size());
+    }
     QWidget::resizeEvent(e);
 }
 
