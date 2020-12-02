@@ -14,13 +14,13 @@
 #include "skin.h"
 #include "appconfig.h"
 
-#include "musicplayer.h"
+//#include "musicplayer.h"
 #include "beepwidget.h"
 #include "rgblightmonitor.h"
 #include "backlightwidget.h"
 #include "calendarwidget.h"
 #include "calculator.h"
-#include "camerawidget.h"
+//#include "camerawidget.h"
 #include "carmeterwidget.h"
 #include "adcviewer.h"
 #include "dhtcollection.h"
@@ -31,7 +31,7 @@
 #include "photosview.h"
 //#include "recorderwidget.h"
 #include "settingwidget.h"
-#include "videoplayer.h"
+//#include "videoplayer.h"
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
@@ -207,10 +207,10 @@ void MainWindow::SltCurrentAppChanged(int index)
         break;
     case 1: {
         if (NULL != m_musicWidget) {
-            m_musicWidget->StopMusic();
+//            m_musicWidget->StopMusic();
         }
 
-        m_widgetWorkSpace = new VideoPlayer(this);
+//        m_widgetWorkSpace = new VideoPlayer(this);
     }
         break;
     case 2: {
@@ -218,15 +218,15 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 3: {
-        m_widgetWorkSpace = new PhotosView(this);
+//        m_widgetWorkSpace = new PhotosView(this);
     }
         break;
     case 4: {
-        m_widgetWorkSpace = new CameraWidget(this);
+//        m_widgetWorkSpace = new CameraWidget(this);
     }
         break;
     case 5: {
-        m_widgetWorkSpace = new WeatherWidget(this);
+//        m_widgetWorkSpace = new WeatherWidget(this);
     }
         break;
     case 6: {
@@ -246,26 +246,26 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 10: {
-        m_widgetWorkSpace = new Calculator(this);
+//        m_widgetWorkSpace = new Calculator(this);
     }
         break;
     case 11: {
-        m_widgetWorkSpace = new MusicPlayer(this);
-        m_nCurrentIndex = index;
-        if (NULL == m_musicWidget) {
-            m_musicWidget = new MusicPlayer(this);
-            connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
-            connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
-        }
+//        m_widgetWorkSpace = new MusicPlayer(this);
+//        m_nCurrentIndex = index;
+//        if (NULL == m_musicWidget) {
+//            m_musicWidget = new MusicPlayer(this);
+//            connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
+//            connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
+//        }
 
-        m_musicWidget->resize(this->size());
-        m_musicWidget->setVisible(true);
-        m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
-        return;
+//        m_musicWidget->resize(this->size());
+//        m_musicWidget->setVisible(true);
+//        m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
+//        return;
     }
         break;
     case 12: {
-        m_widgetWorkSpace = new RgbLightMonitor(this);
+//        m_widgetWorkSpace = new RgbLightMonitor(this);
     }
         break;
     case 13: {
@@ -308,9 +308,9 @@ void MainWindow::SltCurrentAppChanged(int index)
         break;
     case 24: {
         // 关闭音乐
-        if (NULL != m_musicWidget) {
-            m_musicWidget->StopMusic();
-        }
+//        if (NULL != m_musicWidget) {
+//            m_musicWidget->StopMusic();
+//        }
 
 #ifdef BUILD_WIN_NES
         m_widgetWorkSpace = new NesSimulator(this);
@@ -342,7 +342,7 @@ void MainWindow::SltBackHome()
         m_widgetWorkSpace->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
     }
     else if (NULL != m_musicWidget) {
-        m_musicWidget->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
+//        m_musicWidget->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
     }
 }
 
@@ -356,9 +356,9 @@ void MainWindow::SltAppStartOk()
     m_bStartApp = false;
     m_launcherWidget->setEnabled(true);
     if (11 == m_nCurrentIndex) {
-        if (NULL != m_musicWidget && m_musicWidget->isVisible()) {
-            m_musicWidget->InitPlayList();
-        }
+//        if (NULL != m_musicWidget && m_musicWidget->isVisible()) {
+//            m_musicWidget->InitPlayList();
+//        }
     }
 
     if (19 == m_nCurrentIndex && (NULL != m_widgetWorkSpace) && !m_widgetWorkSpace->isVisible()) {
@@ -394,7 +394,7 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     }
 
     if (NULL != m_musicWidget) {
-        m_musicWidget->resize(this->size());
+//        m_musicWidget->resize(this->size());
     }
     QWidget::resizeEvent(e);
 }
