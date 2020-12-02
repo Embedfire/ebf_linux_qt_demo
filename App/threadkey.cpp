@@ -23,7 +23,7 @@
 #endif
 
 // keyboard
-#define KEY_DEV     "/dev/input/by-path/platform-gpio-keys-event"
+#define KEY_DEV     "/dev/input/by-path/platform-sgpio-keys-event"
 // switch
 #define POWER_DEV   "/dev/input/by-path/platform-20cc000.snvs:snvs-powerkey-event"
 
