@@ -250,7 +250,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 11: {
-        m_widgetWorkSpace = new MusicPlayer(this);
+        //m_widgetWorkSpace = new MusicPlayer(this);
         m_nCurrentIndex = index;
         if (NULL == m_musicWidget) {
             m_musicWidget = new MusicPlayer(this);
