@@ -42,7 +42,14 @@ void WeatherApi::QueryCityWeather(const QString &cityCode)
 
     manager->get(requset);
 }
+void WeatherApi::QueryCityWeather_lbb(const QString &city)
+{
+    QString url = QString("http://wthrcdn.etouch.cn/weather_mini?city=%1").arg(city);
+    QNetworkRequest requset;
+    requset.setUrl(QUrl(url));
 
+    manager->get(requset);
+}
 void WeatherApi::replyFinished(QNetworkReply *reply)
 {
     emit signalResult(reply->readAll());

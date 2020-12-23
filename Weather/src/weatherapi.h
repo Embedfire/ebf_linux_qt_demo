@@ -26,6 +26,7 @@ public:
     ~WeatherApi();
 
     void QueryCityWeather(const QString &cityCode);
+    void QueryCityWeather_lbb(const QString &city);
 signals:
     void signalResult(const QByteArray &jsonData);
 

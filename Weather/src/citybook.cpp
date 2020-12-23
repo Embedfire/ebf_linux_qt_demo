@@ -66,6 +66,16 @@ QString CityBook::GetCityId(const QString &cityName)
     return "101010100";
 }
 
+QString CityBook::GetCityName(const QString &cityCode)
+{
+    foreach (City city, m_cityBook) {
+        if (!QString::compare(city.m_strCityCode, cityCode)) {
+            return city.m_strCityName;
+        }
+    }
+    return "北京";
+}
+
 void CityBook::LoadConfig(const QString &fileName)
 {
     QFile file(fileName);

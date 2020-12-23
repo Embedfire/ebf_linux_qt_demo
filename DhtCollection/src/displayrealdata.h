@@ -23,9 +23,12 @@ public:
 signals:
 
 public slots:
-
+    void get_dht11_data(double tem, double hum);
 private:
     QPixmap m_pixmap;
+
+    double tem;
+    double hum;
 protected:
     void paintEvent(QPaintEvent *);
     void drawValues(QPainter *painter);

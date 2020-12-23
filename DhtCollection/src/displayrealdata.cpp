@@ -60,11 +60,11 @@ void DisplayRealData::drawValues(QPainter *painter)
 
     QString strText = "26.1";
     QRect rectTemp(550, 57, 218, 100)    ;
-    painter->drawText(rectTemp, Qt::AlignLeft | Qt::AlignVCenter, strText);
+    painter->drawText(rectTemp, Qt::AlignLeft | Qt::AlignVCenter, QString::number(this->tem,'f',1));
 
     strText = "76";
     QRect rectHumidity(rectTemp.left(), 180, 218, 100);
-    painter->drawText(rectHumidity, Qt::AlignLeft | Qt::AlignVCenter, strText);
+    painter->drawText(rectHumidity, Qt::AlignLeft | Qt::AlignVCenter, QString::number(this->hum,'f',1));
 
     font.setPixelSize(48);
     painter->setFont(font);
@@ -76,7 +76,12 @@ void DisplayRealData::drawValues(QPainter *painter)
     painter->drawText(rectHumidity.right() - nTextWidth, rectHumidity.bottom() - nTextHeight, nTextHeight, nTextHeight,
                       Qt::AlignCenter, QString("%"));
 }
-
+void DisplayRealData::get_dht11_data(double tem, double hum)
+{
+    this->tem=tem;
+    this->hum=hum;
+    this->update();
+}
 void DisplayRealData::mousePressEvent(QMouseEvent *e)
 {
     QWidget::mousePressEvent(e);

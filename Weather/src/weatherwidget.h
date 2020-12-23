@@ -106,6 +106,7 @@ private:
 
     WeatherApi      *m_weatherApi;
     QString          m_strCityCode;
+    QString          m_strCityName;
 
     QMap<int, QtListWidgetItem *> m_weatherItems;
 

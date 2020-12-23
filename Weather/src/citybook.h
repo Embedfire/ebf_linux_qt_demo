@@ -44,6 +44,7 @@ public:
 
     static CityBook *Instance();
     QString GetCityId(const QString &cityName);
+    QString GetCityName(const QString &cityCode);
     void LoadConfig(const QString &fileName);
     QStringList searchCitys(const QString &name);
 

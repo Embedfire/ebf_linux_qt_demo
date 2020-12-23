@@ -321,13 +321,14 @@ WeatherWidget::WeatherWidget(QWidget *parent) : QtAnimationWidget(parent)
     CityBook::Instance()->LoadConfig(qApp->applicationDirPath() + "/conf/city.json");
     // 默认北京市
     m_strCityCode = AppConfig::ReadSetting("Weathcer", "city", "101010100").toString();
+    m_strCityName = CityBook::Instance()->GetCityName(m_strCityCode);
     m_cityManager = NULL;
     // 天气api查询
     m_weatherApi = new WeatherApi(this);
     connect(m_weatherApi, SIGNAL(signalResult(QByteArray)), this, SLOT(SltWeatherReply(QByteArray)));
 
     // 添加默认数据
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 5; i++) {// 5 为显示五天天气预报
         m_weatherItems.insert(i, new QtListWidgetItem(i,
                                                       QString("雷阵雨"),
                                                       QString("27°~ %1°").arg(30 + i),
@@ -363,7 +364,7 @@ void WeatherWidget::InitWidget()
     horLayoutBottom->addStretch();
 
     m_labelDate = new QLabel(this);
-    m_labelDate->setText(tr("16:11 发布"));
+    m_labelDate->setText(QTime::currentTime().toString("hh:mm") + tr("更新"));
     horLayoutBottom->addWidget(m_labelDate);
 
     QVBoxLayout *verLayoutAll = new QVBoxLayout(this);
@@ -399,6 +400,7 @@ void WeatherWidget::SltCityManagerBack()
 void WeatherWidget::SltCityChanged(const QString &city)
 {
     m_strCityCode = CityBook::Instance()->GetCityId(city);
+    m_strCityName = CityBook::Instance()->GetCityName(m_strCityCode);
     AppConfig::SaveSetting("Weathcer", "city", m_strCityCode);;
     InitWeather();
     SltCityManagerBack();
@@ -412,7 +414,7 @@ void WeatherWidget::InitWeather()
     }
 
     m_weatherView->startRefresh();
-    m_weatherApi->QueryCityWeather(m_strCityCode);
+    m_weatherApi->QueryCityWeather_lbb(m_strCityName);
 }
 
 void WeatherWidget::SltToolBtnClicked(int index)
@@ -441,6 +443,7 @@ void WeatherWidget::SltWeatherReply(const QByteArray &jsonData)
     bool bOk = false;
     QtJson::JsonObject result = QtJson::parse(jsonData, bOk).toMap();
     if (bOk) {
+        /*********************** 之前 解析json数据  天气接口失效 http://t.weather.sojson.com/api/weather/city/%1
         QStringList strTodayData;
         QtJson::JsonObject jsonCity = result.value("cityInfo").toMap();
         strTodayData << jsonCity.value("city").toString();
@@ -451,25 +454,68 @@ void WeatherWidget::SltWeatherReply(const QByteArray &jsonData)
 
         int nMonty = QDate::currentDate().month();
         for (int i = 0; i < jsonForecast.size(); i++) {
-            QtJson::JsonObject jsonObj = jsonForecast.at(i).toMap();
-            QStringList strForeacast;
-            int day = jsonObj.value("date").toString().toInt();
-            strForeacast << (tr("%1月%2日 ").arg(nMonty).arg(day) + jsonObj.value("week").toString());
-            QString strType = jsonObj.value("type").toString();
-            strForeacast << strType;
-            strForeacast << getTemperature(jsonObj.value("high").toString(), jsonObj.value("low").toString());
+        QtJson::JsonObject jsonObj = jsonForecast.at(i).toMap();
+        QStringList strForeacast;
+        int day = jsonObj.value("date").toString().toInt();
+        strForeacast << (tr("%1月%2日 ").arg(nMonty).arg(day) + jsonObj.value("week").toString());
+        QString strType = jsonObj.value("type").toString();
+        strForeacast << strType;
+        strForeacast << getTemperature(jsonObj.value("high").toString(), jsonObj.value("low").toString());
 
-            // 添加当天的天气
-            if (0 == i) {
-                strTodayData << jsonObj.value("week").toString();
-                strTodayData << strType;
-                strTodayData << getTemperature(jsonObj.value("high").toString(), jsonObj.value("low").toString());
-                m_weatherView->setWeatherData(strTodayData);
-            }
-
-            m_weatherItems.insert(i, new QtListWidgetItem(i, strForeacast));
+        // 添加当天的天气
+        if (0 == i) {
+            strTodayData << jsonObj.value("week").toString();
+            strTodayData << strType;
+            strTodayData << getTemperature(jsonObj.value("high").toString(), jsonObj.value("low").toString());
+            m_weatherView->setWeatherData(strTodayData);
         }
 
+        m_weatherItems.insert(i, new QtListWidgetItem(i, strForeacast));
+        }
+
+        m_weatherReport->SetItems(m_weatherItems);
+        ***************************************************************************/
+
+        // 当前天气接口 http://wthrcdn.etouch.cn/weather_mini?city=%1
+        if(result.value("desc").toString()!="OK")
+        {
+            qDebug() << "weather data error";
+            return ;
+        }
+
+        QStringList strTodayData;
+        QtJson::JsonObject jsonCity = result.value("data").toMap();
+        QtJson::JsonObject jsonyesterday = jsonCity.value("yesterday").toMap();
+
+        QString CityName = jsonCity.value("city").toString();
+        QString Info = jsonCity.value("ganmao").toString();
+        double Curtem = jsonCity.value("wendu").toDouble();
+
+        strTodayData << CityName;
+        strTodayData << jsonCity.value("wendu").toString();
+
+        QtJson::JsonArray jsonForecast = jsonCity.value("forecast").toList();
+        for (int i = 0; i < jsonForecast.size(); i++) {
+                QtJson::JsonObject jsonObj = jsonForecast.at(i).toMap();
+                QStringList strForeacast;
+                strForeacast << jsonObj.value("date").toString();
+                strForeacast << jsonObj.value("type").toString();
+
+                strForeacast << getTemperature(jsonObj.value("high").toString(),jsonObj.value("low").toString());
+
+                // 添加当天的天气
+                if (0 == i) {
+                    strTodayData << QDateTime::currentDateTime().toString("dddd");
+                    strTodayData << jsonObj.value("type").toString();
+                    strTodayData << getTemperature(jsonObj.value("high").toString(),jsonObj.value("low").toString());
+
+                    m_weatherView->setWeatherData(strTodayData);
+                }
+
+                m_weatherItems.insert(i, new QtListWidgetItem(i, strForeacast));
+            }
+
+        m_labelDate->setText(QTime::currentTime().toString("hh:mm") + tr("更新"));
         m_weatherReport->SetItems(m_weatherItems);
     }
     else {

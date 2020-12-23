@@ -65,12 +65,10 @@ void DisplayRecordData::InitWidget()
     m_customPlotTemp->setBackgroundColor(Qt::transparent);
     m_customPlotTemp->setYStep(6);
     m_customPlotTemp->setMaxValue(60);
-    m_customPlotTemp->StartTest();
 
     m_customPlotHumidity = new QtCustomPlot(m_stackedWidget);
     m_customPlotHumidity->setBackgroundColor(Qt::transparent);
     m_customPlotHumidity->setLabels(tr("时间/S"), tr("湿度/%"));
-    m_customPlotHumidity->StartTest();
 
     m_stackedWidget->addWidget(0, m_customPlotTemp);
     m_stackedWidget->addWidget(1, m_customPlotHumidity);
@@ -97,5 +95,12 @@ void DisplayRecordData::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.fillRect(this->rect(), Qt::transparent);
+}
+
+void DisplayRecordData::get_dht11_data(double tem, double hum)
+{
+    m_customPlotTemp->addData(tem);
+    m_customPlotHumidity->addData(hum);
+    this->update();
 }
 
