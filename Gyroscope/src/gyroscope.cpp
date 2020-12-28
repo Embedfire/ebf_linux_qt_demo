@@ -19,6 +19,8 @@
 #include <QPushButton>
 #include <QMouseEvent>
 
+#include <QDebug>
+
 TextBoardWidget::TextBoardWidget(QWidget *parent) : QtWidgetBase(parent)
 {
     m_nPitchValue = 0;
@@ -53,6 +55,13 @@ void TextBoardWidget::setValue(int index, qint16 value)
 }
 
 void TextBoardWidget::setValues(int p, int r, int y)
+{
+    m_nPitchValue = p;
+    m_nRollValue = r;
+    m_nYawValue = y;
+    this->update();
+}
+void TextBoardWidget::setValues(double p, double r, double y)
 {
     m_nPitchValue = p;
     m_nRollValue = r;
@@ -106,15 +115,18 @@ void TextBoardWidget::paintEvent(QPaintEvent *)
 
     rect = QRect(rect.left() + 64, rect.top(), rect.width() - 80, rect.height());
     rect = QRect(rect.left(), rect.bottom() + 30, rect.width(), rect.height());
-    QString strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(0)).arg(m_nPitchValue, 4, 10).arg(m_strUnits.at(0));
+    //QString strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(0)).arg(m_nPitchValue, 4, 10).arg(m_strUnits.at(0));
+    QString strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(0)).arg(QString::number(m_nPitchValue)).arg(m_strUnits.at(0));
     painter.drawText(rect, strTemp);
 
     rect = QRect(rect.left(), rect.bottom() + 30, rect.width(), rect.height());
-    strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(1)).arg(m_nRollValue, 4, 10).arg(m_strUnits.at(1));
+    //strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(1)).arg(m_nRollValue, 4, 10).arg(m_strUnits.at(1));
+    strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(1)).arg(QString::number(m_nRollValue)).arg(m_strUnits.at(1));
     painter.drawText(rect, strTemp);
 
     rect = QRect(rect.left(), rect.bottom() + 30, rect.width(), rect.height());
-    strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(2)).arg(m_nYawValue, 4, 10).arg(m_strUnits.at(2));
+    //strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(2)).arg(m_nYawValue, 4, 10).arg(m_strUnits.at(2));
+    strTemp = QString("%1 : %2 %3").arg(m_strLabels.at(2)).arg(QString::number(m_nYawValue)).arg(m_strUnits.at(2));
     painter.drawText(rect, strTemp);
 }
 
@@ -127,17 +139,17 @@ Gyroscope::Gyroscope(QWidget *parent) : QtAnimationWidget(parent)
 
     InitWidget();
 
-#if 0
+#if 1
     QTimer *timer = new QTimer(this);
     timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(SltStartTest()));
     timer->start();
 #endif
 
-    // 数据采集
-    m_threadTest = new Mpu6050Thread(this);
-    connect(m_threadTest, SIGNAL(signalUpdate(int,int,qint16)), this, SLOT(SltUpdateValues(int,int,qint16)));
-    m_threadTest->start();
+    // // 数据采集
+    // m_threadTest = new Mpu6050Thread(this);
+    // connect(m_threadTest, SIGNAL(signalUpdate(int,int,qint16)), this, SLOT(SltUpdateValues(int,int,qint16)));
+    // m_threadTest->start();
 }
 
 Gyroscope::~Gyroscope()
@@ -145,7 +157,7 @@ Gyroscope::~Gyroscope()
     delete m_btnHome;
     m_btnHome = NULL;
 
-    m_threadTest->Stop();
+    //m_threadTest->Stop();
 }
 
 void Gyroscope::InitWidget()
@@ -186,8 +198,67 @@ void Gyroscope::InitWidget()
     verLayout->addLayout(horLayout, 7);
 }
 
+//AFS_SEL   2g      32767/2 = data/x        x=data/16384
+//FS_SEL    2000    32767/2000 =data/x      x=data/16.4
 void Gyroscope::SltStartTest()
 {
+
+#ifdef __arm__
+    QFile in_accel_x_raw(MPU6050_ACCEL_X);
+    if (!in_accel_x_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_accel_x_raw read failed!";
+        return;
+    }
+    QString strValue = in_accel_x_raw.readAll();
+    m_nPitchValue = strValue.toInt();
+    in_accel_x_raw.close();
+
+    QFile in_accel_y_raw(MPU6050_ACCEL_X);
+    if (!in_accel_y_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_accel_y_raw read failed!";
+        return;
+    }
+    strValue = in_accel_y_raw.readAll();
+    m_nRollValue = strValue.toInt();
+    in_accel_y_raw.close();
+
+    QFile in_accel_z_raw(MPU6050_ACCEL_X);
+    if (!in_accel_z_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_accel_z_raw read failed!";
+        return;
+    }
+    strValue = in_accel_z_raw.readAll();
+    m_nYawValue = strValue.toInt();
+    in_accel_z_raw.close();
+
+    QFile in_anglvel_x_raw(MPU6050_ACCEL_X);
+    if (!in_anglvel_x_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_anglvel_x_raw read failed!";
+        return;
+    }
+    strValue = in_anglvel_x_raw.readAll();
+    m_nPitchValue_1 = strValue.toInt();
+    in_anglvel_x_raw.close();
+
+    QFile in_anglvel_y_raw(MPU6050_ACCEL_X);
+    if (!in_anglvel_y_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_anglvel_y_raw read failed!";
+        return;
+    }
+    strValue = in_anglvel_y_raw.readAll();
+    m_nRollValue_1 = strValue.toInt();
+    in_anglvel_y_raw.close();
+
+    QFile in_anglvel_z_raw(MPU6050_ACCEL_X);
+    if (!in_anglvel_z_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "in_anglvel_z_raw read failed!";
+        return;
+    }
+    strValue = in_anglvel_z_raw.readAll();
+    m_nYawValue_1 = strValue.toInt();
+    in_anglvel_z_raw.close();
+
+#else
     int nDirection = qrand() % 2;
     m_nYawValue = (qrand() % 80 + 100)  * (1 == nDirection ? 1 : -1);
 
@@ -196,10 +267,12 @@ void Gyroscope::SltStartTest()
 
     nDirection = qrand() % 2;
     m_nPitchValue = (qrand() % 80 + 100)  * (1 == nDirection ? 1 : -1);
+#endif
 
-    m_textBoardLeft->setValues(m_nPitchValue, m_nRollValue, m_nYawValue);
+
+    m_textBoardLeft->setValues(m_nPitchValue/16384.0, m_nRollValue/16384.0, m_nYawValue/16384.0);
 #ifdef USE_TEXT_BOARD
-    m_textBoardRight->setValues(m_nPitchValue, m_nRollValue, m_nYawValue);
+    m_textBoardRight->setValues(m_nPitchValue_1/16.4, m_nRollValue_1/16.4, m_nYawValue_1/16.4);
 #else
     m_widgetDisplay->setYawValue(m_nYawValue);
     m_widgetDisplay->setRollValue(m_nRollValue);
