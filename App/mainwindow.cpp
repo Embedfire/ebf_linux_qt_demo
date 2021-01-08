@@ -491,7 +491,7 @@ bool MainWindow::CheckDevice(QString device)
     else if(device=="RGB彩灯")
         info.setFile(RGB_DEV);
     else if(device=="陀螺仪")
-        info.setFile(MPU6050_DEV);
+        info.setFile(CheckMPU6050Device());
     else if(device=="背光调节")
         info.setFile(BKLIGHT_DEV);
     else if(device=="蜂鸣器")
@@ -529,4 +529,28 @@ bool MainWindow::CheckDevice(QString device)
     m_launcherWidget->setEnabled(false);
     m_bStartApp = true;
     return true;
+}
+
+QString MainWindow::CheckMPU6050Device()
+{
+    QDir devDir(IIC_DEV);
+    if(!devDir.exists())
+        return "";
+
+    QString mpuDevice="/sys/bus/iio/devices/iio\:device%1";
+
+    QFileInfoList list = devDir.entryInfoList();
+    for(int i=0 ; i<list.size(); i++)
+    {
+        QFile iioDeviceName(list.at(i).filePath()+"/name");
+        if (!iioDeviceName.open(QIODevice::ReadOnly))
+            continue;
+        QString name = iioDeviceName.readAll();
+        iioDeviceName.close();
+
+        if(name == "mpu6050\n")
+            return list.at(i).filePath();
+    }
+
+    return "";
 }

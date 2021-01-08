@@ -12,7 +12,7 @@
 #define GYROSCOPE_H
 
 #include "qtwidgetbase.h"
-//#include "mpu6050thread.h"
+#include "mpu6050thread.h"
 #include "gyroscopewidget.h"
 #include "qtwidgetbase.h"
 #include "qtpixmapbutton.h"
@@ -20,13 +20,6 @@
 #ifndef USE_TEXT_BOARD
 #define USE_TEXT_BOARD
 #endif
-
-#define MPU6050_ACCEL_X         "/sys/bus/iio/devices/iio\:device1/in_accel_x_raw"
-#define MPU6050_ACCEL_Y         "/sys/bus/iio/devices/iio\:device1/in_accel_y_raw"
-#define MPU6050_ACCEL_Z         "/sys/bus/iio/devices/iio\:device1/in_accel_z_raw"
-#define MPU6050_ANGLVEL_X       "/sys/bus/iio/devices/iio\:device1/in_anglvel_x_raw"
-#define MPU6050_ANGLVEL_Y       "/sys/bus/iio/devices/iio\:device1/in_anglvel_y_raw"
-#define MPU6050_ANGLVEL_Z       "/sys/bus/iio/devices/iio\:device1/in_anglvel_z_raw"
 
 class TextBoardWidget : public QtWidgetBase
 {
@@ -36,6 +29,7 @@ public:
     ~TextBoardWidget();
 
     void setValue(int index, qint16 value);
+    void setValue(int index, double value);
     void setValues(int p, int r, int y);
     void setValues(double p, double r, double y);
 
@@ -73,7 +67,6 @@ private:
     int m_nRollValue_1;
     int m_nYawValue_1;
 
-
     TextBoardWidget     *m_textBoardLeft;
 #ifdef USE_TEXT_BOARD
     TextBoardWidget     *m_textBoardRight;
@@ -81,15 +74,17 @@ private:
     GyroscopeWidget     *m_widgetDisplay;
 #endif
 
-    //Mpu6050Thread       *m_threadTest;
+    Mpu6050Thread       *m_threadTest;
     QtPixmapButton      *m_btnHome;
 
 private:
     void InitWidget();
+    QString CheckMPU6050Device();
 
 private slots:
     void SltStartTest();
     void SltUpdateValues(int type, int index, qint16 value);
+    void SltUpdateValues(int type, int index, double value);
 protected:
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);

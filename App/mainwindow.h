@@ -35,8 +35,8 @@
 #define RGB_GREEN_DEV   "/sys/class/leds/green/brightness"
 // RGB-蓝
 #define RGB_BLUE_DEV    "/sys/class/leds/blue/brightness"
-// 陀螺仪MPU6050
-#define MPU6050_DEV     "/sys/bus/iio/devices/iio\:device1"
+// IIC
+#define IIC_DEV         "/sys/bus/iio/devices"
 // 背光
 #define BKLIGHT_DEV     "/sys/class/backlight/backlight/brightness"
 // 蜂鸣器
@@ -80,6 +80,7 @@ private:
     void InitThreads();
 
     bool CheckDevice(QString device);
+    QString CheckMPU6050Device();
 private slots:
     void SltCurrentAppChanged(int index);
 
