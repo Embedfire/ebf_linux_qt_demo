@@ -47,7 +47,7 @@ else
 fi
 
 #导出qtdemo的安装目录
-export APP_DIR=/home/debian/qt-app
+export APP_DIR=/usr/local/qt-app
 #指定qt插件路径
 #export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 #指定qt库路径
