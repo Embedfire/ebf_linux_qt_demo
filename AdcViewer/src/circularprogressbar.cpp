@@ -16,9 +16,9 @@
 
 CircularProgressBar::CircularProgressBar(QWidget *parent) : QtWidgetBase(parent)
 {
-    m_nMaxValue = 330;
+    m_nMaxValue = 3300;
     m_MinValue = 0;
-    m_nCurrentValue = 99;
+    m_nCurrentValue = 990;
 
     m_nBaseWidth = 320;
     m_nBaseHeight = 320;
@@ -124,7 +124,8 @@ void CircularProgressBar::drawValue(QPainter *painter)
     font.setPixelSize(35);
     painter->setFont(font);
 
-    QString strValue = QString("%1").arg(m_nCurrentValue * 100 / m_nMaxValue);
+    QString strValue = QString("%1").arg(m_nCurrentValue *100 / m_nMaxValue);
+
     int nValueW = painter->fontMetrics().width(strValue);
 
     font.setPixelSize(18);

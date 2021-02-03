@@ -22,7 +22,7 @@
 // 声卡
 #define VOICE_DEV       "/dev/snd/pcmC0D0p"
 // ADC
-#define ADC_DEV         "/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
+#define ADC_DEV         "/sys/bus/iio/devices/iio:device0"
 // 摄像头
 #define CAMERA_DEV      "/dev/video0"
 // DHT11
@@ -40,7 +40,7 @@
 // 背光
 #define BKLIGHT_DEV     "/sys/class/backlight/backlight/brightness"
 // 蜂鸣器
-#define BEEP_DEV        "/sys/class/gpio/gpio19"
+#define BEEP_DEV        "/sys/class/gpio/gpio45"
 // keyboard
 #define KEY_DEV         "/dev/input/by-path/platform-sgpio-keys-event"
 // switch

@@ -76,11 +76,11 @@ void BeepWidget::InitDataRect()
 void BeepWidget::CheckDevice()
 {
 #ifdef __arm__
-    QString strDevice = "/sys/class/gpio/gpio19";
+    QString strDevice = "/sys/class/gpio/gpio45";
     QDir dir(strDevice);
     if (!dir.exists()) {
-        system("echo 19 > /sys/class/gpio/export");
-        system("echo 'out' > /sys/class/gpio/gpio19/direction");
+        system("echo 45 > /sys/class/gpio/export");
+        system("echo 'out' > /sys/class/gpio/gpio45/direction");
         qDebug() << "check beep gpio" << dir.exists();
     }
 #endif
@@ -89,10 +89,10 @@ void BeepWidget::CheckDevice()
 void BeepWidget::setBeepState(int on)
 {
 #ifdef __arm__
-    QString strFile = "/sys/class/gpio/gpio19/value";
+    QString strFile = "/sys/class/gpio/gpio45/value";
     QFile file(strFile);
     if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-        qDebug() << "/sys/class/gpio/gpio19 export failed!";
+        qDebug() << "/sys/class/gpio/gpio45 export failed!";
         return;
     }
 

@@ -21,7 +21,10 @@
 #include <QDebug>
 #include <QFile>
 
-#define ADC_DEVICE "/sys/bus/iio/devices/iio:device0/in_voltage3_raw"
+#define ADC_DEVICE "/sys/bus/iio/devices/iio:device0"
+#define ADC_RAW "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
+#define ADC_SCALE "/sys/bus/iio/devices/iio:device0/in_voltage_scale"
+#define ADC_OFFSET "/sys/bus/iio/devices/iio:device0/in_voltage_offset"
 
 AdcViewer::AdcViewer(QWidget *parent) : QtAnimationWidget(parent)
 {
@@ -58,8 +61,9 @@ void AdcViewer::InitWidget()
 void AdcViewer::SltTestValue()
 {
     int nValue = 0;
+    double scale=0,offset=0;
 #ifdef __arm__
-    QFile file(ADC_DEVICE);
+    QFile file(ADC_RAW);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "read failed!";
         return;
@@ -68,10 +72,36 @@ void AdcViewer::SltTestValue()
     QString strValue = file.readAll();
     nValue = strValue.toInt();
     file.close();
+
+    file.setFileName(ADC_SCALE);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "read failed!";
+        return;
+    }
+
+    strValue = file.readAll();
+    scale = strValue.toDouble();
+    file.close();
+
+    file.setFileName(ADC_OFFSET);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "read failed!";
+        return;
+    }
+
+    strValue = file.readAll();
+    offset = strValue.toDouble();
+    file.close();
+
+    m_nAdcValue = (nValue+offset)*scale;
+
+//    qDebug()<< nValue << offset << scale;
+//    qDebug()<< m_nAdcValue;
+
 #else
     nValue = qrand() % 4096;
-#endif
     m_nAdcValue = nValue * 330 / 4096;
+#endif
     m_adcValueDisplay->setCurrentValue(m_nAdcValue);
 }
 
@@ -140,7 +170,7 @@ void AdcViewer::drawBoardLogo(QPainter *painter)
 void AdcViewer::drawValue(QPainter *painter)
 {
     painter->save();
-    QString strValue = tr("当前电压：%1V").arg(m_nAdcValue * 1.0 / 100, 0, 'f', 2, QChar('0'));
+    QString strValue = tr("当前电压：%1V").arg(m_nAdcValue * 1.0 / 1000, 0, 'f', 2, QChar('0'));
     QFont font(Skin::m_strAppFontNormal);
     font.setPixelSize(20);
     painter->setFont(font);
