@@ -46,11 +46,16 @@ void MyFrame::paintEvent(QPaintEvent *)
 //    painter.drawRect(reject_rect);
 
     //绘制文字
-    painter.setFont(this->font());
+    QFont font = painter.font();
+    font.setPixelSize(16);
+    painter.setFont(font);
     painter.setPen(Qt::black);
     painter.drawText(accept_rect,Qt::AlignCenter,accept_text);
     painter.drawText(reject_rect,Qt::AlignCenter,reject_text);
     painter.drawText(title_rect,Qt::AlignCenter,message_title);
+
+    font.setPixelSize(14);
+    painter.setFont(font);
     painter.drawText(message_rect,Qt::AlignCenter,message);
     //绘制线条
     painter.drawLine(0,this->height()/3*2,this->width(),this->height()/3*2);

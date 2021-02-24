@@ -6,11 +6,13 @@ INCLUDEPATH         += $$PWD/src
 
 HEADERS += \
     $$PWD/src/camerawidget.h \
-    $$PWD/src/cameraconfig.h
+    $$PWD/src/cameraconfig.h \
+    $$PWD/src/qtviewfinder.h
 
 SOURCES += \
     $$PWD/src/camerawidget.cpp \
-    $$PWD/src/cameraconfig.cpp
+    $$PWD/src/cameraconfig.cpp \
+    $$PWD/src/qtviewfinder.cpp
 
 
 

@@ -7,6 +7,7 @@
  历史纪录 :
  <作者>    <日期>        <版本>        <内容>
            2019/9/15
+           2021/2/22
 *******************************************************************/
 #include "camerawidget.h"
 #include "skin.h"
@@ -18,6 +19,9 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QCameraInfo>
+#include <QHBoxLayout>
+
+#include <QCoreApplication>
 
 #include "qtswitchbutton.h"
 
@@ -41,7 +45,7 @@ CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
     m_cmd = new QProcess(this);
 #endif
 
-    m_camera = NULL;
+    //m_camera = NULL;
     surface = NULL;
 
     m_rectMenu = QRect(m_nBaseWidth - 10 - m_pixmapMenu.width(), 2, m_pixmapMenu.width(), m_pixmapMenu.height());
@@ -50,6 +54,7 @@ CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
 #endif
 
     m_configWidget = new CameraConfig(this);
+
 #if !TEST_PROCESS_CAMERA
     QTimer::singleShot(500, this, SLOT(InitCamera()));
 #endif
@@ -72,9 +77,9 @@ void CameraWidget::TakePhotos()
         QString strFileName = m_strPhotoPath + "Img_";
         strFileName += QDateTime::currentDateTime().toString("yyyyMMddhhmss");
         strFileName += ".png";
-        if (surface->takePhoto(strFileName, m_configWidget->photoSize())) {
-            m_strInfoMsg = QString("相片保存：%1").arg(strFileName);
-        }
+//        if (surface->takePhoto(strFileName, m_configWidget->photoSize())) {
+//            m_strInfoMsg = QString("相片保存：%1").arg(strFileName);
+//        }
     }
 
     this->update();
@@ -88,18 +93,124 @@ void CameraWidget::InitCamera()
 #else
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
-        qDebug() << cameraInfo.deviceName();
-        m_camera = new QCamera(cameraInfo);
-        break;
+
+//        m_camera = new QCamera(cameraInfo);
+        if (cameraInfo == QCameraInfo::defaultCamera())
+        {
+            qDebug() << cameraInfo.deviceName();
+            m_camera.reset(new QCamera(cameraInfo));
+            //m_camera= new QCamera(cameraInfo);
+            break;
+        }
     }
 
     if (NULL != m_camera) {
-        surface = new QtVideoWidgetSurface(this);
+//        surface = new QtVideoWidgetSurface(this);
+//        surface = new QCameraViewfinder(this);
+
+        m_imageCapture.reset(new QCameraImageCapture(m_camera.data()));
+
+        connect(m_imageCapture.data(), &QCameraImageCapture::readyForCaptureChanged, this, &CameraWidget::readyForCapture);
+        connect(m_imageCapture.data(), &QCameraImageCapture::imageCaptured, this, &CameraWidget::processCapturedImage);
+        connect(m_imageCapture.data(), &QCameraImageCapture::imageSaved, this, &CameraWidget::imageSaved);
+        connect(m_imageCapture.data(), QOverload<int, QCameraImageCapture::Error, const QString &>::of(&QCameraImageCapture::error),
+                this, &CameraWidget::displayCaptureError);
+
+
+        surface = new QtViewFinder(this);
+        connect(surface,SIGNAL(returnbtn_clicked_signal()),this, SLOT(on_clieckBackhome()));
+        connect(surface,SIGNAL(take_picture_signal()),this, SLOT(on_takePicture()));
+        surface->setGeometry(0,0,this->width(),this->height());
+        surface->setEnabledTake(false);
+
         m_camera->setViewfinder(surface);
+
+        QCameraViewfinderSettings set;
+        set.setResolution(1280, 720);
+        m_camera->setViewfinderSettings(set);
+
+
+//        m_mediaRecorder.reset(new QMediaRecorder(m_camera.data()));
+//        m_imageCapture.reset(new QCameraImageCapture(m_camera.data()));
+//        m_mediaRecorder->setMetaData(QMediaMetaData::Title, QVariant(QLatin1String("Test Title")));
+
+//        QHBoxLayout *mainlayout = new QHBoxLayout;
+//        this->setLayout(mainlayout);
+//        mainlayout->addWidget(surface);
+
+        surface->show();
+        //qDebug()<<surface->width()<<surface->height();
+        surface->setSize(surface->width(),surface->height());
+
+
         m_camera->start();
+
+
+        //m_configWidget->show();
     }
 #endif
 }
+void CameraWidget::on_clieckBackhome()
+{
+    m_camera->stop();
+    emit signalBackHome();
+}
+
+
+void CameraWidget::on_takePicture()
+{
+    qDebug()<<"takepicture";
+
+    //获取程序当前运行目录
+    QString filepath = QCoreApplication::applicationDirPath();
+    filepath+="/photos/";
+    qDebug()<<filepath;
+    m_imageCapture->capture(filepath);
+}
+void CameraWidget::readyForCapture(bool ready)
+{
+    qDebug()<<"ready:"<<ready;
+    //ui->takeImageButton->setEnabled(ready);
+    surface->setEnabledTake(ready);
+}
+void CameraWidget::imageSaved(int id, const QString &fileName)
+{
+    qDebug()<<"id:"<<id<<"fileName:"<<fileName;
+
+    Q_UNUSED(id);
+//    ui->statusbar->showMessage(tr("Captured \"%1\"").arg(QDir::toNativeSeparators(fileName)));
+
+//    m_isCapturingImage = false;
+//    if (m_applicationExiting)
+//        close();
+    surface->loadImage(fileName);
+}
+void CameraWidget::processCapturedImage(int requestId, const QImage& img)
+{
+    qDebug()<<"requestId:"<<requestId;
+
+    Q_UNUSED(requestId);
+    QImage scaledImage = img.scaled(surface->size(),
+                                    Qt::KeepAspectRatio,
+                                    Qt::SmoothTransformation);
+
+    //ui->lastImagePreviewLabel->setPixmap(QPixmap::fromImage(scaledImage));
+
+    //Display captured image for 4 seconds.
+    //displayCapturedImage();
+    //QTimer::singleShot(4000, this, &Camera::displayViewfinder);
+}
+void CameraWidget::displayCaptureError(int id, const QCameraImageCapture::Error error, const QString &errorString)
+{
+    qDebug()<<"id:"<<id<<"error:"<<error<<"errorString:"<<errorString;
+
+    Q_UNUSED(id);
+    Q_UNUSED(error);
+    //QMessageBox::warning(this, tr("Image Capture Error"), errorString);
+    //m_isCapturingImage = false;
+}
+
+
 
 void CameraWidget::SltClearMessage()
 {
@@ -159,26 +270,26 @@ void CameraWidget::mousePressEvent(QMouseEvent *e)
 
 void CameraWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (m_bPhotoPressed) {
-        m_bPhotoPressed = false;
-        TakePhotos();
-    } else if (m_bMenuPressed) {
-        m_bMenuPressed = false;
-        m_pixmapMenu = QPixmap(":/images/camera/menu_icon.png");
-        this->update();
-        emit signalBackHome();
-    } else if (m_bConfigPressed) {
-        m_bConfigPressed = false;
-        this->update();
+//    if (m_bPhotoPressed) {
+//        m_bPhotoPressed = false;
+//        TakePhotos();
+//    } else if (m_bMenuPressed) {
+//        m_bMenuPressed = false;
+//        m_pixmapMenu = QPixmap(":/images/camera/menu_icon.png");
+//        this->update();
+//        emit signalBackHome();
+//    } else if (m_bConfigPressed) {
+//        m_bConfigPressed = false;
+//        this->update();
 
-        int nX = (this->width() - m_configWidget->width()) / 2;
-        if (m_configWidget->y() < 0) {
-            m_configWidget->StartAnimation(QPoint(nX, -m_configWidget->height()), QPoint(nX, 0), 200, true);
-        }
-        else {
-            m_configWidget->StartAnimation(QPoint(nX, 0), QPoint(nX, -m_configWidget->height()), 200, false);
-        }
-    }
+//        int nX = (this->width() - m_configWidget->width()) / 2;
+//        if (m_configWidget->y() < 0) {
+//            m_configWidget->StartAnimation(QPoint(nX, -m_configWidget->height()), QPoint(nX, 0), 200, true);
+//        }
+//        else {
+//            m_configWidget->StartAnimation(QPoint(nX, 0), QPoint(nX, -m_configWidget->height()), 200, false);
+//        }
+//    }
 
     QWidget::mouseReleaseEvent(e);
 }
@@ -210,7 +321,7 @@ void CameraWidget::paintEvent(QPaintEvent *)
 #endif
 
     // 绘制按钮
-    drawToolButton(&painter);
+    //drawToolButton(&painter);
 }
 
 void CameraWidget::drawToolButton(QPainter *painter)

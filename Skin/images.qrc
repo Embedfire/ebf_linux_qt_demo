@@ -296,5 +296,9 @@
         <file>images/keyled/menu_icon_pressed.png</file>
         <file>images/mainwindow/ic_key.png</file>
         <file>images/weather/type/zh/雪.png</file>
+        <file>images/camera/tool_pressed.png</file>
+        <file>images/camera/tool.png</file>
+        <file>images/camera/take_pressed.png</file>
+        <file>images/camera/take.png</file>
     </qresource>
 </RCC>

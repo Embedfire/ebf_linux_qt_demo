@@ -14,13 +14,21 @@
 #include "qtwidgetbase.h"
 #include "cameraconfig.h"
 #include "qtvideowidgetsurface.h"
+#include "qtviewfinder.h"
+
 #include <QCamera>
+#include <QCameraImageCapture>
+#include <QMediaRecorder>
+#include <QScopedPointer>
+#include <QCameraViewfinder>
+#include <QCameraViewfinderSettings>
+#include <QMediaMetaData>
 
 #include <QTimer>
 #include <QProcess>
 
 #ifdef __arm__
-#define TEST_PROCESS_CAMERA     1
+#define TEST_PROCESS_CAMERA     0
 #else
 #define TEST_PROCESS_CAMERA     0
 #endif
@@ -38,9 +46,14 @@ private:
 #if TEST_PROCESS_CAMERA
     QProcess *m_cmd;
 #endif
-    QCamera *m_camera;
-    QtVideoWidgetSurface *surface;
+//    QCamera *m_camera;
+//    QtVideoWidgetSurface *surface;
+//    QCameraViewfinder *surface;
+    QtViewFinder *surface;
 
+    QScopedPointer<QCamera> m_camera;
+    QScopedPointer<QCameraImageCapture> m_imageCapture;
+    QScopedPointer<QMediaRecorder> m_mediaRecorder;
 
 protected:
     QImage   m_imagePhoto;
@@ -67,6 +80,14 @@ private:
 private slots:
     void InitCamera();
     void SltClearMessage();
+
+    void on_takePicture();
+    void on_clieckBackhome();
+
+    void readyForCapture(bool ready);
+    void imageSaved(int id, const QString &fileName);
+    void processCapturedImage(int requestId, const QImage& img);
+    void displayCaptureError(int id, const QCameraImageCapture::Error error, const QString &errorString);
 
 protected:
     void showEvent(QShowEvent *e);
