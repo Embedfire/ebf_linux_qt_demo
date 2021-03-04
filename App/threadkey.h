@@ -23,7 +23,8 @@ public:
     void Stop();
 
 signals:
-    void signalKeyPressed(const quint8 &type);
+    void SltKeyPressed(const quint8 &type);
+    void signalKeyPressed(const quint8 &code,const quint8 &value);
 
 public slots:
 

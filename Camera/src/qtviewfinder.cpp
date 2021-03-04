@@ -27,16 +27,17 @@ QtViewFinder::QtViewFinder(QWidget *parent):QCameraViewfinder(parent),
     take_picture->setStyleSheet(QString("QPushButton {border-image: url(:/images/camera/take.png);}"
                                    "QPushButton:pressed {border-image: url(:/images/camera/take_pressed.png);}"));
 
-    show_config = new QPushButton(this);
+    show_config = new QToolButton(this);
+    show_config->setCheckable(true);
     connect(show_config, SIGNAL(clicked(bool)), this, SLOT(on_show_config()));
-    show_config->setStyleSheet(QString("QPushButton {border-image: url(:/images/camera/tool.png);}"
-                                   "QPushButton:pressed {border-image: url(:/images/camera/tool_pressed.png);}"));
+    show_config->setStyleSheet(QString("QToolButton {border-image: url(:/images/camera/tool.png);}"
+                                   "QToolButton:pressed {border-image: url(:/images/camera/tool_pressed.png);}"
+                                    "QToolButton:checked {border-image: url(:/images/camera/tool_pressed.png);}"));
 
     show_image = new QLabel(this);
     show_image->hide();
 
     config=new CameraConfig(this);
-    //config->setGeometry(50,20,400,300);
     config->hide();
 
     timer_hide = new QTimer();
@@ -46,7 +47,7 @@ QtViewFinder::QtViewFinder(QWidget *parent):QCameraViewfinder(parent),
     take_picture->setGeometry(m_nBaseWidth/2-25,m_nBaseHeight/5*4,80,80);
     show_config->setGeometry(m_nBaseWidth-100,m_nBaseHeight/5*4+30,74,20);
     show_image->setGeometry(10,m_nBaseHeight-200, 300,200);
-    config->setGeometry(50,20,400,300);
+    config->setGeometry(50,20,430,360);
 }
 
 QtViewFinder::~QtViewFinder()
@@ -67,8 +68,15 @@ void QtViewFinder::on_take_picture()
 
 void QtViewFinder::on_show_config()
 {
-
-    config->show();
+    if(show_config->isChecked())
+    {
+        config->show();
+    }
+    else
+    {
+        config->hide();
+    }
+    //qDebug()<<config->width()<<config->height();
 }
 
 void QtViewFinder::setSize(int width, int height)
@@ -80,7 +88,7 @@ void QtViewFinder::setSize(int width, int height)
     take_picture->setGeometry(m_nBaseWidth/2-25,m_nBaseHeight/5*4,80,80);
     show_config->setGeometry(m_nBaseWidth-100,m_nBaseHeight/5*4+30,74,20);
     show_image->setGeometry(10,m_nBaseHeight-200, 300,200);
-    config->setGeometry(50,20,400,300);
+    config->setGeometry(50,20,430,360);
 }
 
 void QtViewFinder::loadImage(QString image_path)

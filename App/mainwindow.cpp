@@ -35,6 +35,7 @@
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
+#include "qtviewfinder.h"
 
 #include "qtmessage.h"
 
@@ -177,10 +178,10 @@ void MainWindow::InitThreads()
     m_threadUsbInsert->start();
 #endif
 
-    m_threadPowerKey = new ThreadKey(this);
+    //m_threadPowerKey = new ThreadKey(this);
     m_threadKey = new ThreadKey(this, 1);
 
-    m_threadPowerKey->start();
+    //m_threadPowerKey->start();
     m_threadKey->start();
 }
 
@@ -230,6 +231,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     case 4: {
         if(CheckDevice("摄像头"))
             m_widgetWorkSpace = new CameraWidget(this);
+            //m_widgetWorkSpace = new QtViewFinder(this);
     }
         break;
     case 5: {
@@ -302,7 +304,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 17: {
-        if(CheckDevice("蜂鸣器"))
+        //if(CheckDevice("蜂鸣器"))
             m_widgetWorkSpace = new BeepWidget(this);
     }
         break;
@@ -313,8 +315,9 @@ void MainWindow::SltCurrentAppChanged(int index)
     case 19: {
         if(CheckDevice("按键")){
             m_widgetWorkSpace = new KeyPressWidget(this);
-            connect(m_threadPowerKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
-            connect(m_threadKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+//            connect(m_threadPowerKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+//            connect(m_threadKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+            connect(m_threadKey, SIGNAL(signalKeyPressed(const quint8 ,const quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(const quint8 ,const quint8)));
         }
 
     }

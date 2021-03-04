@@ -3,6 +3,7 @@
 
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
+#include <QToolButton>
 
 #include "cameraconfig.h"
 
@@ -19,7 +20,7 @@ private:
     QLabel *show_image;
     QPushButton *m_returnbtn;
     QPushButton *take_picture;
-    QPushButton *show_config;
+    QToolButton *show_config;
     QTimer *timer_hide;
 
     QPixmap m_pixmapMenu;

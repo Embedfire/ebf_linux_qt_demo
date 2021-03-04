@@ -23,9 +23,13 @@
 #endif
 
 // keyboard
-#define KEY_DEV     "/dev/input/by-path/platform-sgpio-keys-event"
+#define KEY_DEV     "/dev/input/by-path/platform-gpio-keys-event"
 // switch
 #define POWER_DEV   "/dev/input/by-path/platform-20cc000.snvs:snvs-powerkey-event"
+
+#define KEY1        11
+#define KEY2        2
+#define WAKE_UP     28
 
 ThreadKey::ThreadKey(QObject *parent, quint8 type) : QThread(parent),
     m_nKeyType(type),m_nKeyPressed(0),m_bRun(false)
@@ -48,7 +52,8 @@ void ThreadKey::run()
 #ifdef __arm__
     int fd = 0;
     struct input_event inmyself;
-    fd = open(0 == m_nKeyType ? POWER_DEV : KEY_DEV, O_RDONLY);
+    //fd = open(0 == m_nKeyType ? POWER_DEV : KEY_DEV, O_RDONLY);
+    fd = open(KEY_DEV, O_RDONLY);
     if (fd < 0)
     {
         printf("Open keyboard failed .\n");
@@ -58,14 +63,15 @@ void ThreadKey::run()
     m_bRun = true;
     while (m_bRun)
     {
+
+
         if (read(fd, &inmyself, sizeof(inmyself)) < 0) {
             m_bRun = false;
             break;
         }
         else {
-            if (0 == inmyself.value) {
-                emit signalKeyPressed(m_nKeyType);
-            }
+            qDebug()<<inmyself.code<<inmyself.type<<inmyself.value;
+            emit signalKeyPressed(inmyself.code,inmyself.value);
         }
     }
 

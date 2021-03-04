@@ -38,11 +38,11 @@
 // IIC
 #define IIC_DEV         "/sys/bus/iio/devices"
 // 背光
-#define BKLIGHT_DEV     "/sys/class/backlight/backlight/brightness"
+#define BKLIGHT_DEV     "/sys/class/backlight"
 // 蜂鸣器
 #define BEEP_DEV        "/sys/class/gpio/gpio45"
 // keyboard
-#define KEY_DEV         "/dev/input/by-path/platform-sgpio-keys-event"
+#define KEY_DEV         "/dev/input/by-path/platform-gpio-keys-event"
 // switch
 #define POWER_DEV       "/dev/input/by-path/platform-20cc000.snvs:snvs-powerkey-event"
 
@@ -68,7 +68,7 @@ private:
     bool                 m_bStartApp;
 
     ThreadMouseCheck    *m_threadUsbInsert;
-    ThreadKey           *m_threadPowerKey;
+    //ThreadKey           *m_threadPowerKey;
     ThreadKey           *m_threadKey;
 
 #ifdef CHECK_MOUSE_BY_TIMER

@@ -33,6 +33,13 @@
 
 CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
+
+#if GST_COMMAND_CAMERA
+    m_cmd = new QProcess(this);
+#else
+#if SURFACE_OR_VIEWFINDER
+    surface = NULL;
+#else
     m_strPhotoPath = qApp->applicationDirPath() + "/photos/";
     m_pixmapMenu = QPixmap(":/images/camera/menu_icon.png");
 
@@ -41,80 +48,56 @@ CameraWidget::CameraWidget(QWidget *parent) : QtAnimationWidget(parent)
     m_bMenuPressed = false;
     m_bOpenDevice = false;
 
-#if TEST_PROCESS_CAMERA
-    m_cmd = new QProcess(this);
-#endif
-
-    //m_camera = NULL;
+    m_camera = NULL;
     surface = NULL;
-
     m_rectMenu = QRect(m_nBaseWidth - 10 - m_pixmapMenu.width(), 2, m_pixmapMenu.width(), m_pixmapMenu.height());
+
 #ifndef __arm__
     m_rectConfig = QRect(m_nBaseWidth - 50 - 80, m_nBaseHeight - 64, 80, 20);
 #endif
-
     m_configWidget = new CameraConfig(this);
-
-#if !TEST_PROCESS_CAMERA
-    QTimer::singleShot(500, this, SLOT(InitCamera()));
 #endif
+#endif
+
+    QTimer::singleShot(500, this, SLOT(on_timeout()));
 }
 
 CameraWidget::~CameraWidget()
 {
-#if TEST_PROCESS_CAMERA
+#if GST_COMMAND_CAMERA
     if  (m_cmd->state() != QProcess::NotRunning) {
         m_cmd->kill();
         qDebug() << "kill";
     }
+#else
+    delete surface;
 #endif
 }
 
-void CameraWidget::TakePhotos()
-{
-    m_strInfoMsg = QString("照相失败！");
-    if (NULL != m_camera) {
-        QString strFileName = m_strPhotoPath + "Img_";
-        strFileName += QDateTime::currentDateTime().toString("yyyyMMddhhmss");
-        strFileName += ".png";
-//        if (surface->takePhoto(strFileName, m_configWidget->photoSize())) {
-//            m_strInfoMsg = QString("相片保存：%1").arg(strFileName);
-//        }
-    }
-
-    this->update();
-    QTimer::singleShot(1000, this, SLOT(SltClearMessage()));
-}
-
+#if GST_COMMAND_CAMERA
 void CameraWidget::InitCamera()
 {
-#if TEST_PROCESS_CAMERA
-    m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
-#else
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, cameras) {
+    //m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video0 ! fbdevsink");
+    m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video0 ! \"video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, framerate=(fraction)15/1\" ! videoconvert ! fbdevsink");
 
-//        m_camera = new QCamera(cameraInfo);
-        if (cameraInfo == QCameraInfo::defaultCamera())
-        {
-            qDebug() << cameraInfo.deviceName();
-            m_camera.reset(new QCamera(cameraInfo));
-            //m_camera= new QCamera(cameraInfo);
-            break;
-        }
-    }
+}
+#else
+#if SURFACE_OR_VIEWFINDER
+void CameraWidget::InitCamera(const QCameraInfo &cameraInfo)
+{
+    m_camera.reset(new QCamera(cameraInfo));
+    connect(m_camera.data(), QOverload<QCamera::Error>::of(&QCamera::error), this, &CameraWidget::displayCameraError);
 
     if (NULL != m_camera) {
-//        surface = new QtVideoWidgetSurface(this);
-//        surface = new QCameraViewfinder(this);
+        //surface = new QtVideoWidgetSurface(this);
+        //surface = new QCameraViewfinder(this);
 
         m_imageCapture.reset(new QCameraImageCapture(m_camera.data()));
 
         connect(m_imageCapture.data(), &QCameraImageCapture::readyForCaptureChanged, this, &CameraWidget::readyForCapture);
-        connect(m_imageCapture.data(), &QCameraImageCapture::imageCaptured, this, &CameraWidget::processCapturedImage);
+        //connect(m_imageCapture.data(), &QCameraImageCapture::imageCaptured, this, &CameraWidget::processCapturedImage);
         connect(m_imageCapture.data(), &QCameraImageCapture::imageSaved, this, &CameraWidget::imageSaved);
-        connect(m_imageCapture.data(), QOverload<int, QCameraImageCapture::Error, const QString &>::of(&QCameraImageCapture::error),
-                this, &CameraWidget::displayCaptureError);
+        connect(m_imageCapture.data(), QOverload<int, QCameraImageCapture::Error, const QString &>::of(&QCameraImageCapture::error),this, &CameraWidget::displayCaptureError);
 
 
         surface = new QtViewFinder(this);
@@ -129,48 +112,79 @@ void CameraWidget::InitCamera()
         set.setResolution(1280, 720);
         m_camera->setViewfinderSettings(set);
 
-
-//        m_mediaRecorder.reset(new QMediaRecorder(m_camera.data()));
-//        m_imageCapture.reset(new QCameraImageCapture(m_camera.data()));
-//        m_mediaRecorder->setMetaData(QMediaMetaData::Title, QVariant(QLatin1String("Test Title")));
-
-//        QHBoxLayout *mainlayout = new QHBoxLayout;
-//        this->setLayout(mainlayout);
-//        mainlayout->addWidget(surface);
-
         surface->show();
-        //qDebug()<<surface->width()<<surface->height();
+        qDebug()<<surface->width()<<surface->height();
+
+//        QCameraViewfinderSettings set = m_camera->viewfinderSettings();
+//        qDebug()<<set.resolution().height()<<set.resolution().width();
         surface->setSize(surface->width(),surface->height());
 
-
         m_camera->start();
-
-
-        //m_configWidget->show();
     }
+}
+#else
+void CameraWidget::InitCamera()
+{
+    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    foreach (const QCameraInfo &cameraInfo, cameras) {
+        qDebug() << cameraInfo.deviceName();
+        m_camera = new QCamera(cameraInfo);
+        break;
+    }
+
+    if (NULL != m_camera) {
+        surface = new QtVideoWidgetSurface(this);
+        m_camera->setViewfinder(surface);
+        m_camera->start();
+    }
+}
+#endif
+#endif
+
+void CameraWidget::on_timeout()
+{
+#if GST_COMMAND_CAMERA
+    InitCamera();
+#else
+#if SURFACE_OR_VIEWFINDER
+    const QList<QCameraInfo> availableCameras = QCameraInfo::availableCameras();
+    for (const QCameraInfo &cameraInfo : availableCameras) {
+        if (cameraInfo == QCameraInfo::defaultCamera())
+            qDebug()<<"defaultCamera ok";
+    }
+    InitCamera(QCameraInfo::defaultCamera());
+#else
+    InitCamera();
+#endif
 #endif
 }
+
+#if GST_COMMAND_CAMERA
+#else
+#if SURFACE_OR_VIEWFINDER
 void CameraWidget::on_clieckBackhome()
 {
     m_camera->stop();
     emit signalBackHome();
 }
-
-
 void CameraWidget::on_takePicture()
 {
-    qDebug()<<"takepicture";
-
     //获取程序当前运行目录
-    QString filepath = QCoreApplication::applicationDirPath();
-    filepath+="/photos/";
-    qDebug()<<filepath;
-    m_imageCapture->capture(filepath);
+    QString strFilePath = QCoreApplication::applicationDirPath();
+    strFilePath+="/photos/";
+    QString strFileName;
+    strFileName += QDateTime::currentDateTime().toString("yyyyMMddhhmss");
+    strFileName += ".png";
+    m_imageCapture->capture(strFilePath+strFileName);
+
+
+//    QCameraFocus *focus = m_camera->focus();
+//    focus->setFocusPointMode(QCameraFocus::FocusPointCustom);
+//    focus->setCustomFocusPoint(QPointF(0.25f, 0.75f)); // A point near the bottom left, 25% away from the corner, near that shiny vase
 }
 void CameraWidget::readyForCapture(bool ready)
 {
     qDebug()<<"ready:"<<ready;
-    //ui->takeImageButton->setEnabled(ready);
     surface->setEnabledTake(ready);
 }
 void CameraWidget::imageSaved(int id, const QString &fileName)
@@ -209,20 +223,51 @@ void CameraWidget::displayCaptureError(int id, const QCameraImageCapture::Error 
     //QMessageBox::warning(this, tr("Image Capture Error"), errorString);
     //m_isCapturingImage = false;
 }
+void CameraWidget::displayCameraError()
+{
+    qDebug()<< m_camera->errorString();
 
+    m_camera->stop();
+    //emit signalBackHome();
+    //this->~CameraWidget();
+}
+#else
+void CameraWidget::TakePhotos()
+{
+    m_strInfoMsg = QString("照相失败！");
+    if (NULL != m_camera) {
+        QString strFileName = m_strPhotoPath + "Img_";
+        strFileName += QDateTime::currentDateTime().toString("yyyyMMddhhmss");
+        strFileName += ".png";
+        if (surface->takePhoto(strFileName, m_configWidget->photoSize())) {
+            m_strInfoMsg = QString("相片保存：%1").arg(strFileName);
+        }
+    }
 
-
+    this->update();
+    QTimer::singleShot(1000, this, SLOT(SltClearMessage()));
+}
 void CameraWidget::SltClearMessage()
 {
     m_strInfoMsg.clear();
     this->update();
 }
+#endif
+#endif
+
+
+//void CameraWidget::SltClearMessage()
+//{
+//    m_strInfoMsg.clear();
+//    this->update();
+//}
 
 void CameraWidget::showEvent(QShowEvent *e)
 {
-#if TEST_PROCESS_CAMERA
+#if GST_COMMAND_CAMERA
     if  (m_cmd->state() == QProcess::NotRunning) {
-        m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
+        //m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video0 ! fbdevsink");
+        m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video0 ! \"video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, framerate=(fraction)15/1\" ! videoconvert ! fbdevsink");
     }
 #endif
     QWidget::showEvent(e);
@@ -230,14 +275,25 @@ void CameraWidget::showEvent(QShowEvent *e)
 
 void CameraWidget::resizeEvent(QResizeEvent *e)
 {
+#if GST_COMMAND_CAMERA
+#else
     SetScaleValue();
+#if SURFACE_OR_VIEWFINDER
+#else
     m_configWidget->setFixedSize(434 * m_scaleX, 360 * m_scaleY);
     m_configWidget->move((this->width() - m_configWidget->width()) / 2, -m_configWidget->height());
+#endif
+#endif
     QWidget::resizeEvent(e);
+
 }
 
 void CameraWidget::mousePressEvent(QMouseEvent *e)
 {
+#if GST_COMMAND_CAMERA
+#else
+#if SURFACE_OR_VIEWFINDER
+#else
     QRect rect;
     ScaleRect(rect, m_rectPhoto);
     if (rect.contains(e->pos())) {
@@ -260,7 +316,9 @@ void CameraWidget::mousePressEvent(QMouseEvent *e)
         this->update();
         return;
     }
-#if TEST_PROCESS_CAMERA
+#endif
+#endif
+#if GST_COMMAND_CAMERA
     if  (m_cmd->state() != QProcess::NotRunning) {
         m_cmd->kill();
     }
@@ -270,27 +328,32 @@ void CameraWidget::mousePressEvent(QMouseEvent *e)
 
 void CameraWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-//    if (m_bPhotoPressed) {
-//        m_bPhotoPressed = false;
-//        TakePhotos();
-//    } else if (m_bMenuPressed) {
-//        m_bMenuPressed = false;
-//        m_pixmapMenu = QPixmap(":/images/camera/menu_icon.png");
-//        this->update();
-//        emit signalBackHome();
-//    } else if (m_bConfigPressed) {
-//        m_bConfigPressed = false;
-//        this->update();
+#if GST_COMMAND_CAMERA
+#else
+#if SURFACE_OR_VIEWFINDER
+#else
+    if (m_bPhotoPressed) {
+        m_bPhotoPressed = false;
+        TakePhotos();
+    } else if (m_bMenuPressed) {
+        m_bMenuPressed = false;
+        m_pixmapMenu = QPixmap(":/images/camera/menu_icon.png");
+        this->update();
+        emit signalBackHome();
+    } else if (m_bConfigPressed) {
+        m_bConfigPressed = false;
+        this->update();
 
-//        int nX = (this->width() - m_configWidget->width()) / 2;
-//        if (m_configWidget->y() < 0) {
-//            m_configWidget->StartAnimation(QPoint(nX, -m_configWidget->height()), QPoint(nX, 0), 200, true);
-//        }
-//        else {
-//            m_configWidget->StartAnimation(QPoint(nX, 0), QPoint(nX, -m_configWidget->height()), 200, false);
-//        }
-//    }
-
+        int nX = (this->width() - m_configWidget->width()) / 2;
+        if (m_configWidget->y() < 0) {
+            m_configWidget->StartAnimation(QPoint(nX, -m_configWidget->height()), QPoint(nX, 0), 200, true);
+        }
+        else {
+            m_configWidget->StartAnimation(QPoint(nX, 0), QPoint(nX, -m_configWidget->height()), 200, false);
+        }
+    }
+#endif
+#endif
     QWidget::mouseReleaseEvent(e);
 }
 
@@ -300,6 +363,10 @@ void CameraWidget::paintEvent(QPaintEvent *)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.scale(m_scaleX, m_scaleY);
     painter.fillRect(QRect(0, 0, m_nBaseWidth, m_nBaseHeight), QColor("#000000"));
+
+#if SURFACE_OR_VIEWFINDER
+#else
+
 
 #ifndef __arm__
     if (!m_strInfoMsg.isEmpty()) {
@@ -320,14 +387,20 @@ void CameraWidget::paintEvent(QPaintEvent *)
     }
 #endif
 
-    // 绘制按钮
-    //drawToolButton(&painter);
+    //绘制按钮
+    drawToolButton(&painter);
+#endif
 }
 
 void CameraWidget::drawToolButton(QPainter *painter)
 {
+#if GST_COMMAND_CAMERA
+#else
+#if SURFACE_OR_VIEWFINDER
+#else
     painter->save();
     painter->drawPixmap(m_rectMenu, m_pixmapMenu);
+
 #ifndef __arm__
     // draw big
     int radius = 80;
@@ -353,5 +426,7 @@ void CameraWidget::drawToolButton(QPainter *painter)
     painter->drawEllipse(nX + 60, nY, radius, radius);
 #endif
     painter->restore();
+#endif
+#endif
 }
 

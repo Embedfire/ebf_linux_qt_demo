@@ -19,6 +19,10 @@
 
 const char *pchLedText[3] = { "LED_R", "LED_G", "LED_B"};
 
+#define KEY1        11
+#define KEY2        2
+#define WAKE_UP     28
+
 KeyPressWidget::KeyPressWidget(QWidget *parent) : QtAnimationWidget(parent)
 {
     InitButtons();
@@ -107,6 +111,33 @@ void KeyPressWidget::SltKeyPressed(const quint8 &type)
 
     this->update();
 }
+
+void KeyPressWidget::SltKeyPressed(const quint8 &code, const quint8 &value)
+{
+    //qDebug()<<code<<value;
+    if(code==KEY1)
+    {
+        QtPixmapButton *btn = m_btns.value(BtnLedG);
+        btn->setPressed(!btn->isPressed());
+        ChangeRgbLightValue("green", btn->isPressed());
+
+    }
+    else if(code==KEY2)
+    {
+        QtPixmapButton *btn = m_btns.value(BtnLedB);
+        btn->setPressed(!btn->isPressed());
+        ChangeRgbLightValue("blue", btn->isPressed());
+    }
+    else if(code==WAKE_UP)
+    {
+        QtPixmapButton *btn = m_btns.value(BtnLedR);
+        btn->setPressed(!btn->isPressed());
+        ChangeRgbLightValue("red", btn->isPressed());
+    }
+
+    this->update();
+}
+
 
 void KeyPressWidget::paintEvent(QPaintEvent *)
 {

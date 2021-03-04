@@ -165,7 +165,7 @@ void CameraConfig::InitWidget()
     m_configMain = new ConfigWidget(m_stackedWidget);
 #if 0
     m_configMain->setItems(QStringList() << tr("自动对焦") << tr("亮度") << tr("饱和度") << tr("对比度")
-                           << tr("分辨率") << tr("光线模式") << tr("特殊效果")) << tr("保存设置"));
+                           << tr("分辨率") << tr("光线模式") << tr("特殊效果"));
 #endif
     m_configMain->setSelectMode(false);
     m_configMain->setRows(7);
@@ -248,7 +248,7 @@ void CameraConfig::InitMainPage()
     {
         QHBoxLayout *horLayout = new QHBoxLayout();
         horLayout->setContentsMargins(10, 0, 0, 0);
-        horLayout->addWidget(new QLabel(tr("对比对"), m_configMain));
+        horLayout->addWidget(new QLabel(tr("对比度"), m_configMain));
         verLayoutAll->addLayout(horLayout);
 
         QtSliderBar *sliderContrastratio = new QtSliderBar(m_configMain);
@@ -321,14 +321,6 @@ void CameraConfig::InitMainPage()
         labelNext->setPixmap(QPixmap(":/images/camera/ic_next.png"));
         horLayout->addWidget(labelNext, 0, Qt::AlignVCenter);
     }
-
-    {
-        QHBoxLayout *horLayout = new QHBoxLayout();
-        horLayout->setContentsMargins(10, 0, 10, 0);
-        horLayout->addWidget(new QLabel(tr("保存设置"), m_configMain));
-        verLayoutAll->addLayout(horLayout);
-    }
-
     verLayoutAll->addStretch();
 
     this->setStyleSheet(QString("QLabel{font-family: '%1'; font: 24px; color: #ffffff; min-height: 45px;}").arg(Skin::m_strAppFontBold));
@@ -350,7 +342,6 @@ void CameraConfig::SltChangePage(int index)
     if (4 == index) nRow = 3;
     else if (5 == index) nRow = 5;
     else if (6 == index) nRow = 7;
-    else if (7 == index) this->hide();
     m_stackedWidget->setCurrentIndex(index - 3, QtStackedWidget::UpDirection, nRow * 45);
     this->resize(this->width(), (nRow + 1) * 45);
 }
