@@ -208,8 +208,37 @@
         <file>images/file/ic_prev_pre.png</file>
         <file>images/file/menu_icon.png</file>
         <file>images/file/menu_icon_pressed.png</file>
+        <file>images/weather/type/zh/暴雪.png</file>
+        <file>images/weather/type/zh/暴雨.png</file>
+        <file>images/weather/type/zh/大暴雨.png</file>
+        <file>images/weather/type/zh/大雪.png</file>
+        <file>images/weather/type/zh/大雨.png</file>
+        <file>images/weather/type/zh/冻雨.png</file>
+        <file>images/weather/type/zh/多云.png</file>
+        <file>images/weather/type/zh/雷阵雨.png</file>
+        <file>images/weather/type/zh/雷阵雨伴有冰雹.png</file>
+        <file>images/weather/type/zh/沙尘暴.png</file>
+        <file>images/weather/type/zh/天气晴.png</file>
+        <file>images/weather/type/zh/雾.png</file>
+        <file>images/weather/type/zh/小雪.png</file>
+        <file>images/weather/type/zh/小雨.png</file>
+        <file>images/weather/type/zh/阴.png</file>
+        <file>images/weather/type/zh/雨夹雪.png</file>
+        <file>images/weather/type/zh/阵雪.png</file>
+        <file>images/weather/type/zh/阵雨.png</file>
+        <file>images/weather/type/zh/中雪.png</file>
+        <file>images/weather/type/zh/中雨.png</file>
+        <file>images/weather/type/zh/晴.png</file>
         <file>images/camera/menu_icon.png</file>
         <file>images/camera/menu_icon_pressed.png</file>
+        <file>images/weather/background/大雪.png</file>
+        <file>images/weather/background/大雨.png</file>
+        <file>images/weather/background/多云.png</file>
+        <file>images/weather/background/雷阵雨.png</file>
+        <file>images/weather/background/晴.png</file>
+        <file>images/weather/background/小雪.png</file>
+        <file>images/weather/background/小雨.png</file>
+        <file>images/weather/background/阴.png</file>
         <file>images/weather/btn_search.png</file>
         <file>images/weather/city_bg.png</file>
         <file>images/weather/ic_back.png</file>
@@ -266,33 +295,10 @@
         <file>images/keyled/menu_icon.png</file>
         <file>images/keyled/menu_icon_pressed.png</file>
         <file>images/mainwindow/ic_key.png</file>
-        <file alias="images/weather/type/zh/暴雪.png">images/weather/type/en/baoxue.png</file>
-        <file alias="images/weather/type/zh/暴雨.png">images/weather/type/en/baoyu.png</file>
-        <file alias="images/weather/type/zh/大暴雨.png">images/weather/type/en/dabaoyu.png</file>
-        <file alias="images/weather/type/zh/大雪.png">images/weather/type/en/daxue.png</file>
-        <file alias="images/weather/type/zh/大雨.png">images/weather/type/en/dayu.png</file>
-        <file alias="images/weather/type/zh/冻雨.png">images/weather/type/en/dongyu.png</file>
-        <file alias="images/weather/type/zh/多云.png">images/weather/type/en/duoyun.png</file>
-        <file alias="images/weather/type/zh/雷阵雨.png">images/weather/type/en/leizhenyu.png</file>
-        <file alias="images/weather/type/zh/雷阵雨冰雹.png">images/weather/type/en/leizhenyubingbao.png</file>
-        <file alias="images/weather/type/zh/晴.png">images/weather/type/en/qing.png</file>
-        <file alias="images/weather/type/zh/沙城暴.png">images/weather/type/en/shachenbao.png</file>
-        <file alias="images/weather/type/zh/雾.png">images/weather/type/en/wu.png</file>
-        <file alias="images/weather/type/zh/小雪.png">images/weather/type/en/xiaoxue.png</file>
-        <file alias="images/weather/type/zh/小雨.png">images/weather/type/en/xiaoyu.png</file>
-        <file alias="images/weather/type/zh/阴.png">images/weather/type/en/yin.png</file>
-        <file alias="images/weather/type/zh/雨夹雪.png">images/weather/type/en/yujiaxue.png</file>
-        <file alias="images/weather/type/zh/阵雪.png">images/weather/type/en/zhenxue.png</file>
-        <file alias="images/weather/type/zh/阵雨.png">images/weather/type/en/zhenyu.png</file>
-        <file alias="images/weather/type/zh/中雪.png">images/weather/type/en/zhongxue.png</file>
-        <file alias="images/weather/type/zh/中雨.png">images/weather/type/en/zhongyu.png</file>
-        <file alias="images/weather/background/大雪.png">images/weather/background/daxue.png</file>
-        <file alias="images/weather/background/大雨.png">images/weather/background/dayu.png</file>
-        <file alias="images/weather/background/多云.png">images/weather/background/duoyun.png</file>
-        <file alias="images/weather/background/雷阵雨.png">images/weather/background/leizhenyu.png</file>
-        <file alias="images/weather/background/晴.png">images/weather/background/qing.png</file>
-        <file alias="images/weather/background/小雪.png">images/weather/background/xiaoxue.png</file>
-        <file alias="images/weather/background/小雨.png">images/weather/background/xiaoyu.png</file>
-        <file alias="images/weather/background/阴.png">images/weather/background/ying.png</file>
+        <file>images/weather/type/zh/雪.png</file>
+        <file>images/camera/tool_pressed.png</file>
+        <file>images/camera/tool.png</file>
+        <file>images/camera/take_pressed.png</file>
+        <file>images/camera/take.png</file>
     </qresource>
 </RCC>

@@ -42,7 +42,9 @@ private:
 
     QProcess            *m_cmd;
     QTimer              *m_timer;
-
+    
+signals:
+    void send_dht11_data(double tem, double hum);
 private slots:
     void SltCurrentChanged(int index);
     void SltProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);

@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : qtpalettewidget.cpp --- QtPaletteWidget
  作 者    : Niyh  (QQ:393320854)
@@ -111,11 +111,7 @@ void QtPaletteWidget::drawFontConfig(QPainter *painter)
     font.setPixelSize(18);
     painter->setFont(font);
     QString strTitle = QString("设置字体大小");
-#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
-    int nTW = painter->fontMetrics().horizontalAdvance(strTitle);
-#else
     int nTW = painter->fontMetrics().width(strTitle);
-#endif
     QRect rectTitle(15, 15, m_nBaseWidth / 2 + nTW / 2, 40);
     painter->setPen(QColor("#5fbae2"));
     painter->setBrush(Qt::NoBrush);
@@ -149,14 +145,10 @@ void QtPaletteWidget::drawColorBoard(QPainter *painter)
     QFont font = painter->font();
     font.setPixelSize(18);
     painter->setFont(font);
-    QString strTitle = tr("设置字体颜色");
+    QString strTitle = QString("设置字体颜色");
 
     QPainterPath path;
-#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
-    int nTW = painter->fontMetrics().horizontalAdvance(strTitle);
-#else
     int nTW = painter->fontMetrics().width(strTitle);
-#endif
     int nTH = painter->fontMetrics().height();
     QRect rectTitle((m_nBaseWidth - nTW) / 2, 60, nTW, nTH);
     path.addRoundedRect(rectTitle, 2, 2);
@@ -171,11 +163,7 @@ void QtPaletteWidget::drawColorBoard(QPainter *painter)
     if (m_bColorPanel && !m_colorPanel.isNull()) {
         painter->drawPixmap(rectCenter.left() + 5, rectCenter.top() + 5, m_colorPanel);
         painter->setPen(QColor("#ffffff"));
-#if (QT_VERSION > QT_VERSION_CHECK(5, 11, 0))
-       int nXOffset = painter->fontMetrics().horizontalAdvance("+");
-#else
         int nXOffset = painter->fontMetrics().width("+");
-#endif
         int nYOffset = painter->fontMetrics().height();
         painter->drawText(m_selectPos.x() - nXOffset / 2, m_selectPos.y() - nYOffset / 2,
                           nXOffset, nYOffset, Qt::AlignCenter, QString("+"));

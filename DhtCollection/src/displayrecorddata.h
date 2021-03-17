@@ -27,7 +27,7 @@ public:
 signals:
 
 public slots:
-
+    void get_dht11_data(double tem, double hum);
 private:
     QtStackedWidget     *m_stackedWidget;
     QtCustomPlot        *m_customPlotTemp;

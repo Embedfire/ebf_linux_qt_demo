@@ -23,7 +23,8 @@ HEADERS += \
     $$PWD/qttextbroswer.h \
     $$PWD/qtlcdclockwidget.h \
     $$PWD/qttoolbar.h \
-    $$PWD/qtaddressbar.h
+    $$PWD/qtaddressbar.h \
+    $$PWD/qtmessage.h
 
 SOURCES += \
     $$PWD/splashscreen.cpp \
@@ -48,5 +49,5 @@ SOURCES += \
     $$PWD/qttextbroswer.cpp \
     $$PWD/qtlcdclockwidget.cpp \
     $$PWD/qttoolbar.cpp \
-    $$PWD/qtaddressbar.cpp
-
+    $$PWD/qtaddressbar.cpp \
+    $$PWD/qtmessage.cpp

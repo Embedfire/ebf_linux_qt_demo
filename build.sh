@@ -2,7 +2,7 @@
 
 set -v
 
-source /opt/fsl-imx-x11/4.1.15-2.1.0/environment-setup-cortexa7hf-neon-poky-linux-gnueabi
+export PATH=/opt/qt-everywhere-src-5.14.1/bin:$PATH
 
 rm *.tar.bz2 
 #make distclean

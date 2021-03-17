@@ -14,15 +14,35 @@
 #include "qtwidgetbase.h"
 #include "cameraconfig.h"
 #include "qtvideowidgetsurface.h"
+#include "qtviewfinder.h"
+
 #include <QCamera>
+#include <QCameraImageCapture>
+#include <QMediaRecorder>
+#include <QScopedPointer>
+#include <QCameraViewfinder>
+#include <QCameraViewfinderSettings>
+#include <QMediaMetaData>
 
 #include <QTimer>
 #include <QProcess>
 
+
+//#define GST_COMMAND_CAMERA
+//#define SURFACE_CAMERA
+//#define VIEWFINDER_CAMERA
+
+
+//arm 直接用gst命令显示摄像头
+//其他情况则使用qt库控制摄像头
+//qt库又分QAbstractVideoSurface QCameraViewfinder两种方式
+
 #ifdef __arm__
-#define TEST_PROCESS_CAMERA     1
-#else
-#define TEST_PROCESS_CAMERA     0
+    #define GST_COMMAND_CAMERA     1
+#endif
+
+#ifndef GST_COMMAND_CAMERA
+    #define SURFACE_OR_VIEWFINDER  1
 #endif
 
 class CameraWidget : public QtAnimationWidget
@@ -33,14 +53,45 @@ public:
     CameraWidget(QWidget *parent = 0);
     ~CameraWidget();
 
+private slots:
+    void on_timeout();
+protected:
+    void showEvent(QShowEvent *e);
 
+    void resizeEvent(QResizeEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+
+    void paintEvent(QPaintEvent *);
+    void drawToolButton(QPainter *painter);
+
+#if GST_COMMAND_CAMERA
 private:
-#if TEST_PROCESS_CAMERA
     QProcess *m_cmd;
-#endif
+    void InitCamera();
+#else
+    #if SURFACE_OR_VIEWFINDER
+private:
+    void InitCamera(const QCameraInfo &cameraInfo);
+private:
+    QtViewFinder *surface;
+    QScopedPointer<QCamera> m_camera;
+    QScopedPointer<QCameraImageCapture> m_imageCapture;
+    QScopedPointer<QMediaRecorder> m_mediaRecorder;
+
+private slots:
+    void on_takePicture();
+    void on_clieckBackhome();
+
+    void readyForCapture(bool ready);
+    void imageSaved(int id, const QString &fileName);
+    void processCapturedImage(int requestId, const QImage& img);
+    void displayCaptureError(int id, const QCameraImageCapture::Error error, const QString &errorString);
+    void displayCameraError();
+    #else
+private:
     QCamera *m_camera;
     QtVideoWidgetSurface *surface;
-
 
 protected:
     QImage   m_imagePhoto;
@@ -68,15 +119,8 @@ private slots:
     void InitCamera();
     void SltClearMessage();
 
-protected:
-    void showEvent(QShowEvent *e);
-
-    void resizeEvent(QResizeEvent *e);
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
-
-    void paintEvent(QPaintEvent *);
-    void drawToolButton(QPainter *painter);
+    #endif
+#endif
 };
 
 #endif // CAMERAWIDGET_H

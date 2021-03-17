@@ -26,6 +26,7 @@ public:
     void Stop();
 signals:
     void signalUpdate(int type, int index, qint16 value);
+    void signalUpdate(int type, int index, double value);
 
 public slots:
 
@@ -33,11 +34,17 @@ private:
     bool m_bRun;
     int  m_fd;
 
+    QString mpuDevice;
+
  private:
     int MPU6050_Init(void);
     quint8 i2c_write(int m_fd, quint8 reg, quint8 val);
     quint8 i2c_read(int m_fd, quint8 reg, quint8 * val);
     short GetData(quint8 REG_Address);
+
+    int ReadData(QString devicePath);
+    QString CheckMPU6050Device();
+
 protected:
     void run();
 };

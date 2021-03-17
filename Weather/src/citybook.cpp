@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : citybook.cpp --- CityBook
  作 者    : Niyh(lynnhua)
@@ -12,7 +12,6 @@
 #include "citybook.h"
 #include <QFile>
 #include <QTime>
-#include <QElapsedTimer>
 #include <QDebug>
 
 //{
@@ -67,6 +66,16 @@ QString CityBook::GetCityId(const QString &cityName)
     return "101010100";
 }
 
+QString CityBook::GetCityName(const QString &cityCode)
+{
+    foreach (City city, m_cityBook) {
+        if (!QString::compare(city.m_strCityCode, cityCode)) {
+            return city.m_strCityName;
+        }
+    }
+    return "北京";
+}
+
 void CityBook::LoadConfig(const QString &fileName)
 {
     QFile file(fileName);
@@ -90,10 +99,13 @@ void CityBook::LoadConfig(const QString &fileName)
 QStringList CityBook::searchCitys(const QString &name)
 {
     QStringList strCitys;
+    QTime time;
+    time.start();
     foreach (City city, m_cityBook) {
         if (city.m_strCityName.contains(name)) {
             strCitys << city.m_strCityName;
         }
     }
+    qDebug() << "elapsed time" << time.elapsed() << "ms" << strCitys.size();
     return strCitys;
 }

@@ -26,6 +26,5 @@ SOURCES += \
     $$PWD/src/equalizewidget.cpp \
     $$PWD/src/mp3infoobject.cpp
 
-
 # add ffmpeg lib
 include($$PWD/../ffmpeg/ffmpeg.pri)

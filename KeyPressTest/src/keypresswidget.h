@@ -27,6 +27,7 @@ public:
 
 public slots:
     void SltKeyPressed(const quint8 &type);
+    void SltKeyPressed(const quint8 &code,const quint8 &value);
 
 private:
     void InitButtons();

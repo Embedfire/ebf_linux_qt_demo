@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : launcherwidget.cpp --- LauncherWidget
  作 者    : Niyh(lynnhua)
@@ -297,7 +297,7 @@ void LauncherWidget::mouseMoveEvent(QMouseEvent *e)
     if (m_bPressed) {
         int nXoffset = e->pos().x() - m_startPos.x();
         m_startPos = e->pos();
-//        if (m_bZoom) nXoffset = nXoffset;
+        if (m_bZoom) nXoffset = nXoffset;
 
         // 向左滑动--显示下一页
         m_nDirection = (nXoffset < 0) ? LeftDirection : RightDirection;

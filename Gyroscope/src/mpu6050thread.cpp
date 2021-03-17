@@ -11,7 +11,8 @@
 *******************************************************************/
 #include "mpu6050thread.h"
 #include <QDebug>
-
+#include <QFile>
+#include <QDir>
 //包含头文件
 #include<stdio.h>
 #include<stdlib.h>
@@ -63,7 +64,28 @@ Mpu6050Thread::~Mpu6050Thread()
 {
     Stop();
 }
+QString Mpu6050Thread::CheckMPU6050Device()
+{
+    QDir devDir("/sys/bus/iio/devices");
+    if(!devDir.exists())
+        return "";
 
+    //QString mpuDevice="/sys/bus/iio/devices/iio\:device%1";
+    QFileInfoList list = devDir.entryInfoList();
+    for(int i=0 ; i<list.size(); i++)
+    {
+        QFile iioDeviceName(list.at(i).filePath()+"/name");
+        if (!iioDeviceName.open(QIODevice::ReadOnly))
+            continue;
+        QString name = iioDeviceName.readAll();
+        iioDeviceName.close();
+
+        if(name == "mpu6050\n")
+            return list.at(i).filePath();
+    }
+
+    return "";
+}
 void Mpu6050Thread::Stop()
 {
     m_bRun = false;
@@ -75,29 +97,33 @@ int Mpu6050Thread::MPU6050_Init(void)
 {
     int fd = -1;
 #ifdef __arm__
-    fd  = open("/dev/i2c-0", O_RDWR);               // open file and enable read and  write
 
-    if (fd < 0)
-    {
-        perror("Can't open /dev/MPU6050 \n");       // open i2c dev file fail
-        return - 1;
-    }
+//    fd  = open("/dev/i2c-0", O_RDWR);               // open file and enable read and  write
 
-    printf("open /dev/i2c-0 success !\n");          // open i2c dev file succes
+//    if (fd < 0)
+//    {
+//        perror("Can't open /dev/MPU6050 \n");       // open i2c dev file fail
+//        return - 1;
+//    }
 
-    if (ioctl(fd, I2C_SLAVE, Address) < 0)
-    {
-        // set i2c address
-        printf("fail to set i2c device slave address!\n");
-        close(fd);
-        return - 1;
-    }
+//    printf("open /dev/i2c-0 success !\n");          // open i2c dev file succes
 
-    printf("set slave address to 0x%x success!\n", Address);
-    i2c_write(fd, PWR_MGMT_1, 0X00);
-    i2c_write(fd, SMPLRT_DIV, 0X07);
-    i2c_write(fd, CONFIG, 0X06);
-    i2c_write(fd, ACCEL_CONFIG, 0X01);
+//    if (ioctl(fd, I2C_SLAVE, Address) < 0)
+//    {
+//        // set i2c address
+//        printf("fail to set i2c device slave address!\n");
+//        close(fd);
+//        return - 1;
+//    }
+
+//    printf("set slave address to 0x%x success!\n", Address);
+//    i2c_write(fd, PWR_MGMT_1, 0X00);
+//    i2c_write(fd, SMPLRT_DIV, 0X07);
+//    i2c_write(fd, CONFIG, 0X06);
+//    i2c_write(fd, ACCEL_CONFIG, 0X01);
+
+    mpuDevice=CheckMPU6050Device();
+
     m_bRun = true;
 #else
     m_bRun = true;
@@ -169,32 +195,40 @@ short Mpu6050Thread::GetData(quint8 REG_Address)
     return (H << 8) + L;
 }
 
+int Mpu6050Thread::ReadData(QString devicePath)
+{
+    QFile in_accel_x_raw(devicePath);
+    if (!in_accel_x_raw.open(QIODevice::ReadOnly)) {
+        qDebug() << "open mpu6050device failed!";
+        return 0;
+    }
+    QString strValue = in_accel_x_raw.readAll();
+    in_accel_x_raw.close();
 
+    return strValue.toInt();
+}
+
+// #define MPU6050_ACCEL_X         "/sys/bus/iio/devices/iio\:device1/in_accel_x_raw"
+// #define MPU6050_ACCEL_Y         "/sys/bus/iio/devices/iio\:device1/in_accel_y_raw"
+// #define MPU6050_ACCEL_Z         "/sys/bus/iio/devices/iio\:device1/in_accel_z_raw"
+// #define MPU6050_ANGLVEL_X       "/sys/bus/iio/devices/iio\:device1/in_anglvel_x_raw"
+// #define MPU6050_ANGLVEL_Y       "/sys/bus/iio/devices/iio\:device1/in_anglvel_y_raw"
+// #define MPU6050_ANGLVEL_Z       "/sys/bus/iio/devices/iio\:device1/in_anglvel_z_raw"
+
+//AFS_SEL   2g      32767/2 = data/x        x=data/16384
+//FS_SEL    2000    32767/2000 =data/x      x=data/16.4
 void Mpu6050Thread::run()
 {
     m_fd = MPU6050_Init();
     // 启动线程
     while (m_bRun)
     {
-        // printf("\033[2J");
-//        usleep(1000 * 10);
-        emit signalUpdate(0, ArgX, GetData(ACCEL_XOUT_H));
-
-//        usleep(1000 * 10);
-        emit signalUpdate(0, ArgY, GetData(ACCEL_YOUT_H));
-
-//        usleep(1000 * 10);
-        emit signalUpdate(0, ArgZ, GetData(ACCEL_ZOUT_H));
-
-//        usleep(1000 * 10);
-        emit signalUpdate(1, ArgX, GetData(GYRO_XOUT_H));
-
-//        usleep(1000 * 10);
-        emit signalUpdate(1, ArgY, GetData(GYRO_YOUT_H));
-
-//        usleep(1000 * 10);
-        emit signalUpdate(1, ArgZ, GetData(GYRO_ZOUT_H));
-
+        emit signalUpdate(0, ArgX, ReadData(this->mpuDevice+"/in_accel_x_raw")/16384.0);
+        emit signalUpdate(0, ArgY, ReadData(this->mpuDevice+"/in_accel_y_raw")/16384.0);
+        emit signalUpdate(0, ArgZ, ReadData(this->mpuDevice+"/in_accel_z_raw")/16384.0);
+        emit signalUpdate(1, ArgX, ReadData(this->mpuDevice+"/in_anglvel_x_raw")/16.4);
+        emit signalUpdate(1, ArgY, ReadData(this->mpuDevice+"/in_anglvel_y_raw")/16.4);
+        emit signalUpdate(1, ArgZ, ReadData(this->mpuDevice+"/in_anglvel_z_raw")/16.4);
         usleep(1000 * 150);
     }
 

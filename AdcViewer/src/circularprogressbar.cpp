@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2017 - All Rights Reserved by
  文 件 名 : circularprogressbar.cpp --- CircularProgressBar
  作 者    : Niyh  (QQ:393320854)
@@ -16,9 +16,9 @@
 
 CircularProgressBar::CircularProgressBar(QWidget *parent) : QtWidgetBase(parent)
 {
-    m_nMaxValue = 330;
+    m_nMaxValue = 3300;
     m_MinValue = 0;
-    m_nCurrentValue = 99;
+    m_nCurrentValue = 990;
 
     m_nBaseWidth = 320;
     m_nBaseHeight = 320;
@@ -124,19 +124,20 @@ void CircularProgressBar::drawValue(QPainter *painter)
     font.setPixelSize(35);
     painter->setFont(font);
 
-    QString strValue = QString("%1").arg(m_nCurrentValue * 100 / m_nMaxValue);
-    int nValueW = getTextWidthByFont(painter->font(), strValue);
+    QString strValue = QString("%1").arg(m_nCurrentValue *100 / m_nMaxValue);
+
+    int nValueW = painter->fontMetrics().width(strValue);
 
     font.setPixelSize(18);
     QFontMetrics fm(font);
-    nValueW += getTextWidthByFont(painter->font(), "%");
+    nValueW += fm.width("%");
 
     int nFontHeith = painter->fontMetrics().height();
     QRect rect(-nValueW / 2, -nFontHeith / 2, nValueW, nFontHeith);
     painter->drawText(rect, Qt::AlignLeft | Qt::AlignTop, strValue);
 
     painter->setFont(font);
-    int nW = getTextWidthByFont(painter->font(), "%");
+    int nW = painter->fontMetrics().width("%");
     nFontHeith = painter->fontMetrics().height();
     rect = QRect(rect.right() - nW, rect.bottom() - nFontHeith - 5, nW, nFontHeith);
     painter->drawText(rect, Qt::AlignCenter, "%");

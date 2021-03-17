@@ -54,7 +54,7 @@ include($$PWD/../KeyPressTest/keypress.pri)
 include($$PWD/../MusicPlayer/musicplayer.pri)
 include($$PWD/../NotePad/notepad.pri)
 include($$PWD/../Photos/photos.pri)
-include($$PWD/../Recorder/recorder.pri)
+#include($$PWD/../Recorder/recorder.pri)
 include($$PWD/../RgbLight/rgblight.pri)
 include($$PWD/../Settings/settings.pri)
 include($$PWD/../VideoPlayer/videoplayer.pri)
@@ -71,6 +71,7 @@ LIBS += -L$$PWD/../thirdpart/libqui/lib -lQtUi
 
 INCLUDEPATH += $$PWD/../thirdpart/libskin/include
 LIBS += -L$$PWD/../thirdpart/libskin/lib -lSkin
+
 
 #temp file
 DESTDIR         = $$PWD/../app_bin
@@ -95,6 +96,5 @@ win32 {
 
 #编译HDMI版本，方便适配大屏显示
 DEFINES      += BUILD_WITH_HDMI
-
 
 TRANSLATIONS    = qt_zh.ts qt_en.ts

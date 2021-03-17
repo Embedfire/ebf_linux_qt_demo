@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : aboutboard.cpp --- AboutBoard
  作 者    : Niyh(lynnhua)
@@ -113,7 +113,7 @@ void AboutBoard::drawItemInfo(QPainter *painter, QtListWidgetItem *item)
 
     QPixmap pixmap = item->m_pixmapIcon;
     if (pixmap.isNull()) {
-        int nW = getTextWidthByFont(painter->font(), item->m_strBaseName);
+        int nW = painter->fontMetrics().width(item->m_strBaseName);
         painter->drawText(QRect(m_nBaseWidth - nW - 20, rect.top(), nW, rect.height()), Qt::AlignCenter, item->m_strBaseName);
     } else {
         painter->drawPixmap(m_nBaseWidth - pixmap.width() - 20, rect.top() + (rect.height() - pixmap.height()) / 2, pixmap);

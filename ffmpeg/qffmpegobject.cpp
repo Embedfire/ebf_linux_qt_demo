@@ -1,4 +1,4 @@
-﻿/******************************************************************
+/******************************************************************
  Copyright (C) 2019 - All Rights Reserved by
  文 件 名 : qffmpegobject.cpp --- QFFmpegObject
  作 者    : Niyh(lynnhua)
@@ -15,10 +15,8 @@
 
 QFFmpegObject::QFFmpegObject(QObject *parent) : QObject(parent)
 {
-    #ifdef __arm__
     // 注册库中所有可用的文件格式和解码器
     av_register_all();
-#endif
 }
 
 QFFmpegObject::~QFFmpegObject()
@@ -28,7 +26,6 @@ QFFmpegObject::~QFFmpegObject()
 QImage QFFmpegObject::getAritstPic(const QString &fileName)
 {
     QImage m_InfoImage;
-#ifdef __arm__
     m_AVFormatContext = avformat_alloc_context();
     // 打开文件
     int result = avformat_open_input(&m_AVFormatContext, fileName.toLocal8Bit().data(), NULL, NULL);
@@ -53,8 +50,6 @@ QImage QFFmpegObject::getAritstPic(const QString &fileName)
             m_InfoImage = QImage::fromData((uchar*)pkt.data, pkt.size);
         }
     }
-#else
-    Q_UNUSED(fileName);
-#endif
+
     return m_InfoImage;
 }

@@ -18,6 +18,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QApplication>
+#include <QCryptographicHash>
 
 DownloadNetworkManager::DownloadNetworkManager(QObject *parent) :
     QNetworkAccessManager(parent), m_bCheckVersion(false)

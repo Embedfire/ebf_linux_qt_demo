@@ -38,6 +38,8 @@ DhtCollection::DhtCollection(QWidget *parent)
 
     m_timer = new QTimer(this);
     m_timer->setInterval(5000);
+    //立即刷新温湿度
+    this->StartCmd();
     connect(m_timer, SIGNAL(timeout()), this, SLOT(StartCmd()));
     m_timer->start();
 }
@@ -69,6 +71,8 @@ void DhtCollection::InitWidget()
 
     m_realData = new DisplayRealData(m_stackedWidget);
     m_recordData = new DisplayRecordData(m_stackedWidget);
+    connect(this, SIGNAL(send_dht11_data(double,double)), m_realData, SLOT(get_dht11_data(double,double)));
+    connect(this, SIGNAL(send_dht11_data(double,double)), m_recordData, SLOT(get_dht11_data(double,double)));
     m_stackedWidget->addWidget(0, m_realData);
     m_stackedWidget->addWidget(1, m_recordData);
 
@@ -106,7 +110,26 @@ void DhtCollection::SltProcessFinished(int exitCode, QProcess::ExitStatus exitSt
 void DhtCollection::StartCmd()
 {
 #ifdef __arm__
-    m_cmd->start(DHT_DEVICE_FILE);
+    FILE *fp = NULL;
+    fp = fopen("/dev/dht11","r");
+    if(fp==NULL)
+        return ;
+    char buffer[6];
+    int readCnt = fread(buffer,sizeof(buffer),4,fp);  /* 返回值为0 */
+    fclose(fp);
+    if(readCnt==0)
+        return ;
+
+    double temp[6];
+    for(int i=0; i<6; i++)
+        temp[i]=buffer[i];
+
+    QString temStr=QString::number(temp[2])+"."+QString::number(temp[3]);
+    QString humStr=QString::number(temp[0])+"."+QString::number(temp[1]);
+
+    emit send_dht11_data(temStr.toDouble(), humStr.toDouble());
+#else
+    emit send_dht11_data(26.1, 76);
 #endif
 }
 

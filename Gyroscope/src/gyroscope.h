@@ -29,16 +29,18 @@ public:
     ~TextBoardWidget();
 
     void setValue(int index, qint16 value);
+    void setValue(int index, double value);
     void setValues(int p, int r, int y);
+    void setValues(double p, double r, double y);
 
     void setTitle(const QString &text);
     void setArgumensLabels(const QStringList &labels);
     void setArgumensUnits(const QStringList &units);
 
 private:
-    qint16 m_nPitchValue;
-    qint16 m_nRollValue;
-    qint16 m_nYawValue;
+    double m_nPitchValue;
+    double m_nRollValue;
+    double m_nYawValue;
 
     QString     m_strTitle;
     QStringList m_strLabels;
@@ -61,6 +63,10 @@ private:
     int m_nRollValue;
     int m_nYawValue;
 
+    int m_nPitchValue_1;
+    int m_nRollValue_1;
+    int m_nYawValue_1;
+
     TextBoardWidget     *m_textBoardLeft;
 #ifdef USE_TEXT_BOARD
     TextBoardWidget     *m_textBoardRight;
@@ -73,10 +79,12 @@ private:
 
 private:
     void InitWidget();
+    QString CheckMPU6050Device();
 
 private slots:
     void SltStartTest();
     void SltUpdateValues(int type, int index, qint16 value);
+    void SltUpdateValues(int type, int index, double value);
 protected:
     void resizeEvent(QResizeEvent *e);
     void paintEvent(QPaintEvent *);

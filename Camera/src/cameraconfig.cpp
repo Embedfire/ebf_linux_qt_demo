@@ -248,7 +248,7 @@ void CameraConfig::InitMainPage()
     {
         QHBoxLayout *horLayout = new QHBoxLayout();
         horLayout->setContentsMargins(10, 0, 0, 0);
-        horLayout->addWidget(new QLabel(tr("对比对"), m_configMain));
+        horLayout->addWidget(new QLabel(tr("对比度"), m_configMain));
         verLayoutAll->addLayout(horLayout);
 
         QtSliderBar *sliderContrastratio = new QtSliderBar(m_configMain);

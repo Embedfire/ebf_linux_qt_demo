@@ -29,12 +29,15 @@
 #include "gyroscope.h"
 #include "notepadwidget.h"
 #include "photosview.h"
-#include "recorderwidget.h"
+//#include "recorderwidget.h"
 #include "settingwidget.h"
 #include "videoplayer.h"
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
+#include "qtviewfinder.h"
+
+#include "qtmessage.h"
 
 #ifdef BUILD_WIN_NES
 #include "nessimulator.h"
@@ -156,7 +159,7 @@ void MainWindow::InitDesktop()
     if (!bMiniBoard) {
         m_launchItems.insert(13, new LauncherItem(13, nPage, tr("陀螺仪"), QPixmap(":/images/mainwindow/ic_gyroscope.png")));
         m_launchItems.insert(17, new LauncherItem(17, nPage, tr("蜂鸣器"), QPixmap(":/images/mainwindow/ic_beep.png")));
-        m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
+//        m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
     }
 
     // 第三页
@@ -175,16 +178,17 @@ void MainWindow::InitThreads()
     m_threadUsbInsert->start();
 #endif
 
-    m_threadPowerKey = new ThreadKey(this);
+    //m_threadPowerKey = new ThreadKey(this);
     m_threadKey = new ThreadKey(this, 1);
 
-    m_threadPowerKey->start();
+    //m_threadPowerKey->start();
     m_threadKey->start();
 }
 
 void MainWindow::SltCurrentAppChanged(int index)
 {
     if (m_bStartApp) return;
+
     m_launcherWidget->setEnabled(false);
     m_bStartApp = true;
 
@@ -206,15 +210,18 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 1: {
-        if (NULL != m_musicWidget) {
-            m_musicWidget->StopMusic();
+        if(CheckDevice("声卡"))
+        {
+            if (NULL != m_musicWidget) {
+                m_musicWidget->StopMusic();
+            }
+            m_widgetWorkSpace = new VideoPlayer(this);
         }
-        //
-        m_widgetWorkSpace = new VideoPlayer(this);
     }
         break;
     case 2: {
-        m_widgetWorkSpace = new AdcViewer(this);
+        if(CheckDevice("ADC"))
+            m_widgetWorkSpace = new AdcViewer(this);
     }
         break;
     case 3: {
@@ -222,7 +229,9 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 4: {
-        m_widgetWorkSpace = new CameraWidget(this);
+        if(CheckDevice("摄像头"))
+            m_widgetWorkSpace = new CameraWidget(this);
+            //m_widgetWorkSpace = new QtViewFinder(this);
     }
         break;
     case 5: {
@@ -242,7 +251,8 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 9: {
-        m_widgetWorkSpace = new DhtCollection(this);
+        if(CheckDevice("DHT11")){
+            m_widgetWorkSpace = new DhtCollection(this);}
     }
         break;
     case 10: {
@@ -250,26 +260,32 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 11: {
-        //        m_widgetWorkSpace = new MusicPlayer(this);
-        m_nCurrentIndex = index;
-        if (NULL == m_musicWidget) {
-            m_musicWidget = new MusicPlayer(this);
-            connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
-            connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
+        //m_widgetWorkSpace = new MusicPlayer(this);
+        if(CheckDevice("声卡"))
+        {
+            m_nCurrentIndex = index;
+            if (NULL == m_musicWidget) {
+                m_musicWidget = new MusicPlayer(this);
+                connect(m_musicWidget, SIGNAL(signalBackHome()), this, SLOT(SltBackHome()));
+                connect(m_musicWidget, SIGNAL(signalAnimationFinished()), this, SLOT(SltAppStartOk()));
+            }
+
+            m_musicWidget->resize(this->size());
+            m_musicWidget->setVisible(true);
+            m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
+            return;
         }
 
-        m_musicWidget->resize(this->size());
-        m_musicWidget->setVisible(true);
-        m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
-        return;
     }
         break;
     case 12: {
-        m_widgetWorkSpace = new RgbLightMonitor(this);
+        if(CheckDevice("RGB彩灯"))
+            m_widgetWorkSpace = new RgbLightMonitor(this);
     }
         break;
     case 13: {
-        m_widgetWorkSpace = new Gyroscope(this);
+        if(CheckDevice("陀螺仪"))
+            m_widgetWorkSpace = new Gyroscope(this);
     }
         break;
     case 14: {
@@ -283,21 +299,27 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 16: {
-        m_widgetWorkSpace = new BackLightWidget(this);
+        if(CheckDevice("背光调节"))
+            m_widgetWorkSpace = new BackLightWidget(this);
     }
         break;
     case 17: {
-        m_widgetWorkSpace = new BeepWidget(this);
+        //if(CheckDevice("蜂鸣器"))
+            m_widgetWorkSpace = new BeepWidget(this);
     }
         break;
     case 18: {
-        m_widgetWorkSpace = new RecorderWidget(this);
+//        m_widgetWorkSpace = new RecorderWidget(this);
     }
         break;
     case 19: {
-        m_widgetWorkSpace = new KeyPressWidget(this);
-        connect(m_threadPowerKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
-        connect(m_threadKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+        if(CheckDevice("按键")){
+            m_widgetWorkSpace = new KeyPressWidget(this);
+//            connect(m_threadPowerKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+//            connect(m_threadKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
+            connect(m_threadKey, SIGNAL(signalKeyPressed(const quint8 ,const quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(const quint8 ,const quint8)));
+        }
+
     }
         break;
     case 23: {
@@ -307,16 +329,20 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 24: {
-        // 关闭音乐
-        if (NULL != m_musicWidget) {
-            m_musicWidget->StopMusic();
-        }
 
-#ifdef BUILD_WIN_NES
-        m_widgetWorkSpace = new NesSimulator(this);
-#else
-        m_widgetWorkSpace = new InfoNesWidget(this);
-#endif
+        if(CheckDevice("NES声卡"))
+        {
+            // 关闭音乐
+            if (NULL != m_musicWidget) {
+                m_musicWidget->StopMusic();
+            }
+
+        #ifdef BUILD_WIN_NES
+                m_widgetWorkSpace = new NesSimulator(this);
+        #else
+                m_widgetWorkSpace = new InfoNesWidget(this);
+        #endif
+        }
     }
         break;
 
@@ -451,3 +477,83 @@ void MainWindow::timerEvent(QTimerEvent *e)
 #endif
 
 
+bool MainWindow::CheckDevice(QString device)
+{
+    QFileInfo info;
+
+    if(device=="声卡")
+        info.setFile(VOICE_DEV);
+    if(device=="NES声卡")
+        info.setFile(VOICE_DEV);
+    else if(device=="ADC")
+        info.setFile(ADC_DEV);
+    else if(device=="摄像头")
+        info.setFile(CAMERA_DEV);
+    else if(device=="DHT11")
+        info.setFile(DHT11_DEV);
+    else if(device=="RGB彩灯")
+        info.setFile(RGB_DEV);
+    else if(device=="陀螺仪")
+        info.setFile(CheckMPU6050Device());
+    else if(device=="背光调节")
+        info.setFile(BKLIGHT_DEV);
+    else if(device=="蜂鸣器")
+        info.setFile(BEEP_DEV);
+    else if(device=="按键")
+        info.setFile(RGB_DEV);
+
+    if(!info.exists())
+    {
+        qDebug()<<"device not found";
+        QtMessage *msg=new QtMessage(this);
+        msg->setMessage(QString("没有检测到%1，\r\n请确认板卡支持该功能或已接入该硬件").arg(device));
+
+        if(msg->exec()==QDialog::Accepted)
+        {
+            //NES 直接不打开
+            if(device=="NES声卡")
+            {
+                m_launcherWidget->setEnabled(true);
+                m_bStartApp = false;
+                return false;
+            }
+
+            m_launcherWidget->setEnabled(false);
+            m_bStartApp = true;
+            return true;
+        }
+        else
+        {
+            m_launcherWidget->setEnabled(true);
+            m_bStartApp = false;
+            return false;
+        }
+    }
+    m_launcherWidget->setEnabled(false);
+    m_bStartApp = true;
+    return true;
+}
+
+QString MainWindow::CheckMPU6050Device()
+{
+    QDir devDir(IIC_DEV);
+    if(!devDir.exists())
+        return "";
+
+    QString mpuDevice="/sys/bus/iio/devices/iio\:device%1";
+
+    QFileInfoList list = devDir.entryInfoList();
+    for(int i=0 ; i<list.size(); i++)
+    {
+        QFile iioDeviceName(list.at(i).filePath()+"/name");
+        if (!iioDeviceName.open(QIODevice::ReadOnly))
+            continue;
+        QString name = iioDeviceName.readAll();
+        iioDeviceName.close();
+
+        if(name == "mpu6050\n")
+            return list.at(i).filePath();
+    }
+
+    return "";
+}
