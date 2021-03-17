@@ -1,49 +1,4 @@
 #! /bin/sh
-type devscan
-
-#判断devscan是否存在，不存在提示安装
-if [ $? -eq 0 ]; then
-    #寻找名叫goodix-ts的触摸屏驱动
-    eventx=$(devscan "goodix-ts")
-    #没有找到则寻找Goodix Capacitive TouchScreen
-    if [ ! $eventx ]; then
-            eventx=$(devscan "Goodix Capacitive TouchScreen")
-    fi
-    #没有找到则寻找iMX6UL Touchscreen Controller
-    if [ ! $eventx ]; then
-            eventx=$(devscan "iMX6UL Touchscreen Controller")
-    fi
-    ########################################################
-    # 添加你自己的显示屏驱动
-    # 首先 sudo evtest  查看是否存在显示屏驱动
-    # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
-    ########################################################
-
-    #输出当前触摸屏驱动
-    echo "eventx=$eventx"
-
-    if [ "$eventx " != " " ]; then
-        #判断触摸屏校准文件是否存在，不存在则校准触摸屏，/etc/pointercal为触摸屏校准文件
-        if [ ! -f "/etc/pointercal" ]; then
-            #指定触摸屏设备
-            export TSLIB_TSDEVICE=/dev/input/$eventx
-            type ts_calibrate
-            if [ $? -eq 0 ]; then
-                ts_calibrate
-            fi
-        fi
-        #同步QT默认的坐标轴和触摸屏的坐标轴
-        #export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=90:invertx
-        export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=0
-    else
-        echo "eventx is null"
-    fi
-else
-    echo "please install devscan"
-    echo
-    echo "sudo apt-get install devscan"
-    exit
-fi
 
 # 指定显示平台插件
 # QT_QPA_PLATFORM 或者-platform命令行选项指定其他设置
@@ -94,17 +49,17 @@ export QT_QPA_EGLFS_TSLIB=1
 
 # 传递设备名称
 # TSLIB_TSDEVICE
-export TSLIB_TSDEVICE=/dev/input/$eventx
+# export TSLIB_TSDEVICE=/dev/input/$eventx
 # evdevtablet 插件为Wacom和类似的基于笔的平板​​电脑提供基本支持。
 # QT_QPA_GENERIC_PLUGINS
-export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/$eventx
+# export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/$eventx
 
 # export TSLIB_TSDEVICE=/dev/input/$eventx
-export TSLIB_TSEVENTTYPE=INPUT
+# export TSLIB_TSEVENTTYPE=INPUT
 # 指定触摸屏校准文件
-export TSLIB_CONFFILE=/etc/ts.conf
+# export TSLIB_CONFFILE=/etc/ts.conf
 # 指定触摸屏校准程序
-export TSLIB_CALIBFILE=/etc/pointercal
+# export TSLIB_CALIBFILE=/etc/pointercal
 
 # 开启调试
 # export QT_LOGGING_RULES=qt.qpa.gl=true

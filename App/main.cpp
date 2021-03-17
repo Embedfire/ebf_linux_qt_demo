@@ -76,9 +76,8 @@ int main(int argc, char *argv[])
 #else
     MainWindow w;
     w.setWindowTitle(QStringLiteral("野火 @ Linux Qt Demo"));
-    // 主要是控制HDMI输出，如果是LCD显示，此行无关紧要
-    // mp157不用
-    // w.resize(AppConfig::GetDesktopSize());
+    // 主要是控制HDMI输出，如果是LCD显示，此行无关紧要 // mp157不用
+    w.resize(AppConfig::GetDesktopSize());
 
 #ifdef __arm__
     w.showFullScreen();

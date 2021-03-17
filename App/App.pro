@@ -72,6 +72,7 @@ LIBS += -L$$PWD/../thirdpart/libqui/lib -lQtUi
 INCLUDEPATH += $$PWD/../thirdpart/libskin/include
 LIBS += -L$$PWD/../thirdpart/libskin/lib -lSkin
 
+
 #temp file
 DESTDIR         = $$PWD/../app_bin
 MOC_DIR         = $$PWD/../build/app
@@ -95,6 +96,5 @@ win32 {
 
 #编译HDMI版本，方便适配大屏显示
 DEFINES      += BUILD_WITH_HDMI
-
 
 TRANSLATIONS    = qt_zh.ts qt_en.ts

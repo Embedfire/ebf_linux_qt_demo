@@ -70,7 +70,7 @@ void ThreadKey::run()
             break;
         }
         else {
-            qDebug()<<inmyself.code<<inmyself.type<<inmyself.value;
+            //qDebug()<<inmyself.code<<inmyself.type<<inmyself.value;
             emit signalKeyPressed(inmyself.code,inmyself.value);
         }
     }
