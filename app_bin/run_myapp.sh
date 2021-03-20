@@ -58,15 +58,17 @@ fi
 #导出qtdemo的安装目录
 export APP_DIR=/usr/local/qt-app
 #指定qt插件路径
-#export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
+export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 #指定qt库路径
 #export LD_LIBRARY_PATH=/lib:/usr/lib
 #指定字体库
-#export QT_QPA_FONTDIR=/usr/share/fonts/SourceHanSans
+export QT_QPA_FONTDIR=/usr/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
 #指定显示终端
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+#禁用QT自带的输入检测
+export QT_QPA_FB_DISABLE_INPUT=1
 #TS配置文件
 export TSLIB_CONFFILE=/etc/ts.conf
 #TS校准文件

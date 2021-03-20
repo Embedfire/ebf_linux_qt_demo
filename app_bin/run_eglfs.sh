@@ -22,6 +22,9 @@ export QT_QPA_FB_DRM=1
 # Qt应用程序将在Qt的lib/fonts目录中查找字体，QT_QPA_FONTDIR环境变量来覆盖此目录
 #export QT_QPA_FONTDIR=/usr/share/fonts/
 
+#禁用QT自带的输入检测
+# export QT_QPA_FB_DISABLE_INPUT=1
+
 # 鼠标设备
 # QT_QPA_EVDEV_MOUSE_PARAMETERS
 export QT_QPA_EVDEV_MOUSE_PARAMETERS=abs
