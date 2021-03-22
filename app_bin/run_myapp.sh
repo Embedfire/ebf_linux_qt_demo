@@ -62,7 +62,7 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 #指定qt库路径
 #export LD_LIBRARY_PATH=/lib:/usr/lib
 #指定字体库
-export QT_QPA_FONTDIR=/usr/fonts
+export QT_QPA_FONTDIR=/usr/lib/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
 #指定显示终端
