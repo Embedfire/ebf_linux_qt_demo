@@ -214,6 +214,8 @@ void MainWindow::SltCurrentAppChanged(int index)
         {
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
+                delete  m_musicWidget;
+                m_musicWidget=NULL;
             }
             m_widgetWorkSpace = new VideoPlayer(this);
         }
@@ -335,6 +337,9 @@ void MainWindow::SltCurrentAppChanged(int index)
             // 关闭音乐
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
+                
+                delete  m_musicWidget;
+                m_musicWidget=NULL;
             }
 
         #ifdef BUILD_WIN_NES
