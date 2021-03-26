@@ -87,4 +87,4 @@ export QT_QPA_FB_TSLIB=1
 
 echo "start app $1..."
 #运行App
-$APP_DIR/$1
+$1
