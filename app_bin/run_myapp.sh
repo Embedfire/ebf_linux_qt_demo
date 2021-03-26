@@ -13,22 +13,26 @@ type devscan
 
 #判断devscan是否存在，不存在提示安装
 if [ $? -eq 0 ]; then
-    #寻找名叫goodix-ts的触摸屏驱动
-    eventx=$(devscan "goodix-ts")
-    #没有找到则寻找Goodix Capacitive TouchScreen
-    if [ ! $eventx ]; then
-            eventx=$(devscan "Goodix Capacitive TouchScreen")
-    fi
-    #没有找到则寻找iMX6UL Touchscreen Controller
-    if [ ! $eventx ]; then
-            eventx=$(devscan "iMX6UL Touchscreen Controller")
-    fi
-    ########################################################
-    # 添加你自己的显示屏驱动
-    # 首先 sudo evtest  查看是否存在显示屏驱动
-    # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
-    ########################################################
-
+    #未检查到触摸屏则一直检测不启动app
+    while [ ! $eventx ]
+    do
+        #寻找名叫goodix-ts的触摸屏驱动
+        eventx=$(devscan "goodix-ts")
+        #没有找到则寻找Goodix Capacitive TouchScreen
+        if [ ! $eventx ]; then
+                eventx=$(devscan "Goodix Capacitive TouchScreen")
+        fi
+        #没有找到则寻找iMX6UL Touchscreen Controller
+        if [ ! $eventx ]; then
+                eventx=$(devscan "iMX6UL Touchscreen Controller")
+        fi
+        ########################################################
+        # 添加你自己的显示屏驱动
+        # 首先 sudo evtest  查看是否存在显示屏驱动
+        # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
+        ########################################################
+        sleep 5
+    done
     #输出当前触摸屏驱动
     echo "eventx=$eventx"
 
@@ -83,4 +87,4 @@ export QT_QPA_FB_TSLIB=1
 
 echo "start app $1..."
 #运行App
-$APP_DIR/$1
+$1
