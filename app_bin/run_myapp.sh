@@ -72,7 +72,7 @@ export QT_QPA_FONTDIR=/usr/lib/fonts
 #指定显示终端
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
 #禁用QT自带的输入检测
-export QT_QPA_FB_DISABLE_INPUT=1
+#export QT_QPA_FB_DISABLE_INPUT=1
 #TS配置文件
 export TSLIB_CONFFILE=/etc/ts.conf
 #TS校准文件
