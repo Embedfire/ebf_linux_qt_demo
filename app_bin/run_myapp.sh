@@ -14,6 +14,7 @@ type devscan
 #判断devscan是否存在，不存在提示安装
 if [ $? -eq 0 ]; then
     #未检查到触摸屏则一直检测不启动app
+    timeout=0
     while [ ! $eventx ]
     do
         #寻找名叫goodix-ts的触摸屏驱动
@@ -31,7 +32,11 @@ if [ $? -eq 0 ]; then
         # 首先 sudo evtest  查看是否存在显示屏驱动
         # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
         ########################################################
-        sleep 5
+        if [ $timeout -ge 5 ]; then
+            break
+        fi
+        let timeout=$timeout+1
+        sleep 1
     done
     #输出当前触摸屏驱动
     echo "eventx=$eventx"
