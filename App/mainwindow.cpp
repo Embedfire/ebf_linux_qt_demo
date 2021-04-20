@@ -343,6 +343,10 @@ void MainWindow::SltCurrentAppChanged(int index)
             // 关闭音乐
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
+<<<<<<< HEAD
+=======
+                
+>>>>>>> b789fd9b3146a02734b4dec743febfcd5ae4c61d
                 delete  m_musicWidget;
                 m_musicWidget=NULL;
             }
