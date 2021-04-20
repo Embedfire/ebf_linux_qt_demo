@@ -162,10 +162,11 @@ void MainWindow::InitDesktop()
 //        m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
     }
 
-    // 第三页
-    nPage++;
-    m_launchItems.insert(24, new LauncherItem(24, nPage, tr("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
+    // 第三页 暂时取消nes游戏模拟器
+//    nPage++;
+//    m_launchItems.insert(24, new LauncherItem(24, nPage, tr("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
 
+    m_launcherWidget->SetPageCount(nPage+1);
     m_launcherWidget->SetItems(m_launchItems);
 #endif
 }
@@ -214,6 +215,8 @@ void MainWindow::SltCurrentAppChanged(int index)
         {
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
+                delete  m_musicWidget;
+                m_musicWidget=NULL;
             }
             m_widgetWorkSpace = new VideoPlayer(this);
         }
@@ -230,8 +233,13 @@ void MainWindow::SltCurrentAppChanged(int index)
         break;
     case 4: {
         if(CheckDevice("摄像头"))
+        {
+            if (NULL != m_musicWidget) {
+                m_musicWidget->StopMusic();
+            }
             m_widgetWorkSpace = new CameraWidget(this);
             //m_widgetWorkSpace = new QtViewFinder(this);
+        }
     }
         break;
     case 5: {
@@ -335,6 +343,8 @@ void MainWindow::SltCurrentAppChanged(int index)
             // 关闭音乐
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
+                delete  m_musicWidget;
+                m_musicWidget=NULL;
             }
 
         #ifdef BUILD_WIN_NES

@@ -2,8 +2,8 @@ INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD
 
 #用于区分 ARM或UBUNTU
-DEFINES      += ARM_X64
-#DEFINES      += LINUX_UBUNTU
+#DEFINES      += ARM_X64
+DEFINES      += LINUX_UBUNTU
 
 win32 {
 LIBS += -L$$PWD/winlib/ -lavcodec -lavfilter -lavformat -lswscale -lavutil

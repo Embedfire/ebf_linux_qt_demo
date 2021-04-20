@@ -64,7 +64,6 @@ void ThreadKey::run()
     while (m_bRun)
     {
 
-
         if (read(fd, &inmyself, sizeof(inmyself)) < 0) {
             m_bRun = false;
             break;

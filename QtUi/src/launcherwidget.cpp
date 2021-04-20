@@ -159,7 +159,7 @@ void LauncherWidget::Init()
     m_btnNext = new QtPixmapButton(0, QRect(750, 180, 40, 40), QPixmap(":/images/mainwindow/ic_next.png"), QPixmap(":/images/mainwindow/ic_next_pre.png"));
 
     // 设置移动点
-    SetPageCount(3);
+    SetPageCount(m_nPageCnt);
 }
 
 void LauncherWidget::setXPos(int nValue)

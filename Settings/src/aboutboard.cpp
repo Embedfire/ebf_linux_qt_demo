@@ -22,8 +22,11 @@
 
 #define FLASH_FILE_PART     4
 #define FLASH_FILE_INFO     "/sys/class/mtd/mtd%1/size"
+//#define FLASH_FILE_INFO     "/sys/class/mtd/mtd%1/mtdblock%1/size"
 #ifndef FLASH_FILE_EMMC
 #define FLASH_FILE_EMMC     "/sys/class/mmc_host/mmc1/mmc1:0001/block/mmcblk1/size"
+#define BOARD_TYPE          "/proc/device-tree/model"
+
 #endif
 
 AboutBoard::AboutBoard(QWidget *parent) : QtListWidget(parent)
@@ -49,6 +52,25 @@ AboutBoard::~AboutBoard()
 void AboutBoard::InitBoardInfo()
 {
 #ifdef __arm__
+
+    // 板子类型
+    if (!QFile::exists(BOARD_TYPE)) {
+        m_strBoardType = "LubanCat Robot S1 Board";
+        return;
+    }
+
+    QFile file_type(BOARD_TYPE);
+    if (!file_type.open(QIODevice::ReadOnly)) {
+        qDebug() << "Read type failed";
+        return;
+    }
+    m_strBoardType=file_type.readAll();
+    file_type.close();
+
+    if(m_strBoardType.contains("STM32MP157"))
+        m_strBoardType = "LubanCat Robot S1 Board";
+
+
     // emmc设备检测
     if (QFile::exists(FLASH_FILE_EMMC)) {
         m_strNandSize = "";
@@ -56,11 +78,11 @@ void AboutBoard::InitBoardInfo()
     }
 
     // nand容量读取
-    quint32 usize, i;
+    quint32 usize=0, i;
+
     QString flash_file;
     for (i = 0; i < FLASH_FILE_PART; i++) {
         flash_file = QString(FLASH_FILE_INFO).arg(i);
-
         QFile file(flash_file);
         if (!file.open(QIODevice::ReadOnly)) {
             qDebug() << "Read flash size failed";
@@ -72,7 +94,6 @@ void AboutBoard::InitBoardInfo()
         usize += strTemp.toULong();
         file.close();
     }
-
     usize /= (1024 * 1024);
     m_strNandSize = QString("%1MB NAND").arg(usize);
 
@@ -83,7 +104,7 @@ void AboutBoard::InitWidget()
 {
     int index = 0;
     m_listItems.insert(index, new QtListWidgetItem(index, tr("硬件版本"),  tr("V1.0"), QPixmap())); index++;
-    m_listItems.insert(index, new QtListWidgetItem(index, tr("开发板型号"),  tr("EBF6UL/6ULL S1 Pro"), QPixmap())); index++;
+    m_listItems.insert(index, new QtListWidgetItem(index, tr("开发板型号"),  m_strBoardType, QPixmap())); index++;
     m_strNandSize = m_strNandSize.isEmpty() ? tr("8GB eMMC") : m_strNandSize;
     m_listItems.insert(index, new QtListWidgetItem(index, tr("存储空间"),  m_strNandSize, QPixmap())); index++;
     m_listItems.insert(index, new QtListWidgetItem(index, tr("内存大小"),  tr("512MB"), QPixmap())); index++;

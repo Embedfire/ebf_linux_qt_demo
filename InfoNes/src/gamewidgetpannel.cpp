@@ -12,12 +12,16 @@
 #include "skin.h"
 #include "appconfig.h"
 
+#include "neswidget.h"
+
 #include <QApplication>
 #include <QPainter>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
+
+#define LINUXFB
 
 GameWidgetPannel::GameWidgetPannel(QWidget *parent) : QtWidgetBase(parent)
 {
@@ -30,6 +34,11 @@ GameWidgetPannel::GameWidgetPannel(QWidget *parent) : QtWidgetBase(parent)
     m_timer->setInterval(1000);
     m_timer->setSingleShot(true);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(hide()));
+
+
+#ifndef LINUXFB
+    nes = new NesWidget(this);
+#endif
 }
 
 GameWidgetPannel::~GameWidgetPannel()
@@ -43,6 +52,8 @@ void GameWidgetPannel::startGame(const QString &fileName)
 {
     if (isRunning()) return;
     if (m_timer->isActive()) m_timer->stop();
+
+#ifdef LINUXFB
 
     QString strCmd = qApp->applicationDirPath() + "/InfoNes";
     if (QFile::exists(strCmd)) {
@@ -66,6 +77,11 @@ void GameWidgetPannel::startGame(const QString &fileName)
     }
 
     this->show();
+#else
+    nes->setFileName(fileName);
+    nes->show();
+
+#endif
 }
 
 bool GameWidgetPannel::isRunning()

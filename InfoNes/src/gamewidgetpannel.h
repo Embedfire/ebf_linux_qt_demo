@@ -15,6 +15,8 @@
 #include <QProcess>
 #include <QTimer>
 
+class NesWidget;
+
 class GameWidgetPannel : public QtWidgetBase
 {
     Q_OBJECT
@@ -36,6 +38,9 @@ private:
     bool      m_bQuit;
 
     QTimer   *m_timer;
+
+    NesWidget *nes;
+
 protected:
     QString CheckKeyboardInsert();
 

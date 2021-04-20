@@ -22,7 +22,7 @@ PlayTitleBarWidget::PlayTitleBarWidget(QWidget *parent) : QtToolBar(parent)
     m_nBaseWidth = Skin::m_nScreenWidth;
     m_nBaseHeight = 50;
 
-    m_rectBack = QRect(20, 10, 40, 40);
+    m_rectBack = QRect(20, 10, 70, 70);
 }
 
 PlayTitleBarWidget::~PlayTitleBarWidget()

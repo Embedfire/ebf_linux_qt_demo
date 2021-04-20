@@ -35,6 +35,7 @@ private slots:
 
 private:
     QString m_strNandSize;
+    QString m_strBoardType;
 
 protected:
     void drawItemInfo(QPainter *painter, QtListWidgetItem *item);

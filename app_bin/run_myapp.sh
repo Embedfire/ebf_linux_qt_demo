@@ -13,22 +13,31 @@ type devscan
 
 #判断devscan是否存在，不存在提示安装
 if [ $? -eq 0 ]; then
-    #寻找名叫goodix-ts的触摸屏驱动
-    eventx=$(devscan "goodix-ts")
-    #没有找到则寻找Goodix Capacitive TouchScreen
-    if [ ! $eventx ]; then
-            eventx=$(devscan "Goodix Capacitive TouchScreen")
-    fi
-    #没有找到则寻找iMX6UL Touchscreen Controller
-    if [ ! $eventx ]; then
-            eventx=$(devscan "iMX6UL Touchscreen Controller")
-    fi
-    ########################################################
-    # 添加你自己的显示屏驱动
-    # 首先 sudo evtest  查看是否存在显示屏驱动
-    # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
-    ########################################################
-
+    #未检查到触摸屏则一直检测不启动app
+    timeout=0
+    while [ ! $eventx ]
+    do
+        #寻找名叫goodix-ts的触摸屏驱动
+        eventx=$(devscan "goodix-ts")
+        #没有找到则寻找Goodix Capacitive TouchScreen
+        if [ ! $eventx ]; then
+                eventx=$(devscan "Goodix Capacitive TouchScreen")
+        fi
+        #没有找到则寻找iMX6UL Touchscreen Controller
+        if [ ! $eventx ]; then
+                eventx=$(devscan "iMX6UL Touchscreen Controller")
+        fi
+        ########################################################
+        # 添加你自己的显示屏驱动
+        # 首先 sudo evtest  查看是否存在显示屏驱动
+        # 存在添加类似于上面的判断 改为你自己的显示屏驱动名称
+        ########################################################
+        if [ $timeout -ge 5 ]; then
+            break
+        fi
+        let timeout=$timeout+1
+        sleep 1
+    done
     #输出当前触摸屏驱动
     echo "eventx=$eventx"
 
@@ -62,13 +71,13 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 #指定qt库路径
 #export LD_LIBRARY_PATH=/lib:/usr/lib
 #指定字体库
-export QT_QPA_FONTDIR=/usr/fonts
+export QT_QPA_FONTDIR=/usr/lib/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
 #指定显示终端
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
 #禁用QT自带的输入检测
-export QT_QPA_FB_DISABLE_INPUT=1
+#export QT_QPA_FB_DISABLE_INPUT=1
 #TS配置文件
 export TSLIB_CONFFILE=/etc/ts.conf
 #TS校准文件
@@ -83,4 +92,4 @@ export QT_QPA_FB_TSLIB=1
 
 echo "start app $1..."
 #运行App
-$APP_DIR/$1
+$1

@@ -39,7 +39,7 @@ void CheckDirs(const QString &path, const QStringList &dirs) {
 int main(int argc, char *argv[])
 {
     // 设置输入法
-#if 1
+#if 0
     qputenv("QT_IM_MODULE", QByteArray("xyinput"));
 #else
     qputenv("QT_IM_MODULE", QByteArray("qtkeyboard"));
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 #else
     MainWindow w;
     w.setWindowTitle(QStringLiteral("野火 @ Linux Qt Demo"));
-    // 主要是控制HDMI输出，如果是LCD显示，此行无关紧要 // mp157不用
+    //eglfs省略这一行 mp157不用
     w.resize(AppConfig::GetDesktopSize());
 
 #ifdef __arm__

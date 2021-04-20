@@ -66,7 +66,7 @@ Description = ebf-qtdemo qtdemo
 After=actlogo.service
 
 [Service]
-ExecStart = /usr/local/qt-app/run.sh
+ExecStart = /usr/local/qt-app/run_eglfs.sh
 Type = simple
 
 [Install]
@@ -76,7 +76,7 @@ EOF
 mkdir -p ebfdemo/DEBIAN
 # 添加程序信息
 cat >ebfdemo/DEBIAN/control<<EOF
-Package: ebf-157-qtdemo
+Package: ebf-qtdemo
 Version: $Version
 Section: utils
 Priority: optional
