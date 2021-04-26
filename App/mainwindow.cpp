@@ -20,7 +20,7 @@
 #include "backlightwidget.h"
 #include "calendarwidget.h"
 #include "calculator.h"
-//#include "camerawidget.h"
+#include "camerawidget.h"
 #include "carmeterwidget.h"
 #include "adcviewer.h"
 #include "dhtcollection.h"
@@ -31,7 +31,7 @@
 #include "photosview.h"
 //#include "recorderwidget.h"
 #include "settingwidget.h"
-//#include "videoplayer.h"
+#include "videoplayer.h"
 #include "weatherwidget.h"
 #include "keypresswidget.h"
 #include "infoneswidget.h"
@@ -138,7 +138,7 @@ void MainWindow::InitDesktop()
         m_launchItems.insert(2, new LauncherItem(2, nPage, tr("ADC"), QPixmap(":/images/mainwindow/ic_adc.png")));
         m_launchItems.insert(4, new LauncherItem(4, nPage, tr("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
         m_launchItems.insert(9, new LauncherItem(9, nPage, tr("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
-        m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
+        //m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
     }
 
     // 第二页
@@ -156,7 +156,7 @@ void MainWindow::InitDesktop()
     if (!bMiniBoard) {
         m_launchItems.insert(13, new LauncherItem(13, nPage, tr("陀螺仪"), QPixmap(":/images/mainwindow/ic_gyroscope.png")));
         m_launchItems.insert(17, new LauncherItem(17, nPage, tr("蜂鸣器"), QPixmap(":/images/mainwindow/ic_beep.png")));
-//        m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
+        //m_launchItems.insert(18, new LauncherItem(18, nPage, tr("录音"), QPixmap(":/images/mainwindow/ic_record.png")));
     }
 
     // 第三页
@@ -210,7 +210,7 @@ void MainWindow::SltCurrentAppChanged(int index)
 //            m_musicWidget->StopMusic();
         }
 
-//        m_widgetWorkSpace = new VideoPlayer(this);
+        m_widgetWorkSpace = new VideoPlayer(this);
     }
         break;
     case 2: {
@@ -218,15 +218,15 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 3: {
-//        m_widgetWorkSpace = new PhotosView(this);
+        m_widgetWorkSpace = new PhotosView(this);
     }
         break;
     case 4: {
-//        m_widgetWorkSpace = new CameraWidget(this);
+        m_widgetWorkSpace = new CameraWidget(this);
     }
         break;
     case 5: {
-//        m_widgetWorkSpace = new WeatherWidget(this);
+/        m_widgetWorkSpace = new WeatherWidget(this);
     }
         break;
     case 6: {
@@ -246,7 +246,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 10: {
-//        m_widgetWorkSpace = new Calculator(this);
+        m_widgetWorkSpace = new Calculator(this);
     }
         break;
     case 11: {
@@ -265,7 +265,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 12: {
-//        m_widgetWorkSpace = new RgbLightMonitor(this);
+        m_widgetWorkSpace = new RgbLightMonitor(this);
     }
         break;
     case 13: {
