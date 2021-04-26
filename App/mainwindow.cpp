@@ -226,7 +226,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 5: {
-/        m_widgetWorkSpace = new WeatherWidget(this);
+        m_widgetWorkSpace = new WeatherWidget(this);
     }
         break;
     case 6: {
