@@ -97,7 +97,7 @@ void QtFileDialog::InitWidget()
 
     QPushButton *btnRoot = new QPushButton(widgetRecent);
     btnRoot->setText("root");
-    btnGroup->addButton(btnHome, 1);
+    btnGroup->addButton(btnRoot, 1);
     verLayoutRecent->addWidget(btnRoot);
 
     verLayoutRecent->addStretch();
