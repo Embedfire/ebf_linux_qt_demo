@@ -1,5 +1,6 @@
 build
 app_bin/App
+app_bin/*.deb
 run_dir
 thirdpart/libqui
 thirdpart/libskin

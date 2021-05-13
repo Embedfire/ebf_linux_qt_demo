@@ -233,8 +233,10 @@ void QtFileDialog::SltBtnRecentClicked(int index)
 {
     if (0 == index) {
         m_listView->setRootIndex(m_model->index("/home/"));
-    } else {
+        this->SltItemClicked(m_model->index("/home/"));
+    } else if(1 == index){
         m_listView->setRootIndex(m_model->index("/root/"));
+        this->SltItemClicked(m_model->index("/root/"));
     }
 }
 
