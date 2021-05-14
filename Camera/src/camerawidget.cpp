@@ -84,7 +84,8 @@ void CameraWidget::TakePhotos()
 void CameraWidget::InitCamera()
 {
 #if TEST_PROCESS_CAMERA
-    m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
+    //m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
+    m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video1 ! \"video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, framerate=(fraction)15/1\" ! videoconvert ! fbdevsink");
 #else
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
@@ -111,7 +112,8 @@ void CameraWidget::showEvent(QShowEvent *e)
 {
 #if TEST_PROCESS_CAMERA
     if  (m_cmd->state() == QProcess::NotRunning) {
-        m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
+        //m_cmd->start("gst-launch-1.0 imxv4l2src device=/dev/video1 ! imxv4l2sink");
+        m_cmd->start("gst-launch-1.0 -v v4l2src device=/dev/video1 ! \"video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, framerate=(fraction)15/1\" ! videoconvert ! fbdevsink");
     }
 #endif
     QWidget::showEvent(e);
