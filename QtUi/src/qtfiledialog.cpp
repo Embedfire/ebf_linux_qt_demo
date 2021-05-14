@@ -97,7 +97,7 @@ void QtFileDialog::InitWidget()
 
     QPushButton *btnRoot = new QPushButton(widgetRecent);
     btnRoot->setText("root");
-    btnGroup->addButton(btnHome, 1);
+    btnGroup->addButton(btnRoot, 1);
     verLayoutRecent->addWidget(btnRoot);
 
     verLayoutRecent->addStretch();
@@ -233,8 +233,10 @@ void QtFileDialog::SltBtnRecentClicked(int index)
 {
     if (0 == index) {
         m_listView->setRootIndex(m_model->index("/home/"));
-    } else {
+        this->SltItemClicked(m_model->index("/home/"));
+    } else if(1 == index){
         m_listView->setRootIndex(m_model->index("/root/"));
+        this->SltItemClicked(m_model->index("/root/"));
     }
 }
 

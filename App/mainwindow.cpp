@@ -163,8 +163,8 @@ void MainWindow::InitDesktop()
     }
 
     // 第三页 暂时取消nes游戏模拟器
-//    nPage++;
-//    m_launchItems.insert(24, new LauncherItem(24, nPage, tr("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
+    nPage++;
+    m_launchItems.insert(24, new LauncherItem(24, nPage, tr("InfoNES模拟器"), QPixmap(":/images/mainwindow/ic_game.png")));
 
     m_launcherWidget->SetPageCount(nPage+1);
     m_launcherWidget->SetItems(m_launchItems);
@@ -343,10 +343,6 @@ void MainWindow::SltCurrentAppChanged(int index)
             // 关闭音乐
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
-<<<<<<< HEAD
-=======
-                
->>>>>>> b789fd9b3146a02734b4dec743febfcd5ae4c61d
                 delete  m_musicWidget;
                 m_musicWidget=NULL;
             }

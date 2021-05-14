@@ -1,11 +1,14 @@
-Version=1.0.0.0
-Package=ebf-157-qtdemo_1.0.0.0_armhf.deb
+Version=1.0.0.1
+Package=ebf-157-qtdemo_1.0.0.1_armhf.deb
 
-mkdir -p  ebfdemo
-rm -rf ebfdemo/*
+#deb包 临时目录
+PackageDir=ebfdemo
+
+mkdir -p  $PackageDir
+
 rm -rf $Package
 
-USRLIB=ebfdemo/usr/lib
+USRLIB=$PackageDir/usr/lib
 mkdir -p ${USRLIB}
 
 #ffmpeg相关的库
@@ -18,22 +21,27 @@ cp -d -R ../ffmpeg/armlib/libavdevice*              ${USRLIB}
 cp -d -R ../ffmpeg/armlib/libavfilter*              ${USRLIB}
 cp -d -R ../ffmpeg/armlib/libswscale*               ${USRLIB}
 
-#qtui和skin库
-cp -d -R ../thirdpart/libskin/lib/libSkin*	    ${USRLIB}
-cp -d -R ../thirdpart/libqui/lib/libQtUi*	    ${USRLIB}
+# qtui和skin库
+cp -d -R ../thirdpart/libskin/lib/libSkin*          ${USRLIB}
+cp -d -R ../thirdpart/libqui/lib/libQtUi*           ${USRLIB}
 
 #字体
-USRFONT=ebfdemo/usr/share/fonts
+USRFONT=$PackageDir/usr/share/fonts
 mkdir -p ${USRFONT}
 cp -r    ttf/*                                      ${USRFONT}
 
 #输入法
-INPUT=ebfdemo/usr/lib/arm-linux-gnueabihf/qt5/plugins/platforminputcontexts/
+INPUT=$PackageDir/usr/lib/arm-linux-gnueabihf/qt5/plugins/platforminputcontexts/
 mkdir -p ${INPUT}
-cp -r conf/platforminputcontexts/libSoft-keyboard.so ${INPUT}
+cp -r conf/plugins/platforminputcontexts/libSoft-keyboard.so ${INPUT}
+
+# 可旋转的 linuxfb
+LinuxFb=$PackageDir/usr/lib/plugins/platforms/
+mkdir -p ${LinuxFb}
+cp -r conf/plugins/platforms/libqlinuxfb.so         ${LinuxFb}
 
 #qt-app中的资源文件和配置文件
-APPINSTALL=ebfdemo/usr/local/qt-app
+APPINSTALL=$PackageDir/usr/local/qt-app
 mkdir -p ${APPINSTALL}
 cp -r 	 conf                                       ${APPINSTALL}
 cp -r 	 dict                                       ${APPINSTALL}
@@ -53,29 +61,29 @@ cp -r 	 run_myapp.sh                               ${APPINSTALL}
 cp -r 	 run_eglfs.sh                               ${APPINSTALL}
 
 #修改脚本执行权限
-chmod 775 ebfdemo/usr/local/qt-app/run_eglfs.sh
-chmod 775 ebfdemo/usr/local/qt-app/run.sh
+chmod 775 $PackageDir/usr/local/qt-app/run_eglfs.sh
+chmod 775 $PackageDir/usr/local/qt-app/run.sh
 
 #deb控制信息
 
 # systemd执行qt run.sh
-mkdir -p ebfdemo/lib/systemd/system
-cat >ebfdemo/lib/systemd/system/ebf-qtdemo.service<<EOF
+mkdir -p $PackageDir/lib/systemd/system
+cat >$PackageDir/lib/systemd/system/ebf-qtdemo.service<<EOF
 [Unit]
 Description = ebf-qtdemo qtdemo
 After=actlogo.service
 
 [Service]
-ExecStart = /usr/local/qt-app/run_eglfs.sh
+ExecStart = /usr/local/qt-app/run.sh
 Type = simple
 
 [Install]
 WantedBy = multi-user.target
 EOF
 
-mkdir -p ebfdemo/DEBIAN
+mkdir -p $PackageDir/DEBIAN
 # 添加程序信息
-cat >ebfdemo/DEBIAN/control<<EOF
+cat >$PackageDir/DEBIAN/control<<EOF
 Package: ebf-qtdemo
 Version: $Version
 Section: utils
@@ -88,12 +96,14 @@ Description: soft package
 EOF
 
 # 添加自启动服务
-cat >ebfdemo/DEBIAN/postinst<<EOF
+cat >$PackageDir/DEBIAN/postinst<<EOF
 #!/bin/bash
 systemctl enable ebf-qtdemo
 EOF
 
-chmod 775 ebfdemo/DEBIAN/postinst
+chmod 775 $PackageDir/DEBIAN/postinst
 
 #打包
-dpkg -b ebfdemo $Package
+dpkg -b $PackageDir $Package
+
+rm -rf $PackageDir

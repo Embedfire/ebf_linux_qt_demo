@@ -43,7 +43,7 @@ void BackLightPage::InitWidget()
 void BackLightPage::ReadBacklight()
 {
 #ifdef __arm__
-    QString strFile = "/sys/class/backlight/backlight/brightness";
+    QString strFile = "/sys/class/backlight/lcd-backlight/brightness";
     QFile file(strFile);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "open Leds failed!";
@@ -66,7 +66,7 @@ void BackLightPage::SltValueChanged(int value)
 
     m_nLevel = (value < 5 ? 5 : value);
 #ifdef __arm__
-    QString strFile = "/sys/class/backlight/backlight/brightness";
+    QString strFile = "/sys/class/backlight/lcd-backlight/brightness";
     QFile file(strFile);
     if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
         qDebug() << "open Leds failed!";
