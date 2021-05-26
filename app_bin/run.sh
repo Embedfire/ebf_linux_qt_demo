@@ -2,6 +2,9 @@
 
 type devscan
 
+#设置屏幕旋转角度
+rotation=0
+
 #判断devscan是否存在，不存在提示安装
 if [ $? -eq 0 ]; then
     #未检查到触摸屏则一直检测不启动app
@@ -38,12 +41,22 @@ if [ $? -eq 0 ]; then
             export TSLIB_TSDEVICE=/dev/input/$eventx
             type ts_calibrate
             if [ $? -eq 0 ]; then
-                ts_calibrate
+                if [ $rotation -eq 0 ]; then
+                    ts_calibrate -r 0
+                elif [ $rotation -eq 90 ]; then
+                    ts_calibrate -r 1
+                elif [ $rotation -eq 180 ]; then
+                    ts_calibrate -r 2
+                elif [ $rotation -eq 270 ]; then
+                    ts_calibrate -r 2
+                else 
+                    ts_calibrate
+                fi
             fi
         fi
         #同步QT默认的坐标轴和触摸屏的坐标轴
         #export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=90:invertx
-        export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=0
+        export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=$rotation
     else
         echo "eventx is null"
     fi
@@ -64,8 +77,8 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 export QT_QPA_FONTDIR=/usr/lib/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
-#指定显示终端
-export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+#指定显示终端 设置屏幕旋转角度
+export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0:rotation=$rotation
 #禁用QT自带的输入检测
 #export QT_QPA_FB_DISABLE_INPUT=1
 #TS配置文件
