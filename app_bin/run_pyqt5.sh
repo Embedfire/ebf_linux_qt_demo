@@ -9,6 +9,13 @@ else
   echo "current pyqt $1"
 fi
 
+#设置屏幕旋转角度 默认不旋转
+rotation=0
+#检测屏幕设备文件 MIPI屏幕自动旋转90度
+if [ -e "/sys/bus/platform/devices/5a000000.dsi/5a000000.dsi.0" ]; then
+    rotation=90
+fi
+
 type devscan
 
 #判断devscan是否存在，不存在提示安装
@@ -47,7 +54,17 @@ if [ $? -eq 0 ]; then
             export TSLIB_TSDEVICE=/dev/input/$eventx
             type ts_calibrate
             if [ $? -eq 0 ]; then
-                ts_calibrate
+                if [ $rotation -eq 0 ]; then
+                    ts_calibrate -r 0
+                elif [ $rotation -eq 90 ]; then
+                    ts_calibrate -r 1
+                elif [ $rotation -eq 180 ]; then
+                    ts_calibrate -r 2
+                elif [ $rotation -eq 270 ]; then
+                    ts_calibrate -r 3
+                else 
+                    ts_calibrate
+                fi
             fi
         fi
         #同步QT默认的坐标轴和触摸屏的坐标轴
@@ -74,7 +91,7 @@ export QT_QPA_FONTDIR=/usr/lib/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
 #指定显示终端
-export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0:rotation=$rotation
 #禁用QT自带的输入检测
 #export QT_QPA_FB_DISABLE_INPUT=1
 #TS配置文件

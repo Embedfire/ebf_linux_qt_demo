@@ -1,5 +1,12 @@
 #! /bin/bash
 
+#设置屏幕旋转角度 默认不旋转
+rotation=0
+#检测屏幕设备文件 MIPI屏幕自动旋转90度
+if [ -e "/sys/bus/platform/devices/5a000000.dsi/5a000000.dsi.0" ]; then
+    rotation=90
+fi
+
 type devscan
 
 #判断devscan是否存在，不存在提示安装
@@ -38,16 +45,22 @@ if [ $? -eq 0 ]; then
             export TSLIB_TSDEVICE=/dev/input/$eventx
             type ts_calibrate
             if [ $? -eq 0 ]; then
-                if [ -e "/sys/bus/platform/devices/5a000000.dsi/5a000000.dsi.0" ]; then
+                if [ $rotation -eq 0 ]; then
+                    ts_calibrate -r 0
+                elif [ $rotation -eq 90 ]; then
                     ts_calibrate -r 1
-                else
+                elif [ $rotation -eq 180 ]; then
+                    ts_calibrate -r 2
+                elif [ $rotation -eq 270 ]; then
+                    ts_calibrate -r 3
+                else 
                     ts_calibrate
                 fi
             fi
         fi
         #同步QT默认的坐标轴和触摸屏的坐标轴
         #export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=90:invertx
-        export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=0
+        export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/$eventx:rotate=$rotation
     else
         echo "eventx is null"
     fi
@@ -58,12 +71,8 @@ else
     exit
 fi
 
-if [ -e "/sys/bus/platform/devices/5a000000.dsi/5a000000.dsi.0" ]; then
-    #界面旋转角度 0，90，180，270
-    export QT_QPA_EGLFS_ROTATION=-90
-fi
-
-
+#屏幕旋转
+export QT_QPA_EGLFS_ROTATION=$rotation
 # 指定显示平台插件
 # QT_QPA_PLATFORM 或者-platform命令行选项指定其他设置
 export QT_QPA_PLATFORM=eglfs

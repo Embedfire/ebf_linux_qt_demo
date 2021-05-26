@@ -91,7 +91,7 @@ Priority: optional
 Architecture: armhf
 Depends:devscan,libts-bin,alsa-utils,qt5-default,libqt5multimedia5,libqt5multimedia5-plugins,gstreamer1.0-plugins-base,gstreamer1.0-tools,gstreamer1.0-plugins-bad,gstreamer1.0-plugins-good,gstreamer1.0-alsa,gstreamer1.0-libav
 Installed-Size: 512
-Maintainer: [url=mailto:sunwill_chen@hotmail.com]sunwill_chen#hotmail.com
+Maintainer: embedfire <embedfire@embedfire.com>
 Description: soft package
 EOF
 
