@@ -1,13 +1,22 @@
 #! /bin/bash
 
+type devscan
+
 #设置屏幕旋转角度 默认不旋转
 rotation=0
+
 #检测屏幕设备文件 MIPI屏幕自动旋转90度
 if [ -e "/sys/bus/platform/devices/5a000000.dsi/5a000000.dsi.0" ]; then
     rotation=90
 fi
 
-type devscan
+# 旋转屏幕需要重新校准，每次都需要重新校准
+if [ $rotation -ne 0 ]; then
+    rm /etc/pointercal
+    #指定qt插件路径 即需要旋转的时候，使用使用我们自己插件
+    export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
+fi
+
 #判断devscan是否存在，不存在提示安装
 if [ $? -eq 0 ]; then
     #未检查到触摸屏则一直检测不启动app
@@ -72,15 +81,24 @@ fi
 
 #导出qtdemo的安装目录
 export APP_DIR=/usr/local/qt-app
-#指定qt插件路径
-export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
 #指定qt库路径
 #export LD_LIBRARY_PATH=/lib:/usr/lib
 #指定字体库
 export QT_QPA_FONTDIR=/usr/share/fonts
 #qt命令路径
 #export PATH=$PATH:$QT_DIR/libexec
-#指定显示终端
+
+# if [ $rotation -ne 0 ]; then
+#     #指定qt插件路径 即需要旋转的时候，使用使用我们自己插件
+#     export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins
+#     #指定显示终端 和 旋转角度
+#     export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0:rotation=$rotation
+# else
+#     #指定显示终端
+#     export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0
+# fi
+
+#指定显示终端 和 旋转角度
 export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb0:rotation=$rotation
 
 #禁用QT自带的输入检测

@@ -300,5 +300,26 @@
         <file>images/camera/tool.png</file>
         <file>images/camera/take_pressed.png</file>
         <file>images/camera/take.png</file>
+        <file>images/mainwindow/ic_ec20.png</file>
+        <file>images/ec20/bg004.png</file>
+        <file>images/ec20/ic_setting.png</file>
+        <file>images/ec20/ic_setting_1.png</file>
+        <file>images/ec20/ic_measure.png</file>
+        <file>images/ec20/ic_measure_1.png</file>
+        <file>images/ec20/ic_location.png</file>
+        <file>images/ec20/ic_location_1.png</file>
+        <file>images/ec20/ic_home.png</file>
+        <file>images/ec20/ic_home_1.png</file>
+        <file>images/ec20/ic_exit.png</file>
+        <file>images/ec20/ic_exit_1.png</file>
+        <file>images/ec20/ic_device.png</file>
+        <file>images/ec20/ic_device_1.png</file>
+        <file>images/ec20/btn002.png</file>
+        <file>images/ec20/btn002_1.png</file>
+        <file>images/ec20/btn001.png</file>
+        <file>images/ec20/btn001_1.png</file>
+        <file>images/ec20/updown.png</file>
+        <file>images/ec20/card_2.png</file>
+        <file>images/ec20/card_1.png</file>
     </qresource>
 </RCC>

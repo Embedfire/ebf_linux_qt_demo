@@ -1,5 +1,5 @@
-Version=1.0.0.1
-Package=ebf-157-qtdemo_1.0.0.1_armhf.deb
+Version=1.0.0.2
+Package=ebf-157-qtdemo_1.0.0.2_armhf.deb
 
 #deb包 临时目录
 PackageDir=ebfdemo
@@ -89,7 +89,7 @@ Version: $Version
 Section: utils
 Priority: optional
 Architecture: armhf
-Depends:devscan,libts-bin,alsa-utils,qt5-default,libqt5multimedia5,libqt5multimedia5-plugins,gstreamer1.0-plugins-base,gstreamer1.0-tools,gstreamer1.0-plugins-bad,gstreamer1.0-plugins-good,gstreamer1.0-alsa,gstreamer1.0-libav
+Depends:devscan,libts-bin,alsa-utils,qt5-default,libqt5multimedia5,libqt5multimedia5-plugins,gstreamer1.0-plugins-base,gstreamer1.0-tools,gstreamer1.0-plugins-bad,gstreamer1.0-plugins-good,gstreamer1.0-alsa,gstreamer1.0-libav,peripheral,ipppd
 Installed-Size: 512
 Maintainer: embedfire <embedfire@embedfire.com>
 Description: soft package

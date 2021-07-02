@@ -38,6 +38,7 @@
 #include "qtviewfinder.h"
 
 #include "qtmessage.h"
+#include "ec20widget.h"
 
 #ifdef BUILD_WIN_NES
 #include "nessimulator.h"
@@ -112,6 +113,9 @@ void MainWindow::InitWidget() {
     m_aboutUs->hide();
     connect(m_launcherWidget, SIGNAL(signalAboutClicked()), m_aboutUs, SLOT(SltStartMove()));
 
+    //m_widgetWorkSpace = new EC20Widget(this);
+    //m_widgetWorkSpace->show();
+
 #if 0
     if (NULL == m_musicWidget) {
         m_musicWidget = new MusicPlayer(this);
@@ -153,6 +157,7 @@ void MainWindow::InitDesktop()
     m_launchItems.insert(15, new LauncherItem(15, nPage, tr("汽车仪表"), QPixmap(":/images/mainwindow/ic_car.png")));
     m_launchItems.insert(16, new LauncherItem(16, nPage, tr("背光调节"), QPixmap(":/images/mainwindow/ic_backlight.png")));
     m_launchItems.insert(19, new LauncherItem(19, nPage, tr("按键测试"), QPixmap(":/images/mainwindow/ic_key.png")));
+    m_launchItems.insert(20, new LauncherItem(20, nPage, tr("EC20"), QPixmap(":/images/mainwindow/ic_ec20.png")));
     m_launchItems.insert(23, new LauncherItem(23, nPage, tr("系统设置"), QPixmap(":/images/mainwindow/ic_setting.png")));
 
     // mini板卡取消功能
@@ -327,7 +332,10 @@ void MainWindow::SltCurrentAppChanged(int index)
 //            connect(m_threadKey, SIGNAL(signalKeyPressed(quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(quint8)));
             connect(m_threadKey, SIGNAL(signalKeyPressed(const quint8 ,const quint8)), (KeyPressWidget *)m_widgetWorkSpace, SLOT(SltKeyPressed(const quint8 ,const quint8)));
         }
-
+    }
+        break;
+    case 20: {
+        m_widgetWorkSpace = new EC20Widget(this);
     }
         break;
     case 23: {
