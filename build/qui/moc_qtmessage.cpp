@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qtmessage.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../QtUi/src/qtmessage.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'qtmessage.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -41,7 +42,7 @@ QT_MOC_LITERAL(0, 0, 7) // "MyFrame"
 static const uint qt_meta_data_MyFrame[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -62,10 +63,14 @@ void MyFrame::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject MyFrame::staticMetaObject = {
-    { &QFrame::staticMetaObject, qt_meta_stringdata_MyFrame.data,
-      qt_meta_data_MyFrame,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject MyFrame::staticMetaObject = { {
+    QMetaObject::SuperData::link<QFrame::staticMetaObject>(),
+    qt_meta_stringdata_MyFrame.data,
+    qt_meta_data_MyFrame,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *MyFrame::metaObject() const
@@ -110,7 +115,7 @@ QT_MOC_LITERAL(3, 25, 13) // "rejectOperate"
 static const uint qt_meta_data_QtMessage[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -134,7 +139,7 @@ static const uint qt_meta_data_QtMessage[] = {
 void QtMessage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtMessage *_t = static_cast<QtMessage *>(_o);
+        auto *_t = static_cast<QtMessage *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->acceptOperate(); break;
@@ -145,10 +150,14 @@ void QtMessage::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtMessage::staticMetaObject = {
-    { &QDialog::staticMetaObject, qt_meta_stringdata_QtMessage.data,
-      qt_meta_data_QtMessage,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtMessage::staticMetaObject = { {
+    QMetaObject::SuperData::link<QDialog::staticMetaObject>(),
+    qt_meta_stringdata_QtMessage.data,
+    qt_meta_data_QtMessage,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtMessage::metaObject() const

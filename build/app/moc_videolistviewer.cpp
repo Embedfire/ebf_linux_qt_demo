@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'videolistviewer.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../VideoPlayer/src/videolistviewer.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'videolistviewer.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -41,7 +42,7 @@ QT_MOC_LITERAL(0, 0, 15) // "VideoListViewer"
 static const uint qt_meta_data_VideoListViewer[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -62,10 +63,14 @@ void VideoListViewer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject VideoListViewer::staticMetaObject = {
-    { &QtPageListWidget::staticMetaObject, qt_meta_stringdata_VideoListViewer.data,
-      qt_meta_data_VideoListViewer,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject VideoListViewer::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtPageListWidget::staticMetaObject>(),
+    qt_meta_stringdata_VideoListViewer.data,
+    qt_meta_data_VideoListViewer,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *VideoListViewer::metaObject() const

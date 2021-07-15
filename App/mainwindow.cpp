@@ -144,7 +144,9 @@ void MainWindow::InitDesktop()
         m_launchItems.insert(1, new LauncherItem(1, nPage, tr("视频播放"), QPixmap(":/images/mainwindow/ic_video.png")));
         m_launchItems.insert(2, new LauncherItem(2, nPage, tr("ADC"), QPixmap(":/images/mainwindow/ic_adc.png")));
         m_launchItems.insert(4, new LauncherItem(4, nPage, tr("相机"), QPixmap(":/images/mainwindow/ic_camera.png")));
-        m_launchItems.insert(9, new LauncherItem(9, nPage, tr("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
+        //157不需要温湿度
+        //m_launchItems.insert(9, new LauncherItem(9, nPage, tr("温湿度"), QPixmap(":/images/mainwindow/ic_temp.png")));
+        m_launchItems.insert(9, new LauncherItem(9, nPage, tr("EC20"), QPixmap(":/images/mainwindow/ic_ec20.png")));
         m_launchItems.insert(11, new LauncherItem(11, nPage, tr("音乐播放"), QPixmap(":/images/mainwindow/ic_music.png")));
     }
 
@@ -157,7 +159,6 @@ void MainWindow::InitDesktop()
     m_launchItems.insert(15, new LauncherItem(15, nPage, tr("汽车仪表"), QPixmap(":/images/mainwindow/ic_car.png")));
     m_launchItems.insert(16, new LauncherItem(16, nPage, tr("背光调节"), QPixmap(":/images/mainwindow/ic_backlight.png")));
     m_launchItems.insert(19, new LauncherItem(19, nPage, tr("按键测试"), QPixmap(":/images/mainwindow/ic_key.png")));
-    m_launchItems.insert(20, new LauncherItem(20, nPage, tr("EC20"), QPixmap(":/images/mainwindow/ic_ec20.png")));
     m_launchItems.insert(23, new LauncherItem(23, nPage, tr("系统设置"), QPixmap(":/images/mainwindow/ic_setting.png")));
 
     // mini板卡取消功能
@@ -264,8 +265,11 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 9: {
-        if(CheckDevice("DHT11")){
-            m_widgetWorkSpace = new DhtCollection(this);}
+//        if(CheckDevice("DHT11")){
+//            m_widgetWorkSpace = new DhtCollection(this);}
+
+        if(CheckDevice("EC20")){
+            m_widgetWorkSpace = new EC20Widget(this);}
     }
         break;
     case 10: {
@@ -335,7 +339,7 @@ void MainWindow::SltCurrentAppChanged(int index)
     }
         break;
     case 20: {
-        m_widgetWorkSpace = new EC20Widget(this);
+
     }
         break;
     case 23: {
@@ -519,6 +523,8 @@ bool MainWindow::CheckDevice(QString device)
         info.setFile(BEEP_DEV);
     else if(device=="按键")
         info.setFile(RGB_DEV);
+    else if(device=="EC20")
+        info.setFile(EC20_DEV);
 
     if(!info.exists())
     {
@@ -533,11 +539,13 @@ bool MainWindow::CheckDevice(QString device)
             {
                 m_launcherWidget->setEnabled(true);
                 m_bStartApp = false;
+                delete msg;
                 return false;
             }
 
             m_launcherWidget->setEnabled(false);
             m_bStartApp = true;
+            delete msg;
             return true;
         }
         else
@@ -549,6 +557,7 @@ bool MainWindow::CheckDevice(QString device)
     }
     m_launcherWidget->setEnabled(false);
     m_bStartApp = true;
+
     return true;
 }
 

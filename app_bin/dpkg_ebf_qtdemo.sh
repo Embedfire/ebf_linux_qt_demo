@@ -71,7 +71,6 @@ mkdir -p $PackageDir/lib/systemd/system
 cat >$PackageDir/lib/systemd/system/ebf-qtdemo.service<<EOF
 [Unit]
 Description = ebf-qtdemo qtdemo
-After=actlogo.service
 
 [Service]
 ExecStart = /usr/local/qt-app/run.sh

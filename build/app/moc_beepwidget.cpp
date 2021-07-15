@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'beepwidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../Beep/src/beepwidget.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'beepwidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -44,7 +45,7 @@ QT_MOC_LITERAL(3, 27, 10) // "switchRect"
 static const uint qt_meta_data_BeepWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -69,7 +70,7 @@ static const uint qt_meta_data_BeepWidget[] = {
 void BeepWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        BeepWidget *_t = static_cast<BeepWidget *>(_o);
+        auto *_t = static_cast<BeepWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltLongPressed(); break;
@@ -78,7 +79,7 @@ void BeepWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     }
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
-        BeepWidget *_t = static_cast<BeepWidget *>(_o);
+        auto *_t = static_cast<BeepWidget *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -86,7 +87,7 @@ void BeepWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         default: break;
         }
     } else if (_c == QMetaObject::WriteProperty) {
-        BeepWidget *_t = static_cast<BeepWidget *>(_o);
+        auto *_t = static_cast<BeepWidget *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -99,10 +100,14 @@ void BeepWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject BeepWidget::staticMetaObject = {
-    { &QtAnimationWidget::staticMetaObject, qt_meta_stringdata_BeepWidget.data,
-      qt_meta_data_BeepWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject BeepWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtAnimationWidget::staticMetaObject>(),
+    qt_meta_stringdata_BeepWidget.data,
+    qt_meta_data_BeepWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *BeepWidget::metaObject() const
@@ -133,7 +138,7 @@ int BeepWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         _id -= 1;
     }
 #ifndef QT_NO_PROPERTIES
-   else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
+    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
         _id -= 1;

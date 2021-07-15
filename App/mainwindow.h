@@ -45,6 +45,8 @@
 #define KEY_DEV         "/dev/input/by-path/platform-gpio-keys-event"
 // switch
 #define POWER_DEV       "/dev/input/by-path/platform-20cc000.snvs:snvs-powerkey-event"
+// 4G模块
+#define EC20_DEV        "/dev/ttyUSB2"
 
 class MusicPlayer;
 

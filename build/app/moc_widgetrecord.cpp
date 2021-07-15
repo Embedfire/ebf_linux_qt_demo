@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'widgetrecord.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../MusicPlayer/src/widgetrecord.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'widgetrecord.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -42,7 +43,7 @@ QT_MOC_LITERAL(1, 11, 6) // "ratote"
 static const uint qt_meta_data_PixmapItem[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -63,7 +64,7 @@ void PixmapItem::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
 
 #ifndef QT_NO_PROPERTIES
     if (_c == QMetaObject::ReadProperty) {
-        PixmapItem *_t = static_cast<PixmapItem *>(_o);
+        auto *_t = static_cast<PixmapItem *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -71,7 +72,7 @@ void PixmapItem::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         default: break;
         }
     } else if (_c == QMetaObject::WriteProperty) {
-        PixmapItem *_t = static_cast<PixmapItem *>(_o);
+        auto *_t = static_cast<PixmapItem *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -87,10 +88,14 @@ void PixmapItem::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject PixmapItem::staticMetaObject = {
-    { &QObject::staticMetaObject, qt_meta_stringdata_PixmapItem.data,
-      qt_meta_data_PixmapItem,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject PixmapItem::staticMetaObject = { {
+    QMetaObject::SuperData::link<QObject::staticMetaObject>(),
+    qt_meta_stringdata_PixmapItem.data,
+    qt_meta_data_PixmapItem,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *PixmapItem::metaObject() const
@@ -113,7 +118,7 @@ int PixmapItem::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     
 #ifndef QT_NO_PROPERTIES
-   if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
+    if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
         _id -= 1;
@@ -155,7 +160,7 @@ QT_MOC_LITERAL(3, 26, 13) // "SltHandleMove"
 static const uint qt_meta_data_WidgetRecord[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -179,7 +184,7 @@ static const uint qt_meta_data_WidgetRecord[] = {
 void WidgetRecord::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        WidgetRecord *_t = static_cast<WidgetRecord *>(_o);
+        auto *_t = static_cast<WidgetRecord *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltCicleRun(); break;
@@ -189,10 +194,14 @@ void WidgetRecord::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject WidgetRecord::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_WidgetRecord.data,
-      qt_meta_data_WidgetRecord,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject WidgetRecord::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_WidgetRecord.data,
+    qt_meta_data_WidgetRecord,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *WidgetRecord::metaObject() const

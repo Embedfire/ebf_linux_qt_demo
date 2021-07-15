@@ -11,11 +11,12 @@
 #include "boardlogowidget.h"
 #include "skin.h"
 #include <QPainter>
+#include <QPainterPath>
 
 BoardLogoWidget::BoardLogoWidget(QWidget *parent) : QWidget(parent)
 {
     this->setMinimumSize(364, 332);
-    m_pixmap = QPixmap(":/images/adc/ic_board.png");
+    m_pixmap = QPixmap(":/images/adc/ic_board_157.png");
 }
 
 BoardLogoWidget::~BoardLogoWidget()
@@ -40,22 +41,28 @@ void BoardLogoWidget::drawPointLine(QPainter *painter)
 {
     painter->save();
     QPainterPath path;
-    path.moveTo(45, 195);
-    path.lineTo(221, 195);
-    path.lineTo(221, 300);
+    //path.moveTo(45, 195);
+    //path.lineTo(221, 195);
+    //path.lineTo(221, 300);
+    path.moveTo(300, 165);
+    path.lineTo(300, 205);
+
     painter->setPen(QPen(QColor("#ffffff"), 2));
     painter->drawPath(path);
 
     QFont font(Skin::m_strAppFontNormal);
-    font.setPixelSize(28);
+    font.setPixelSize(22);
     font.setBold(true);
     painter->setFont(font);
     int nH = painter->fontMetrics().height();
-    painter->drawText(230, 300, tr("调节电压"));
+    //painter->drawText(230, 300, tr("调节电压"));
+    painter->drawText(250, 300, tr("调节电压"));
 
-    font.setPixelSize(22);
+    font.setPixelSize(18);
     painter->setFont(font);
-    painter->drawText(230, 290 - nH, tr("旋转电位器"));
+    //painter->drawText(230, 290 - nH, tr("旋转电位器"));
+    painter->drawText(250, 290 - nH, tr("旋转电位器"));
     painter->restore();
+
 }
 

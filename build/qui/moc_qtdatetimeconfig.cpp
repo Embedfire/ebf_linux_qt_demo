@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qtdatetimeconfig.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../QtUi/src/qtdatetimeconfig.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'qtdatetimeconfig.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -43,7 +44,7 @@ QT_MOC_LITERAL(2, 34, 0) // ""
 static const uint qt_meta_data_NumberSelected[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -65,7 +66,7 @@ static const uint qt_meta_data_NumberSelected[] = {
 void NumberSelected::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        NumberSelected *_t = static_cast<NumberSelected *>(_o);
+        auto *_t = static_cast<NumberSelected *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalIndexChanged(); break;
@@ -84,10 +85,14 @@ void NumberSelected::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject NumberSelected::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_NumberSelected.data,
-      qt_meta_data_NumberSelected,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject NumberSelected::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_NumberSelected.data,
+    qt_meta_data_NumberSelected,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *NumberSelected::metaObject() const
@@ -148,7 +153,7 @@ QT_MOC_LITERAL(2, 34, 0) // ""
 static const uint qt_meta_data_QtDateTimeConfig[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -170,7 +175,7 @@ static const uint qt_meta_data_QtDateTimeConfig[] = {
 void QtDateTimeConfig::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtDateTimeConfig *_t = static_cast<QtDateTimeConfig *>(_o);
+        auto *_t = static_cast<QtDateTimeConfig *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltNumberChanged(); break;
@@ -180,10 +185,14 @@ void QtDateTimeConfig::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtDateTimeConfig::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_QtDateTimeConfig.data,
-      qt_meta_data_QtDateTimeConfig,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtDateTimeConfig::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_QtDateTimeConfig.data,
+    qt_meta_data_QtDateTimeConfig,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtDateTimeConfig::metaObject() const

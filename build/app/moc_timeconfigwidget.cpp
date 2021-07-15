@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'timeconfigwidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../Calendar/src/timeconfigwidget.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'timeconfigwidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -47,7 +48,7 @@ QT_MOC_LITERAL(5, 51, 13) // "SltBtnClicked"
 static const uint qt_meta_data_TimeConfigWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -75,7 +76,7 @@ static const uint qt_meta_data_TimeConfigWidget[] = {
 void TimeConfigWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        TimeConfigWidget *_t = static_cast<TimeConfigWidget *>(_o);
+        auto *_t = static_cast<TimeConfigWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalChangePage((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
@@ -94,10 +95,14 @@ void TimeConfigWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject TimeConfigWidget::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_TimeConfigWidget.data,
-      qt_meta_data_TimeConfigWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject TimeConfigWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_TimeConfigWidget.data,
+    qt_meta_data_TimeConfigWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *TimeConfigWidget::metaObject() const
@@ -133,7 +138,7 @@ int TimeConfigWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void TimeConfigWidget::signalChangePage(int _t1, int _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP

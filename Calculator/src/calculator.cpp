@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QDebug>
+#include <QPainterPath>
 
 Calculator::Calculator(QWidget *parent) : QtAnimationWidget(parent),
     m_nCurrentIndex(-1)

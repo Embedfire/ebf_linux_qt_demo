@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'clockbackgroundcfg.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../Calendar/src/clockbackgroundcfg.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'clockbackgroundcfg.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -47,7 +48,7 @@ QT_MOC_LITERAL(5, 60, 9) // "direction"
 static const uint qt_meta_data_ClockBackgroundCfg[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -71,7 +72,7 @@ static const uint qt_meta_data_ClockBackgroundCfg[] = {
 void ClockBackgroundCfg::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        ClockBackgroundCfg *_t = static_cast<ClockBackgroundCfg *>(_o);
+        auto *_t = static_cast<ClockBackgroundCfg *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalBackground((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -97,10 +98,14 @@ void ClockBackgroundCfg::qt_static_metacall(QObject *_o, QMetaObject::Call _c, i
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject ClockBackgroundCfg::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_ClockBackgroundCfg.data,
-      qt_meta_data_ClockBackgroundCfg,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject ClockBackgroundCfg::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_ClockBackgroundCfg.data,
+    qt_meta_data_ClockBackgroundCfg,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *ClockBackgroundCfg::metaObject() const
@@ -136,14 +141,14 @@ int ClockBackgroundCfg::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void ClockBackgroundCfg::signalBackground(int _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void ClockBackgroundCfg::signalChangePage(int _t1, int _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP

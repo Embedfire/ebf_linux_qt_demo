@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'weatherwidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../Weather/src/weatherwidget.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'weatherwidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -46,7 +47,7 @@ QT_MOC_LITERAL(4, 40, 14) // "SltResetWidget"
 static const uint qt_meta_data_WeatherView[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -74,7 +75,7 @@ static const uint qt_meta_data_WeatherView[] = {
 void WeatherView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        WeatherView *_t = static_cast<WeatherView *>(_o);
+        auto *_t = static_cast<WeatherView *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalToolBtnClicked((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -93,10 +94,14 @@ void WeatherView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject WeatherView::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_WeatherView.data,
-      qt_meta_data_WeatherView,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject WeatherView::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_WeatherView.data,
+    qt_meta_data_WeatherView,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *WeatherView::metaObject() const
@@ -132,7 +137,7 @@ int WeatherView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void WeatherView::signalToolBtnClicked(int _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 struct qt_meta_stringdata_WeatherReport_t {
@@ -156,7 +161,7 @@ QT_MOC_LITERAL(0, 0, 13) // "WeatherReport"
 static const uint qt_meta_data_WeatherReport[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -177,10 +182,14 @@ void WeatherReport::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject WeatherReport::staticMetaObject = {
-    { &QtListWidget::staticMetaObject, qt_meta_stringdata_WeatherReport.data,
-      qt_meta_data_WeatherReport,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject WeatherReport::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtListWidget::staticMetaObject>(),
+    qt_meta_stringdata_WeatherReport.data,
+    qt_meta_data_WeatherReport,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *WeatherReport::metaObject() const
@@ -234,7 +243,7 @@ QT_MOC_LITERAL(9, 106, 8) // "jsonData"
 static const uint qt_meta_data_WeatherWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        5,   14, // methods
@@ -264,7 +273,7 @@ static const uint qt_meta_data_WeatherWidget[] = {
 void WeatherWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        WeatherWidget *_t = static_cast<WeatherWidget *>(_o);
+        auto *_t = static_cast<WeatherWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltCityManagerBack(); break;
@@ -277,10 +286,14 @@ void WeatherWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject WeatherWidget::staticMetaObject = {
-    { &QtAnimationWidget::staticMetaObject, qt_meta_stringdata_WeatherWidget.data,
-      qt_meta_data_WeatherWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject WeatherWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtAnimationWidget::staticMetaObject>(),
+    qt_meta_stringdata_WeatherWidget.data,
+    qt_meta_data_WeatherWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *WeatherWidget::metaObject() const

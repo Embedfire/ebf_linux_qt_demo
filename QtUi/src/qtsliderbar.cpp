@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QPainterPath>
 
 QtSliderBar::QtSliderBar(QWidget *parent) : QWidget(parent),
     m_nDirection(Vertical),m_nCurrentValue(100),m_nMaxValue(100),

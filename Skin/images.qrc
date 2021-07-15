@@ -49,7 +49,6 @@
         <file>images/rgblight/ic_rgblight_selected.png</file>
         <file>images/rgblight/ic_slider.png</file>
         <file>images/adc/adc_background.png</file>
-        <file>images/adc/ic_board.png</file>
         <file>images/adc/ic_glow.png</file>
         <file>images/adc/ring_background.png</file>
         <file>images/browser/ic_go.png</file>
@@ -321,5 +320,6 @@
         <file>images/ec20/updown.png</file>
         <file>images/ec20/card_2.png</file>
         <file>images/ec20/card_1.png</file>
+        <file>images/adc/ic_board_157.png</file>
     </qresource>
 </RCC>

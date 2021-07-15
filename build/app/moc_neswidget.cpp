@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'neswidget.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../QtNesSimulator/neswidget.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'neswidget.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -41,7 +42,7 @@ QT_MOC_LITERAL(0, 0, 9) // "NesWidget"
 static const uint qt_meta_data_NesWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -62,10 +63,14 @@ void NesWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject NesWidget::staticMetaObject = {
-    { &QtAnimationWidget::staticMetaObject, qt_meta_stringdata_NesWidget.data,
-      qt_meta_data_NesWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject NesWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtAnimationWidget::staticMetaObject>(),
+    qt_meta_stringdata_NesWidget.data,
+    qt_meta_data_NesWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *NesWidget::metaObject() const
@@ -109,7 +114,7 @@ QT_MOC_LITERAL(2, 21, 0) // ""
 static const uint qt_meta_data_mNesThread[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -131,7 +136,7 @@ static const uint qt_meta_data_mNesThread[] = {
 void mNesThread::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        mNesThread *_t = static_cast<mNesThread *>(_o);
+        auto *_t = static_cast<mNesThread *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->loadFrame(); break;
@@ -150,10 +155,14 @@ void mNesThread::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject mNesThread::staticMetaObject = {
-    { &QThread::staticMetaObject, qt_meta_stringdata_mNesThread.data,
-      qt_meta_data_mNesThread,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject mNesThread::staticMetaObject = { {
+    QMetaObject::SuperData::link<QThread::staticMetaObject>(),
+    qt_meta_stringdata_mNesThread.data,
+    qt_meta_data_mNesThread,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *mNesThread::metaObject() const

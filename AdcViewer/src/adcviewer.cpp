@@ -20,6 +20,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QFile>
+#include <QPainterPath>
 
 #define ADC_DEVICE "/sys/bus/iio/devices/iio:device0"
 #define ADC_RAW "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
@@ -146,11 +147,14 @@ void AdcViewer::drawBoardLogo(QPainter *painter)
 {
     painter->save();
     int nY = 83;
-    painter->drawPixmap(1, nY, QPixmap(":/images/adc/ic_board.png"));
+    painter->drawPixmap(1, nY, QPixmap(":/images/adc/ic_board_157.png"));
     QPainterPath path;
-    path.moveTo(45, 195 + nY);
-    path.lineTo(221, 195 + nY);
-    path.lineTo(221, 300 + nY);
+//    path.moveTo(45, 195 + nY);
+//    path.lineTo(221, 195 + nY);
+//    path.lineTo(221, 300 + nY);
+    path.moveTo(300, 165 + nY);
+    path.lineTo(300, 235 + nY);
+
     painter->setPen(QPen(QColor("#ffffff"), 2));
     painter->drawPath(path);
 
@@ -159,11 +163,13 @@ void AdcViewer::drawBoardLogo(QPainter *painter)
     font.setBold(true);
     painter->setFont(font);
     int nH = painter->fontMetrics().height();
-    painter->drawText(230, 300 + nY, tr("调节电压"));
+    //painter->drawText(230, 300 + nY, tr("调节电压"));
+    painter->drawText(250, 320 + nY, tr("调节电压"));
 
     font.setPixelSize(22);
     painter->setFont(font);
-    painter->drawText(230, 290 - nH + nY, tr("旋转电位器"));
+    //painter->drawText(230, 290 - nH + nY, tr("旋转电位器"));
+    painter->drawText(250, 310 - nH + nY, tr("旋转电位器"));
     painter->restore();
 }
 

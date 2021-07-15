@@ -11,6 +11,7 @@
 #include "qtpalettewidget.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QPainterPath>
 
 QtPaletteWidget::QtPaletteWidget(QWidget *parent) : QtAnimationWidget(parent)
 {

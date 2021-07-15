@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qtaddressbar.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../QtUi/src/qtaddressbar.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'qtaddressbar.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -47,7 +48,7 @@ QT_MOC_LITERAL(5, 54, 14) // "SltNextAddress"
 static const uint qt_meta_data_AddressLineEdit[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -77,7 +78,7 @@ static const uint qt_meta_data_AddressLineEdit[] = {
 void AddressLineEdit::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        AddressLineEdit *_t = static_cast<AddressLineEdit *>(_o);
+        auto *_t = static_cast<AddressLineEdit *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalAddress((*reinterpret_cast< const QString(*)>(_a[1]))); break;
@@ -97,10 +98,14 @@ void AddressLineEdit::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject AddressLineEdit::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_AddressLineEdit.data,
-      qt_meta_data_AddressLineEdit,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject AddressLineEdit::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_AddressLineEdit.data,
+    qt_meta_data_AddressLineEdit,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *AddressLineEdit::metaObject() const
@@ -136,7 +141,7 @@ int AddressLineEdit::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void AddressLineEdit::signalAddress(const QString & _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 struct qt_meta_stringdata_QtAddressBar_t {
@@ -165,7 +170,7 @@ QT_MOC_LITERAL(4, 43, 7) // "strAddr"
 static const uint qt_meta_data_QtAddressBar[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -189,7 +194,7 @@ static const uint qt_meta_data_QtAddressBar[] = {
 void QtAddressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtAddressBar *_t = static_cast<QtAddressBar *>(_o);
+        auto *_t = static_cast<QtAddressBar *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalBackHome(); break;
@@ -215,10 +220,14 @@ void QtAddressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtAddressBar::staticMetaObject = {
-    { &QtWidgetTitleBar::staticMetaObject, qt_meta_stringdata_QtAddressBar.data,
-      qt_meta_data_QtAddressBar,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtAddressBar::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetTitleBar::staticMetaObject>(),
+    qt_meta_stringdata_QtAddressBar.data,
+    qt_meta_data_QtAddressBar,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtAddressBar::metaObject() const
@@ -260,7 +269,7 @@ void QtAddressBar::signalBackHome()
 // SIGNAL 1
 void QtAddressBar::signalAddress(const QString & _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP

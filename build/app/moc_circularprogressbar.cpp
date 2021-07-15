@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'circularprogressbar.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../AdcViewer/src/circularprogressbar.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'circularprogressbar.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -46,7 +47,7 @@ QT_MOC_LITERAL(4, 47, 8) // "SetValue"
 static const uint qt_meta_data_CircularProgressBar[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -80,7 +81,7 @@ static const uint qt_meta_data_CircularProgressBar[] = {
 void CircularProgressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        CircularProgressBar *_t = static_cast<CircularProgressBar *>(_o);
+        auto *_t = static_cast<CircularProgressBar *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->currentValueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -99,7 +100,7 @@ void CircularProgressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
     }
 #ifndef QT_NO_PROPERTIES
     else if (_c == QMetaObject::ReadProperty) {
-        CircularProgressBar *_t = static_cast<CircularProgressBar *>(_o);
+        auto *_t = static_cast<CircularProgressBar *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -107,7 +108,7 @@ void CircularProgressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
         default: break;
         }
     } else if (_c == QMetaObject::WriteProperty) {
-        CircularProgressBar *_t = static_cast<CircularProgressBar *>(_o);
+        auto *_t = static_cast<CircularProgressBar *>(_o);
         Q_UNUSED(_t)
         void *_v = _a[0];
         switch (_id) {
@@ -119,10 +120,14 @@ void CircularProgressBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, 
 #endif // QT_NO_PROPERTIES
 }
 
-QT_INIT_METAOBJECT const QMetaObject CircularProgressBar::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_CircularProgressBar.data,
-      qt_meta_data_CircularProgressBar,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject CircularProgressBar::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_CircularProgressBar.data,
+    qt_meta_data_CircularProgressBar,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *CircularProgressBar::metaObject() const
@@ -153,7 +158,7 @@ int CircularProgressBar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         _id -= 2;
     }
 #ifndef QT_NO_PROPERTIES
-   else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
+    else if (_c == QMetaObject::ReadProperty || _c == QMetaObject::WriteProperty
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
         _id -= 1;
@@ -175,7 +180,7 @@ int CircularProgressBar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void CircularProgressBar::currentValueChanged(int _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP

@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qtwidgetbase.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../QtUi/src/qtwidgetbase.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'qtwidgetbase.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -46,7 +47,7 @@ QT_MOC_LITERAL(4, 46, 5) // "index"
 static const uint qt_meta_data_QtWidgetBase[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -70,7 +71,7 @@ static const uint qt_meta_data_QtWidgetBase[] = {
 void QtWidgetBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtWidgetBase *_t = static_cast<QtWidgetBase *>(_o);
+        auto *_t = static_cast<QtWidgetBase *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalBackHome(); break;
@@ -96,10 +97,14 @@ void QtWidgetBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtWidgetBase::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_QtWidgetBase.data,
-      qt_meta_data_QtWidgetBase,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtWidgetBase::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_meta_stringdata_QtWidgetBase.data,
+    qt_meta_data_QtWidgetBase,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtWidgetBase::metaObject() const
@@ -141,7 +146,7 @@ void QtWidgetBase::signalBackHome()
 // SIGNAL 1
 void QtWidgetBase::signalBtnClicked(int _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 struct qt_meta_stringdata_QtWidgetTitleBar_t {
@@ -168,7 +173,7 @@ QT_MOC_LITERAL(3, 32, 5) // "index"
 static const uint qt_meta_data_QtWidgetTitleBar[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        1,   14, // methods
@@ -190,7 +195,7 @@ static const uint qt_meta_data_QtWidgetTitleBar[] = {
 void QtWidgetTitleBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtWidgetTitleBar *_t = static_cast<QtWidgetTitleBar *>(_o);
+        auto *_t = static_cast<QtWidgetTitleBar *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltBtnClicked((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -199,10 +204,14 @@ void QtWidgetTitleBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtWidgetTitleBar::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_QtWidgetTitleBar.data,
-      qt_meta_data_QtWidgetTitleBar,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtWidgetTitleBar::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_QtWidgetTitleBar.data,
+    qt_meta_data_QtWidgetTitleBar,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtWidgetTitleBar::metaObject() const
@@ -259,7 +268,7 @@ QT_MOC_LITERAL(3, 43, 20) // "SltAnimationFinished"
 static const uint qt_meta_data_QtAnimationWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -287,7 +296,7 @@ static const uint qt_meta_data_QtAnimationWidget[] = {
 void QtAnimationWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QtAnimationWidget *_t = static_cast<QtAnimationWidget *>(_o);
+        auto *_t = static_cast<QtAnimationWidget *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signalAnimationFinished(); break;
@@ -307,10 +316,14 @@ void QtAnimationWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject QtAnimationWidget::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_QtAnimationWidget.data,
-      qt_meta_data_QtAnimationWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject QtAnimationWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_QtAnimationWidget.data,
+    qt_meta_data_QtAnimationWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *QtAnimationWidget::metaObject() const

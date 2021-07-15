@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'threadkey.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../App/threadkey.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'threadkey.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -48,7 +49,7 @@ QT_MOC_LITERAL(6, 52, 5) // "value"
 static const uint qt_meta_data_ThreadKey[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        2,   14, // methods
@@ -72,7 +73,7 @@ static const uint qt_meta_data_ThreadKey[] = {
 void ThreadKey::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        ThreadKey *_t = static_cast<ThreadKey *>(_o);
+        auto *_t = static_cast<ThreadKey *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltKeyPressed((*reinterpret_cast< const quint8(*)>(_a[1]))); break;
@@ -98,10 +99,14 @@ void ThreadKey::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject ThreadKey::staticMetaObject = {
-    { &QThread::staticMetaObject, qt_meta_stringdata_ThreadKey.data,
-      qt_meta_data_ThreadKey,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject ThreadKey::staticMetaObject = { {
+    QMetaObject::SuperData::link<QThread::staticMetaObject>(),
+    qt_meta_stringdata_ThreadKey.data,
+    qt_meta_data_ThreadKey,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *ThreadKey::metaObject() const
@@ -137,14 +142,14 @@ int ThreadKey::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void ThreadKey::SltKeyPressed(const quint8 & _t1)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void ThreadKey::signalKeyPressed(const quint8 & _t1, const quint8 & _t2)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 QT_WARNING_POP

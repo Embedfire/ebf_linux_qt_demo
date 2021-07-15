@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'gyroscope.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.11.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "../../Gyroscope/src/gyroscope.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'gyroscope.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.11.3. It"
+#error "This file was generated using the moc from 5.15.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -41,7 +42,7 @@ QT_MOC_LITERAL(0, 0, 15) // "TextBoardWidget"
 static const uint qt_meta_data_TextBoardWidget[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
@@ -62,10 +63,14 @@ void TextBoardWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     Q_UNUSED(_a);
 }
 
-QT_INIT_METAOBJECT const QMetaObject TextBoardWidget::staticMetaObject = {
-    { &QtWidgetBase::staticMetaObject, qt_meta_stringdata_TextBoardWidget.data,
-      qt_meta_data_TextBoardWidget,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject TextBoardWidget::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtWidgetBase::staticMetaObject>(),
+    qt_meta_stringdata_TextBoardWidget.data,
+    qt_meta_data_TextBoardWidget,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *TextBoardWidget::metaObject() const
@@ -114,7 +119,7 @@ QT_MOC_LITERAL(6, 51, 5) // "value"
 static const uint qt_meta_data_Gyroscope[] = {
 
  // content:
-       7,       // revision
+       8,       // revision
        0,       // classname
        0,    0, // classinfo
        3,   14, // methods
@@ -140,7 +145,7 @@ static const uint qt_meta_data_Gyroscope[] = {
 void Gyroscope::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        Gyroscope *_t = static_cast<Gyroscope *>(_o);
+        auto *_t = static_cast<Gyroscope *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->SltStartTest(); break;
@@ -151,10 +156,14 @@ void Gyroscope::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject Gyroscope::staticMetaObject = {
-    { &QtAnimationWidget::staticMetaObject, qt_meta_stringdata_Gyroscope.data,
-      qt_meta_data_Gyroscope,  qt_static_metacall, nullptr, nullptr}
-};
+QT_INIT_METAOBJECT const QMetaObject Gyroscope::staticMetaObject = { {
+    QMetaObject::SuperData::link<QtAnimationWidget::staticMetaObject>(),
+    qt_meta_stringdata_Gyroscope.data,
+    qt_meta_data_Gyroscope,
+    qt_static_metacall,
+    nullptr,
+    nullptr
+} };
 
 
 const QMetaObject *Gyroscope::metaObject() const
