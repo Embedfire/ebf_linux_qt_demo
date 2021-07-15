@@ -14,7 +14,10 @@
 #include "skin.h"
 #include "appconfig.h"
 
+#ifdef FFMPEG
 #include "musicplayer.h"
+#endif
+
 #include "beepwidget.h"
 #include "rgblightmonitor.h"
 #include "backlightwidget.h"
@@ -219,11 +222,13 @@ void MainWindow::SltCurrentAppChanged(int index)
     case 1: {
         if(CheckDevice("声卡"))
         {
+#ifdef FFMPEG
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
                 delete  m_musicWidget;
                 m_musicWidget=NULL;
             }
+#endif
             m_widgetWorkSpace = new VideoPlayer(this);
         }
     }
@@ -240,9 +245,11 @@ void MainWindow::SltCurrentAppChanged(int index)
     case 4: {
         if(CheckDevice("摄像头"))
         {
+#ifdef FFMPEG
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
             }
+#endif
             m_widgetWorkSpace = new CameraWidget(this);
             //m_widgetWorkSpace = new QtViewFinder(this);
         }
@@ -278,6 +285,7 @@ void MainWindow::SltCurrentAppChanged(int index)
         break;
     case 11: {
         //m_widgetWorkSpace = new MusicPlayer(this);
+#ifdef FFMPEG
         if(CheckDevice("声卡"))
         {
             m_nCurrentIndex = index;
@@ -292,7 +300,7 @@ void MainWindow::SltCurrentAppChanged(int index)
             m_musicWidget->StartAnimation(QPoint(this->width(), this->height()), QPoint(0, 0), 300, true);
             return;
         }
-
+#endif
     }
         break;
     case 12: {
@@ -352,12 +360,14 @@ void MainWindow::SltCurrentAppChanged(int index)
 
         if(CheckDevice("NES声卡"))
         {
+#ifdef FFMPEG
             // 关闭音乐
             if (NULL != m_musicWidget) {
                 m_musicWidget->StopMusic();
                 delete  m_musicWidget;
                 m_musicWidget=NULL;
             }
+#endif
 
         #ifdef BUILD_WIN_NES
                 m_widgetWorkSpace = new NesSimulator(this);
@@ -389,9 +399,11 @@ void MainWindow::SltBackHome()
     if (NULL != m_widgetWorkSpace) {
         m_widgetWorkSpace->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
     }
+#ifdef FFMPEG
     else if (NULL != m_musicWidget) {
         m_musicWidget->StartAnimation(QPoint(0, 0), QPoint(-this->width(), -this->height()), 300, false);
     }
+#endif
 }
 
 void MainWindow::SltChangeCursorShap(Qt::CursorShape shape)
@@ -404,9 +416,11 @@ void MainWindow::SltAppStartOk()
     m_bStartApp = false;
     m_launcherWidget->setEnabled(true);
     if (11 == m_nCurrentIndex) {
+#ifdef FFMPEG
         if (NULL != m_musicWidget && m_musicWidget->isVisible()) {
             m_musicWidget->InitPlayList();
         }
+#endif
     }
 
     if (19 == m_nCurrentIndex && (NULL != m_widgetWorkSpace) && !m_widgetWorkSpace->isVisible()) {
@@ -441,9 +455,12 @@ void MainWindow::resizeEvent(QResizeEvent *e)
         m_widgetWorkSpace->resize(this->size());
     }
 
+#ifdef FFMPEG
     if (NULL != m_musicWidget) {
         m_musicWidget->resize(this->size());
     }
+#endif
+
     QWidget::resizeEvent(e);
 }
 
